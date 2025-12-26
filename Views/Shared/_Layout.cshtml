@@ -1,49 +1,169 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SportBookingSystem</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SportBookingSystem.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - TQTSport</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- CSS Files -->
+
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SportBookingSystem</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+    <!-- Dropdown Overlay -->
+    <div class="dropdown-overlay" id="dropdownOverlay"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Logo -->
+            <a href="@Url.Action("Index", "Home")" class="logo">
+                <div class="logo-icon">⚽</div>
+                <span>SportHub</span>
+            </a>
+
+            <!-- Navigation Menu -->
+            <nav class="nav-menu">
+                <a href="@Url.Action("Index", "Home")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                    🏠 Trang chủ
+                </a>
+                <a href="@Url.Action("Index", "Fields")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
+                    🏟️ Đặt sân
+                </a>
+
+                <!-- Dịch Vụ Dropdown -->
+                <div class="dropdown" id="servicesDropdown">
+                    <button class="dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" || ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
+                        🛍️ Dịch vụ
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="@Url.Action("Index", "FoodDrinks")" class="dropdown-item">
+                            <span class="dropdown-item-icon">🍔</span>
+                            <span>Đồ Ăn & Thức Uống</span>
+                        </a>
+                        <a href="@Url.Action("Index", "Products")" class="dropdown-item">
+                            <span class="dropdown-item-icon">⚽</span>
+                            <span>Đồ Dùng Thể Thao</span>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="@Url.Action("Index", "History")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")">
+                    📜 Lịch sử
+                </a>
+            </nav>
+
+            <!-- Header Actions -->
+            <div class="header-actions">
+                <!-- Wallet Balance -->
+                <div class="wallet-balance" onclick="window.location.href='@Url.Action("Index", "Wallet")'">
+                    💰 <span>@(ViewBag.WalletBalance ?? "2,450,000₫")</span>
+                </div>
+
+                <!-- User Avatar Dropdown -->
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-avatar">
+                        @(ViewBag.UserInitials ?? "NV")
+                    </div>
+                    <div class="user-dropdown-menu">
+                        <!-- User Info -->
+                        <div class="user-dropdown-header">
+                            <div class="user-dropdown-name">@(ViewBag.UserName ?? "Nguyễn Văn A")</div>
+                            <div class="user-dropdown-email">@(ViewBag.UserEmail ?? "user@sporthub.vn")</div>
+                        </div>
+                        <!-- Menu Items -->
+                        <a href="@Url.Action("Profile", "Account")" class="user-dropdown-item">
+                            <span class="dropdown-item-icon">👤</span>
+                            <span>Thông tin cá nhân</span>
+                        </a>
+                        <a href="@Url.Action("Transactions", "History")" class="user-dropdown-item">
+                            <span class="dropdown-item-icon">📜</span>
+                            <span>Lịch sử giao dịch</span>
+                        </a>
+                        <a href="@Url.Action("Index", "Settings")" class="user-dropdown-item">
+                            <span class="dropdown-item-icon">⚙️</span>
+                            <span>Cài đặt</span>
+                        </a>
+                        <a href="@Url.Action("Logout", "Account")" class="user-dropdown-item danger">
+                            <span class="dropdown-item-icon">🚪</span>
+                            <span>Đăng xuất</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SportBookingSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        @RenderBody()
+    </main>
+
+    @*  <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Brand Column -->
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-icon" style="width: 40px; height: 40px; font-size: 20px;">⚽</div>
+                    <span>SportHub</span>
+                </div>
+                <p class="footer-desc">
+                    Nền tảng đặt sân thể thao trực tuyến hàng đầu Việt Nam.
+                    Đặt sân dễ dàng, thanh toán nhanh chóng, trải nghiệm tuyệt vời.
+                </p>
+            </div>
+
+            <!-- Products Column -->
+            <div class="footer-column">
+                <h4>Sản phẩm</h4>
+                <div class="footer-links">
+                    <a href="@Url.Action("Index", "Fields")" class="footer-link">Đặt sân bóng</a>
+                    <a href="@Url.Action("Index", "Wallet")" class="footer-link">Ví điện tử</a>
+                    <a href="@Url.Action("Index", "FoodDrinks")" class="footer-link">Đồ ăn & thức uống</a>
+                    <a href="@Url.Action("Index", "Products")" class="footer-link">Đồ dùng thể thao</a>
+                </div>
+            </div>
+
+            <!-- Support Column -->
+            <div class="footer-column">
+                <h4>Hỗ trợ</h4>
+                <div class="footer-links">
+                    <a href="@Url.Action("Help", "Support")" class="footer-link">Trung tâm trợ giúp</a>
+                    <a href="@Url.Action("Contact", "Support")" class="footer-link">Liên hệ</a>
+                    <a href="@Url.Action("Terms", "Legal")" class="footer-link">Điều khoản</a>
+                    <a href="@Url.Action("Privacy", "Legal")" class="footer-link">Chính sách</a>
+                </div>
+            </div>
+
+            <!-- Social Column -->
+            <div class="footer-column">
+                <h4>Kết nối</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link" target="_blank">Facebook</a>
+                    <a href="#" class="footer-link" target="_blank">Instagram</a>
+                    <a href="#" class="footer-link" target="_blank">Twitter</a>
+                    <a href="#" class="footer-link" target="_blank">YouTube</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            © @DateTime.Now.Year SportHub. All rights reserved. Made with ⚽ for football lovers.
+        </div>
+    </footer> *@
+    <script src="~/js/site.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
