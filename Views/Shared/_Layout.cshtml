@@ -3,13 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TQTSport</title>
+    <title>@ViewData["Title"] - SportHub</title>
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- CSS Files -->
-
     <link rel="stylesheet" href="~/css/site.css" />
 
     @await RenderSectionAsync("Styles", required: false)
@@ -18,16 +17,24 @@
     <!-- Dropdown Overlay -->
     <div class="dropdown-overlay" id="dropdownOverlay"></div>
 
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+
     <!-- Header -->
     <header class="header">
         <div class="header-container">
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                ☰
+            </button>
+
             <!-- Logo -->
             <a href="@Url.Action("Index", "Home")" class="logo">
                 <div class="logo-icon">⚽</div>
                 <span>SportHub</span>
             </a>
 
-            <!-- Navigation Menu -->
+            <!-- Desktop Navigation Menu -->
             <nav class="nav-menu">
                 <a href="@Url.Action("Index", "Home")"
                    class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
@@ -103,12 +110,90 @@
         </div>
     </header>
 
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav" id="mobileNav">
+        <!-- Mobile Nav Header -->
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <div class="logo-icon" style="width: 36px; height: 36px; font-size: 18px;">⚽</div>
+                <span style="font-size: 18px;">SportHub</span>
+            </div>
+            <button class="mobile-nav-close" id="mobileNavClose">✕</button>
+        </div>
+
+        <!-- Mobile Nav Links -->
+        <div class="mobile-nav-links">
+            <!-- Main Menu -->
+            <div class="mobile-nav-section">
+                <div class="mobile-nav-section-title">Menu Chính</div>
+                <a href="@Url.Action("Index", "Home")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
+                    <span>🏠</span>
+                    <span>Trang chủ</span>
+                </a>
+                <a href="@Url.Action("Index", "Fields")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
+                    <span>🏟️</span>
+                    <span>Đặt sân</span>
+                </a>
+                <a href="@Url.Action("Index", "History")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")">
+                    <span>📜</span>
+                    <span>Lịch sử</span>
+                </a>
+            </div>
+
+            <div class="mobile-nav-divider"></div>
+
+            <!-- Services -->
+            <div class="mobile-nav-section">
+                <div class="mobile-nav-section-title">Dịch Vụ</div>
+                <a href="@Url.Action("Index", "FoodDrinks")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" ? "active" : "")">
+                    <span>🍔</span>
+                    <span>Đồ ăn & thức uống</span>
+                </a>
+                <a href="@Url.Action("Index", "Products")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
+                    <span>⚽</span>
+                    <span>Đồ dùng thể thao</span>
+                </a>
+            </div>
+
+            <div class="mobile-nav-divider"></div>
+
+            <!-- Wallet -->
+            <div class="mobile-nav-section">
+                <div class="mobile-nav-section-title">Tài Khoản</div>
+                <a href="@Url.Action("Index", "Wallet")" class="mobile-nav-link">
+                    <span>💰</span>
+                    <span>Ví điện tử</span>
+                </a>
+                <a href="@Url.Action("Profile", "Account")" class="mobile-nav-link">
+                    <span>👤</span>
+                    <span>Thông tin cá nhân</span>
+                </a>
+                <a href="@Url.Action("Transactions", "History")" class="mobile-nav-link">
+                    <span>📜</span>
+                    <span>Lịch sử giao dịch</span>
+                </a>
+                <a href="@Url.Action("Index", "Settings")" class="mobile-nav-link">
+                    <span>⚙️</span>
+                    <span>Cài đặt</span>
+                </a>
+            </div>
+
+            <div class="mobile-nav-divider"></div>
+
+            <!-- Logout -->
+            <a href="@Url.Action("Logout", "Account")" class="mobile-nav-link" style="color: var(--danger);">
+                <span>🚪</span>
+                <span>Đăng xuất</span>
+            </a>
+        </div>
+    </nav>
+
     <!-- Main Content -->
     <main>
         @RenderBody()
     </main>
 
-    @*  <!-- Footer -->
+    @* <!-- Footer -->
     <footer class="footer">
         <div class="footer-container">
             <!-- Brand Column -->
@@ -162,8 +247,9 @@
             © @DateTime.Now.Year SportHub. All rights reserved. Made with ⚽ for football lovers.
         </div>
     </footer> *@
-    <script src="~/js/site.js"></script>
 
+    <!-- JavaScript -->
+    <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
