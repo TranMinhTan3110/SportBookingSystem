@@ -1,8 +1,518 @@
-﻿@* @{
-    ViewData["Title"] = "Home Page";
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/Home.css" />
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div> *@
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-background">
+        <img src="~/pic/hero-section-pic.png" class="hero-pic">
+    </div>
+    <div class="hero-content">
+        <h1>Đặt Sân Bóng<br>Dễ Dàng & Nhanh Chóng</h1>
+        <p>Hệ thống đặt sân thể thao trực tuyến hiện đại với thanh toán ví điện tử tiện lợi</p>
+        <div class="hero-actions">
+            <a href="#fields" class="btn btn-primary">🏟️ Đặt sân ngay</a>
+            <a href="#features" class="btn btn-secondary">🎯 Tìm hiểu thêm</a>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<div class="container">
+    <!-- Wallet & Quick Actions -->
+    <div class="wallet-section fade-in-up">
+        <div class="wallet-card">
+            <div class="wallet-header">
+                <div>
+                    <div class="wallet-title">Ví Điện Tử</div>
+                </div>
+                <div class="wallet-icon">💳</div>
+            </div>
+
+            <div class="wallet-balance-display">
+                <div class="balance-label">Số dư khả dụng</div>
+                <div class="balance-amount">2,450,000₫</div>
+            </div>
+
+            <div class="wallet-actions">
+                <button class="wallet-btn">➕ Nạp tiền</button>
+                <button class="wallet-btn">💸 Chuyển khoản</button>
+                <button class="wallet-btn">📊 Chi tiết</button>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h3 class="quick-actions-title">Thao tác nhanh</h3>
+            <div class="action-list">
+                <a href="#" class="action-item">
+                    <div class="action-icon">📅</div>
+                    <div class="action-text">
+                        <div class="action-title">Lịch đặt sân của tôi</div>
+                        <div class="action-desc">3 lịch sắp tới</div>
+                    </div>
+                    <span>→</span>
+                </a>
+
+                <a href="#" class="action-item">
+                    <div class="action-icon">🎁</div>
+                    <div class="action-text">
+                        <div class="action-title">Điểm thưởng</div>
+                        <div class="action-desc">1,250 điểm</div>
+                    </div>
+                    <span>→</span>
+                </a>
+
+                <a href="#" class="action-item">
+                    <div class="action-icon">⚙️</div>
+                    <div class="action-text">
+                        <div class="action-title">Cài đặt</div>
+                        <div class="action-desc">Quản lý tài khoản</div>
+                    </div>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fields Section -->
+    <section id="fields" class="fade-in-up delay-1">
+        <div class="section-header">
+            <div class="section-header-content">
+                <h2 class="section-title">🏟️ Chọn Sân Yêu Thích</h2>
+                <p class="section-subtitle">Đa dạng loại sân, giá cả hợp lý, đặt sân dễ dàng</p>
+            </div>
+            <a href="@Url.Action("Index", "Fields")" class="view-all-btn">
+                Xem tất cả →
+            </a>
+        </div>
+        <div class="fields-grid">
+            <!-- Field Card 1 -->
+            <div class="field-card">
+                <div class="field-image">
+                    <span class="field-badge">🌟 Phổ biến</span>
+                </div>
+                <div class="field-content">
+                    <div class="field-header">
+                        <div>
+                            <div class="field-name">Sân A1 - Premium</div>
+                            <div class="field-type">Sân 5 người</div>
+                        </div>
+                    </div>
+
+                    <div class="field-footer">
+                        <div class="field-price">
+                            <span class="price-label">Giá từ</span>
+                            <span class="price-value">300K/h</span>
+                        </div>
+                        <button class="btn-book">Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Field Card 2 -->
+            <div class="field-card">
+                <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">
+                    <span class="field-badge">🔥 Hot</span>
+                </div>
+                <div class="field-content">
+                    <div class="field-header">
+                        <div>
+                            <div class="field-name">Sân B3 - Standard</div>
+                            <div class="field-type">Sân 7 người</div>
+                        </div>
+                    </div>
+
+                    <div class="field-footer">
+                        <div class="field-price">
+                            <span class="price-label">Giá từ</span>
+                            <span class="price-value">450K/h</span>
+                        </div>
+                        <button class="btn-book">Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Field Card 3 -->
+            <div class="field-card">
+                <div class="field-image" style="background: linear-gradient(135deg, #8B5CF6, #EC4899);">
+                    <span class="field-badge">💎 VIP</span>
+                </div>
+                <div class="field-content">
+                    <div class="field-header">
+                        <div>
+                            <div class="field-name">Sân C2 - Deluxe</div>
+                            <div class="field-type">Sân 11 người</div>
+                        </div>
+                    </div>
+
+                    <div class="field-footer">
+                        <div class="field-price">
+                            <span class="price-label">Giá từ</span>
+                            <span class="price-value">800K/h</span>
+                        </div>
+                        <button class="btn-book">Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Field Card 4 -->
+            <div class="field-card">
+                <div class="field-image" style="background: linear-gradient(135deg, #06B6D4, #3B82F6);">
+                    <span class="field-badge">💰 Giá tốt</span>
+                </div>
+                <div class="field-content">
+                    <div class="field-header">
+                        <div>
+                            <div class="field-name">Sân A3 - Economy</div>
+                            <div class="field-type">Sân 5 người</div>
+                        </div>
+                    </div>
+
+                    <div class="field-footer">
+                        <div class="field-price">
+                            <span class="price-label">Giá từ</span>
+                            <span class="price-value">250K/h</span>
+                        </div>
+                        <button class="btn-book">Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Field Card 5 -->
+            <div class="field-card">
+                <div class="field-image" style="background: linear-gradient(135deg, #14B8A6, #10B981);">
+                    <span class="field-badge">🆕 Mới</span>
+                </div>
+                <div class="field-content">
+                    <div class="field-header">
+                        <div>
+                            <div class="field-name">Sân D1 - New</div>
+                            <div class="field-type">Sân 7 người</div>
+                        </div>
+                    </div>
+
+                    <div class="field-footer">
+                        <div class="field-price">
+                            <span class="price-label">Giá từ</span>
+                            <span class="price-value">400K/h</span>
+                        </div>
+                        <button class="btn-book">Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Field Card 6 -->
+            <div class="field-card">
+                <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #10B981);">
+                    <span class="field-badge">⭐ Top rated</span>
+                </div>
+                <div class="field-content">
+                    <div class="field-header">
+                        <div>
+                            <div class="field-name">Sân B1 - Premium</div>
+                            <div class="field-type">Sân 5 người</div>
+                        </div>
+                    </div>
+
+                    <div class="field-footer">
+                        <div class="field-price">
+                            <span class="price-label">Giá từ</span>
+                            <span class="price-value">350K/h</span>
+                        </div>
+                        <button class="btn-book">Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ĐỒ ĂN & THỨC UỐNG NỔI BẬT -->
+    <section id="food-drinks" class="products-section fade-in-up delay-2">
+        <div class="section-header">
+            <div class="section-header-content">
+                <h2 class="section-title">🍔 Đồ Ăn & Thức Uống Nổi Bật</h2>
+                <p class="section-subtitle">Gọi món giao tận sân, không lo gián đoạn trận đấu</p>
+            </div>
+            <a href="@Url.Action("Index", "FoodDrinks")" class="view-all-btn">
+                Xem tất cả →
+            </a>
+        </div>
+
+        <div class="products-grid">
+            <!-- Food Item 1 -->
+            <div class="product-card">
+                <div class="product-image food-bg-1">
+                    <span class="product-badge hot">🔥 Bán chạy</span>
+                    <div class="product-emoji">🍔</div>
+                </div>
+                <div class="product-content">
+                    <div class="product-header">
+                        <h3 class="product-name">Combo Burger Bò</h3>
+                    </div>
+                    <p class="product-desc">Burger bò + Khoai tây + Coca</p>
+
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Giá</span>
+                            <span class="price-value">85K</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart">
+                                🛒 Giỏ hàng
+                            </button>
+                            <button class="btn-buy-now">
+                                💳 Mua ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food Item 2 -->
+            <div class="product-card">
+                <div class="product-image food-bg-2">
+                    <span class="product-badge new">⭐ Mới</span>
+                    <div class="product-emoji">🍕</div>
+                </div>
+                <div class="product-content">
+                    <div class="product-header">
+                        <h3 class="product-name">Pizza Hải Sản</h3>
+                    </div>
+                    <p class="product-desc">Pizza size M, đế dày, nhiều topping</p>
+
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Giá</span>
+                            <span class="price-value">120K</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart">
+                                🛒 Giỏ hàng
+                            </button>
+                            <button class="btn-buy-now">
+                                💳 Mua ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Food Item 3 -->
+            <div class="product-card">
+                <div class="product-image food-bg-3">
+                    <span class="product-badge discount">💰 Giảm giá</span>
+                    <div class="product-emoji">🥤</div>
+                </div>
+                <div class="product-content">
+                    <div class="product-header">
+                        <h3 class="product-name">Trà Sữa Trân Châu</h3>
+                    </div>
+                    <p class="product-desc">Trà sữa size L, ít đường, nhiều topping</p>
+
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Giá</span>
+                            <span class="price-value">35K</span>
+                        </div>
+                        <div class="product-actions">
+                            <button class="btn-add-cart">
+                                🛒 Giỏ hàng
+                            </button>
+                            <button class="btn-buy-now">
+                                💳 Mua ngay
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ĐỒ DÙNG THỂ THAO NỔI BẬT -->
+    <section id="products" class="products-section fade-in-up delay-3">
+        <div class="section-header">
+            <div class="section-header-content">
+                <h2 class="section-title">⚽ Đồ Dùng Thể Thao Nổi Bật</h2>
+                <p class="section-subtitle">Trang bị chuyên nghiệp cho người chơi</p>
+            </div>
+            <a href="@Url.Action("Index", "Products")" class="view-all-btn">
+                Xem tất cả →
+            </a>
+        </div>
+
+        <div class="products-grid">
+            <!-- Product Item 1 -->
+            <div class="product-card">
+                <div class="product-image product-bg-1">
+                    <span class="product-badge hot">🔥 Hot</span>
+                    <div class="product-emoji">👟</div>
+                </div>
+                <div class="product-content">
+                    <div class="product-header">
+                        <h3 class="product-name">Giày Đá Bóng Nike</h3>
+                    </div>
+                    <p class="product-desc">Nike Mercurial Vapor 14, màu đen</p>
+
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Giá</span>
+                            <span class="price-value">1.2 tr</span>
+                        </div>
+                        <button class="btn-rent-now">
+                            🏃 Thuê ngay
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Item 2 -->
+            <div class="product-card">
+                <div class="product-image product-bg-2">
+                    <span class="product-badge popular">⭐ Phổ biến</span>
+                    <div class="product-emoji">👕</div>
+                </div>
+                <div class="product-content">
+                    <div class="product-header">
+                        <h3 class="product-name">Áo Đá Bóng Adidas</h3>
+                    </div>
+                    <p class="product-desc">Áo thể thao co giãn 4 chiều, thoáng mát</p>
+
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Giá</span>
+                            <span class="price-value">250K</span>
+                        </div>
+                        <button class="btn-rent-now">
+                            🏃 Thuê ngay
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Item 3 -->
+            <div class="product-card">
+                <div class="product-image product-bg-3">
+                    <span class="product-badge new">🆕 Mới về</span>
+                    <div class="product-emoji">🧤</div>
+                </div>
+                <div class="product-content">
+                    <div class="product-header">
+                        <h3 class="product-name">Găng Tay Thủ Môn</h3>
+                    </div>
+                    <p class="product-desc">Găng tay bắt bóng chống trượt, có khung bảo vệ</p>
+
+                    <div class="product-footer">
+                        <div class="product-price">
+                            <span class="price-label">Giá</span>
+                            <span class="price-value">350K</span>
+                        </div>
+                        <button class="btn-rent-now">
+                            🏃 Thuê ngay
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history" class="history-card fade-in-up delay-3">
+        <div class="history-header">
+            <h2 class="history-title">📜 Lịch Sử Giao Dịch Gần Đây</h2>
+            <button class="btn btn-secondary">Xem tất cả</button>
+        </div>
+
+        <div class="history-list">
+            <div class="history-item">
+                <div class="history-icon">🏟️</div>
+                <div class="history-details">
+                    <div class="history-item-title">Đặt Sân A1 - Premium</div>
+                    <div class="history-item-date">20/12/2024 14:30 • 2 giờ</div>
+                </div>
+                <div class="history-amount negative">-600,000₫</div>
+                <span class="history-status success">Hoàn thành</span>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🍔</div>
+                <div class="history-details">
+                    <div class="history-item-title">Đơn Canteen #456</div>
+                    <div class="history-item-date">20/12/2024 15:00</div>
+                </div>
+                <div class="history-amount negative">-85,000₫</div>
+                <span class="history-status success">Hoàn thành</span>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">💰</div>
+                <div class="history-details">
+                    <div class="history-item-title">Nạp tiền vào ví</div>
+                    <div class="history-item-date">19/12/2024 10:20</div>
+                </div>
+                <div class="history-amount positive">+2,000,000₫</div>
+                <span class="history-status success">Thành công</span>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🏟️</div>
+                <div class="history-details">
+                    <div class="history-item-title">Đặt Sân B3 - Standard</div>
+                    <div class="history-item-date">18/12/2024 18:00 • 1.5 giờ</div>
+                </div>
+                <div class="history-amount negative">-675,000₫</div>
+                <span class="history-status success">Hoàn thành</span>
+            </div>
+
+            <div class="history-item">
+                <div class="history-icon">🎁</div>
+                <div class="history-details">
+                    <div class="history-item-title">Nhận điểm thưởng</div>
+                    <div class="history-item-date">18/12/2024 19:30</div>
+                </div>
+                <div class="history-amount positive">+150 điểm</div>
+                <span class="history-status success">Đã cộng</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features-section fade-in-up delay-2">
+        <div class="section-header" style="text-align: center;">
+            <h2 class="section-title">🎯 Tại Sao Chọn SportHub?</h2>
+            <p class="section-subtitle">Trải nghiệm đặt sân hiện đại với nhiều tiện ích vượt trội</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Đặt Sân Nhanh Chóng</h3>
+                <p class="feature-desc">Chỉ 3 bước đơn giản, đặt sân trong vòng 30 giây</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">💳</div>
+                <h3 class="feature-title">Thanh Toán Linh Hoạt</h3>
+                <p class="feature-desc">Ví điện tử, chuyển khoản, thẻ tín dụng - đa dạng phương thức</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">🎁</div>
+                <h3 class="feature-title">Tích Điểm Thưởng</h3>
+                <p class="feature-desc">Tích điểm mỗi lần đặt sân, đổi quà hấp dẫn</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="feature-icon">🍔</div>
+                <h3 class="feature-title">Canteen Tiện Lợi</h3>
+                <p class="feature-desc">Đặt đồ ăn uống giao tận sân, không lo gián đoạn</p>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/Home.js"></script>
+}
