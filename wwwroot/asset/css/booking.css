@@ -711,3 +711,52 @@
         font-size: 1rem;
     }
 }
+/* Tùy chỉnh phần nút bấm mới */
+.filter-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.filter-clear-btn {
+    padding: 10px;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .filter-clear-btn:hover {
+        background: #ef4444; /* Màu đỏ nhạt khi muốn xóa */
+        color: white;
+        border-color: #ef4444;
+    }
+
+.filter-submit-btn {
+    padding: 10px;
+    background: var(--primary);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .filter-submit-btn:hover {
+        background: var(--primary-dark);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+/* Ẩn class cũ nếu không dùng đến nữa */
+.filter-clear {
+    display: none;
+}

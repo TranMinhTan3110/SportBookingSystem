@@ -1,5 +1,5 @@
 ﻿@section Styles {
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    @* <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> *@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/asset/css/booking.css" />
 }
@@ -22,7 +22,6 @@
         <div class="filter-card">
             <div class="filter-header">
                 <h3 class="filter-title">🔍 Bộ Lọc</h3>
-                <span class="filter-clear">Xóa tất cả</span>
             </div>
 
             <!-- Date Filter -->
@@ -143,6 +142,10 @@
                         <div class="price-slider-fill"></div>
                     </div>
                 </div>
+            </div>
+            <div class="filter-actions">
+                <button type="button" class="filter-submit-btn">Lọc</button>
+                <button type="button" class="filter-clear-btn">Làm mới</button>
             </div>
         </div>
     </aside>
@@ -378,8 +381,8 @@
 
             <!-- Field Card 6 -->
             <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
-                    <span class="field-status-badge available">✓ Còn trống</span>
+                <div class="field-image" style="background: linear-gradient(135deg, #EF4444, #991B1B);">
+                    <span class="field-status-badge booked">✕ Đã hết sân</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -400,19 +403,19 @@
                             <span class="pricing-type">Giá đặt sân full</span>
                             <span class="pricing-value">350,000₫</span>
                         </div>
-                        <div class="deposit-note">
-                            * Đặt cọc: Thanh toán 30% trước, còn lại trả khi đến sân
+                        <div class="deposit-note" style="color: #ef4444; font-weight: bold;">
+                            * Hiện tại khung giờ này đã được đặt kín.
                         </div>
                     </div>
 
                     <div class="field-actions">
-                        <button class="btn-deposit">
+                        <button class="btn-deposit" style="opacity: 0.5; cursor: not-allowed;" disabled>
                             <span class="btn-icon">💳</span>
                             <span>Đặt cọc</span>
                         </button>
-                        <button class="btn-book">
-                            <span class="btn-icon">✓</span>
-                            <span>Đặt sân</span>
+                        <button class="btn-book" style="background: #94a3b8; cursor: not-allowed;" disabled>
+                            <span class="btn-icon">✕</span>
+                            <span>Hết chỗ</span>
                         </button>
                     </div>
                 </div>
@@ -420,66 +423,84 @@
         </div>
     </section>
 </div>
+@section Scripts {
+    @* <script src="~/js/site.js"></script> *@
+    <script>
+        // Set today's date as default
+        const dateInput = document.getElementById('bookingDate');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
 
-<script>
-    // Set today's date as default
-    const dateInput = document.getElementById('bookingDate');
-    const today = new Date().toISOString().split('T')[0];
-    dateInput.value = today;
-
-    // Time slot selection
-    document.querySelectorAll('.time-slot').forEach(slot => {
-        slot.addEventListener('click', function () {
-            if (!this.classList.contains('booked')) {
-                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                this.classList.add('selected');
-            }
-        });
-    });
-
-    // Filter clear
-    document.querySelector('.filter-clear').addEventListener('click', function () {
-        document.querySelectorAll('.filter-option input').forEach(checkbox => {
-            checkbox.checked = false;
-        });
+        // Time slot selection
         document.querySelectorAll('.time-slot').forEach(slot => {
-            slot.classList.remove('selected');
+            slot.addEventListener('click', function () {
+                if (!this.classList.contains('booked')) {
+                    document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                    this.classList.add('selected');
+                }
+            });
         });
-    });
 
-    // Deposit button
-    document.querySelectorAll('.btn-deposit').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const fieldName = this.closest('.field-card').querySelector('.field-name').textContent;
-            const depositPrice = this.closest('.field-card').querySelector('.pricing-row:first-child .pricing-value').textContent;
-
-            if (confirm(`Xác nhận đặt cọc ${depositPrice} cho ${fieldName}?`)) {
-                alert(`Đang chuyển đến trang thanh toán đặt cọc...\nSân: ${fieldName}\nSố tiền: ${depositPrice}`);
-            }
+        // Filter clear
+        document.querySelector('.filter-clear').addEventListener('click', function () {
+            document.querySelectorAll('.filter-option input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
         });
-    });
 
-    // Book button
-    document.querySelectorAll('.btn-book').forEach(btn => {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            const fieldName = this.closest('.field-card').querySelector('.field-name').textContent;
-            const fullPrice = this.closest('.field-card').querySelector('.pricing-row:last-child .pricing-value').textContent;
+        // Deposit button
+        document.querySelectorAll('.btn-deposit').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const fieldName = this.closest('.field-card').querySelector('.field-name').textContent;
+                const depositPrice = this.closest('.field-card').querySelector('.pricing-row:first-child .pricing-value').textContent;
 
-            if (confirm(`Xác nhận đặt sân và thanh toán full ${fullPrice} cho ${fieldName}?`)) {
-                alert(`Đang chuyển đến trang thanh toán...\nSân: ${fieldName}\nSố tiền: ${fullPrice}`);
-            }
+                if (confirm(`Xác nhận đặt cọc ${depositPrice} cho ${fieldName}?`)) {
+                    alert(`Đang chuyển đến trang thanh toán đặt cọc...\nSân: ${fieldName}\nSố tiền: ${depositPrice}`);
+                }
+            });
         });
-    });
 
-    // Field card click
-    document.querySelectorAll('.field-card').forEach(card => {
-        card.addEventListener('click', function (e) {
-            if (!e.target.closest('button')) {
-                const fieldName = this.querySelector('.field-name').textContent;
-                alert(`Xem chi tiết: ${fieldName}`);
-            }
+        // Book button
+        document.querySelectorAll('.btn-book').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                const fieldName = this.closest('.field-card').querySelector('.field-name').textContent;
+                const fullPrice = this.closest('.field-card').querySelector('.pricing-row:last-child .pricing-value').textContent;
+
+                if (confirm(`Xác nhận đặt sân và thanh toán full ${fullPrice} cho ${fieldName}?`)) {
+                    alert(`Đang chuyển đến trang thanh toán...\nSân: ${fieldName}\nSố tiền: ${fullPrice}`);
+                }
+            });
         });
-    });
-</script>
+
+        // Field card click
+        document.querySelectorAll('.field-card').forEach(card => {
+            card.addEventListener('click', function (e) {
+                if (!e.target.closest('button')) {
+                    const fieldName = this.querySelector('.field-name').textContent;
+                    alert(`Xem chi tiết: ${fieldName}`);
+                }
+            });
+        });
+                // Cập nhật Filter clear cho nút mới
+        document.querySelector('.filter-clear-btn').addEventListener('click', function () {
+            document.querySelectorAll('.filter-option input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            // Reset thêm các input khác nếu cần
+            document.getElementById('bookingDate').value = today;
+        });
+
+        // Sự kiện cho nút Lọc
+        document.querySelector('.filter-submit-btn').addEventListener('click', function() {
+            alert('Đang thực hiện lọc dữ liệu...');
+        });
+    </script>
+}
