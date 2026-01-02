@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- CSS Files -->
+
     <link rel="stylesheet" href="~/css/site.css" />
 
     @await RenderSectionAsync("Styles", required: false)
@@ -47,7 +48,7 @@
 
                 <!-- Dịch Vụ Dropdown -->
                 <div class="dropdown" id="servicesDropdown">
-                    <button class="dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" || ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
+                    <button type="button" class="dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" || ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")" >
                         🛍️ Dịch vụ
                         <span class="dropdown-arrow">▼</span>
                     </button>
