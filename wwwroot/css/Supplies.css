@@ -289,7 +289,7 @@
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 8px;
-    color: var(--primary); /* Sử dụng biến từ layout chung */
+    color: var(--primary); 
 }
 
 .product-name {
@@ -309,16 +309,14 @@
 .product-price {
     font-size: 1.25rem;
     font-weight: 700;
-    color: var(--primary); /* Sử dụng biến từ layout chung */
+    color: var(--primary);
 }
 
 .btn-contain {
     margin-top: auto;
 }
 
-/* ============================================
-   RESPONSIVE (Dành riêng cho trang này)
-   ============================================ */
+
 
 /* Tablet & Smaller Desktop */
 @media (max-width: 992px) {
@@ -360,7 +358,7 @@
    FIX DROPDOWN - OVERRIDE BOOTSTRAP
    ============================================ */
 
-/* Force remove Bootstrap dropdown behavior */
+
 .header .dropdown-toggle::after {
     content: none !important;
     display: none !important;
@@ -372,7 +370,7 @@
     box-shadow: none !important;
 }
 
-/* Force dropdown menu to use custom behavior */
+
 .header .dropdown-menu {
     display: block !important;
     opacity: 0;
@@ -395,7 +393,7 @@
     pointer-events: auto !important;
 }
 
-/* Fix dropdown items */
+
 .header .dropdown-item {
     display: flex !important;
     align-items: center;
@@ -416,7 +414,7 @@
         padding-left: 20px;
     }
 
-/* Fix user dropdown */
+
 .header .user-dropdown-menu {
     display: block !important;
     opacity: 0;
