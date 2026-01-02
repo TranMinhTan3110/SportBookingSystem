@@ -1,0 +1,269 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" />
+}
+
+<!-- Main Content -->
+<div class="dashboard-container">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon money">💰</div>
+                <div class="stat-trend up">
+                    <span>↗</span>
+                    <span>+12.5%</span>
+                </div>
+            </div>
+            <div class="stat-value">52,450,000₫</div>
+            <div class="stat-label">Doanh thu hôm nay</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon booking">📅</div>
+                <div class="stat-trend up">
+                    <span>↗</span>
+                    <span>+8.2%</span>
+                </div>
+            </div>
+            <div class="stat-value">48</div>
+            <div class="stat-label">Lượt đặt sân hôm nay</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon field">🏟️</div>
+                <div class="stat-trend up">
+                    <span>↗</span>
+                    <span>+15%</span>
+                </div>
+            </div>
+            <div class="stat-value">32/40</div>
+            <div class="stat-label">Sân đang hoạt động</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-header">
+                <div class="stat-icon users">👥</div>
+                <div class="stat-trend up">
+                    <span>↗</span>
+                    <span>+5.7%</span>
+                </div>
+            </div>
+            <div class="stat-value">1,245</div>
+            <div class="stat-label">Khách hàng tích cực</div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Revenue Chart -->
+        <div class="card chart-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span class="card-title-icon">📈</span>
+                    Doanh thu 7 ngày qua
+                </h3>
+                <button class="card-action">Xem chi tiết</button>
+            </div>
+            <div class="chartjs-container">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card activity-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span class="card-title-icon"></span>
+                </h3>
+            </div>
+            <div class="activity-list">
+                @* <div class="activity-item">
+                    <div class="activity-icon booking">📅</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Đặt sân mới - Sân 5A</div>
+                        <div class="activity-time">2 phút trước</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon money">💳</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Thanh toán 1,200,000₫</div>
+                        <div class="activity-time">15 phút trước</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon users">👤</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Khách hàng mới đăng ký</div>
+                        <div class="activity-time">1 giờ trước</div>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon food">🍔</div>
+                    <div class="activity-content">
+                        <div class="activity-title">Đơn canteen #523</div>
+                        <div class="activity-time">2 giờ trước</div>
+                    </div>
+                </div> *@
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Bookings -->
+    <div class="card bookings-card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <span class="card-title-icon">📋</span>
+                Lịch đặt sân hôm nay
+            </h3>
+            <button class="card-action">Xem tất cả</button>
+        </div>
+        <div class="bookings-list">
+            <div class="booking-item">
+                <div class="booking-time">
+                    <div class="booking-hour">14:00</div>
+                    <div class="booking-date">Hôm nay</div>
+                </div>
+                <div class="booking-info">
+                    <div class="booking-field">Sân 5 người - Sân A1</div>
+                    <div class="booking-customer">
+                        <span>👤</span>
+                        <span>Nguyễn Văn A</span>
+                    </div>
+                </div>
+                <span class="booking-status confirmed">Đã xác nhận</span>
+            </div>
+
+            <div class="booking-item">
+                <div class="booking-time">
+                    <div class="booking-hour">16:00</div>
+                    <div class="booking-date">Hôm nay</div>
+                </div>
+                <div class="booking-info">
+                    <div class="booking-field">Sân 7 người - Sân B3</div>
+                    <div class="booking-customer">
+                        <span>👤</span>
+                        <span>Trần Thị B</span>
+                    </div>
+                </div>
+                <span class="booking-status pending">Chờ thanh toán</span>
+            </div>
+
+            <div class="booking-item">
+                <div class="booking-time">
+                    <div class="booking-hour">18:00</div>
+                    <div class="booking-date">Hôm nay</div>
+                </div>
+                <div class="booking-info">
+                    <div class="booking-field">Sân 11 người - Sân C2</div>
+                    <div class="booking-customer">
+                        <span>👤</span>
+                        <span>Lê Văn C</span>
+                    </div>
+                </div>
+                <span class="booking-status confirmed">Đã xác nhận</span>
+            </div>
+
+            <div class="booking-item">
+                <div class="booking-time">
+                    <div class="booking-hour">20:00</div>
+                    <div class="booking-date">Hôm nay</div>
+                </div>
+                <div class="booking-info">
+                    <div class="booking-field">Sân 5 người - Sân A3</div>
+                    <div class="booking-customer">
+                        <span>👤</span>
+                        <span>Phạm Thị D</span>
+                    </div>
+                </div>
+                <span class="booking-status completed">Hoàn thành</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="bottom-grid">
+        <!-- Top Fields -->
+        <div class="card top-fields-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span class="card-title-icon">🏆</span>
+                    Top sân được đặt nhiều nhất
+                </h3>
+            </div>
+            <div class="top-fields-list">
+                <div class="field-item">
+                    <div class="field-rank gold">1</div>
+                    <div class="field-details">
+                        <div class="field-name">Sân 5 người - A1</div>
+                        <div class="field-bookings">248 lượt đặt tháng này</div>
+                    </div>
+                    <div class="field-revenue">24.8M₫</div>
+                </div>
+
+                <div class="field-item">
+                    <div class="field-rank silver">2</div>
+                    <div class="field-details">
+                        <div class="field-name">Sân 7 người - B3</div>
+                        <div class="field-bookings">196 lượt đặt tháng này</div>
+                    </div>
+                    <div class="field-revenue">21.6M₫</div>
+                </div>
+
+                <div class="field-item">
+                    <div class="field-rank bronze">3</div>
+                    <div class="field-details">
+                        <div class="field-name">Sân 11 người - C2</div>
+                        <div class="field-bookings">175 lượt đặt tháng này</div>
+                    </div>
+                    <div class="field-revenue">26.5M₫</div>
+                </div>
+
+                <div class="field-item">
+                    <div class="field-rank">4</div>
+                    <div class="field-details">
+                        <div class="field-name">Sân 5 người - A2</div>
+                        <div class="field-bookings">162 lượt đặt tháng này</div>
+                    </div>
+                    <div class="field-revenue">16.2M₫</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card quick-actions-card">
+            <div class="card-header">
+                <h3 class="card-title">
+                    <span class="card-title-icon">⚡</span>
+                    Thao tác nhanh
+                </h3>
+            </div>
+            <div class="quick-actions">
+                <a href="#" class="action-btn">
+                    <div class="action-icon add">➕</div>
+                    <div class="action-label">Thêm đặt sân mới</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="action-icon field">🏟️</div>
+                    <div class="action-label">Quản lý sân</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="action-icon users">👥</div>
+                    <div class="action-label">Danh sách khách hàng</div>
+                </a>
+                <a href="#" class="action-btn">
+                    <div class="action-icon report">📊</div>
+                    <div class="action-label">Báo cáo chi tiết</div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/dashboard.js"></script>
+}
