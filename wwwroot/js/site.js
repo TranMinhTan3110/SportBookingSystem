@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const toggle = servicesDropdown.querySelector('.dropdown-toggle');
 
         toggle.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
             const isOpen = servicesDropdown.classList.contains('open');
 
