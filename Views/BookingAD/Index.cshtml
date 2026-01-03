@@ -1,0 +1,482 @@
+﻿@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/asset/css/bookingAD.css" />
+}
+@{
+    ViewData["Title"] = "Quản Lý Sân";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+
+<div class="fields-management">
+    <!-- Header Actions -->
+    <div class="page-header">
+        <div class="header-title">
+            <h2>Quản Lý Sân</h2>
+            <p class="subtitle">Quản lý thông tin và trạng thái các sân thể thao</p>
+        </div>
+        <button class="btn-add-field" data-bs-toggle="modal" data-bs-target="#addFieldModal">
+            <i class="fas fa-plus"></i> Thêm Sân Mới
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filter-group">
+            <label>LOẠI SÂN</label>
+            <select class="form-select filter-select">
+                <option value="">Tất cả</option>
+                <option value="football">⚽ Bóng đá</option>
+                <option value="tennis">🎾 Tennis</option>
+                <option value="volleyball">🏐 Bóng chuyền</option>
+                <option value="badminton">🏸 Cầu lông</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>TRẠNG THÁI</label>
+            <select class="form-select filter-select">
+                <option value="">Tất cả</option>
+                <option value="active">Hoạt động</option>
+                <option value="maintenance">Bảo trì</option>
+                <option value="inactive">Ngưng hoạt động</option>
+            </select>
+        </div>
+
+        <div class="filter-group search-group">
+            <label>TÌM KIẾM</label>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" class="form-control search-input" placeholder="Tìm theo tên sân..." style="padding-left:48px">
+            </div>
+        </div>
+    </div>
+
+    <!-- Fields Grid -->
+    <div class="fields-grid">
+        <!-- Field Card 1 -->
+        <div class="field-card">
+            <div class="field-image">
+                <img src="~/asset/images/football-field.jpg" alt="Sân 5 người - A1" onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text=⚽'">
+                <span class="badge-status badge-active">HOẠT ĐỘNG</span>
+            </div>
+            <div class="field-content">
+                <div class="field-header">
+                    <h3 class="field-name">Sân 5 người - A1</h3>
+                    <div class="field-actions">
+                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="field-type">
+                    <span class="sport-icon">⚽</span>
+                    <span>Bóng đá</span>
+                </div>
+                <div class="field-info">
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Giá thuê</span>
+                            <span class="info-value price">200,000đ/giờ</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kích thước</span>
+                            <span class="info-value">25m x 15m</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Đặt trong tháng</span>
+                            <span class="info-value">248 lượt</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Doanh thu</span>
+                            <span class="info-value revenue">24.8tr</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field Card 2 -->
+        <div class="field-card">
+            <div class="field-image">
+                <img src="~/asset/images/tennis-field.jpg" alt="Sân Tennis - T1" onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text=🎾'">
+                <span class="badge-status badge-active">HOẠT ĐỘNG</span>
+            </div>
+            <div class="field-content">
+                <div class="field-header">
+                    <h3 class="field-name">Sân Tennis - T1</h3>
+                    <div class="field-actions">
+                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="field-type">
+                    <span class="sport-icon">🎾</span>
+                    <span>Tennis</span>
+                </div>
+                <div class="field-info">
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Giá thuê</span>
+                            <span class="info-value price">150,000đ/giờ</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kích thước</span>
+                            <span class="info-value">23.8m x 10.9m</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Đặt trong tháng</span>
+                            <span class="info-value">186 lượt</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Doanh thu</span>
+                            <span class="info-value revenue">18.6tr</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field Card 3 -->
+        <div class="field-card">
+            <div class="field-image">
+                <img src="~/asset/images/football-field2.jpg" alt="Sân 7 người - A2" onerror="this.src='https://via.placeholder.com/400x250/1E293B/F59E0B?text=⚽'">
+                <span class="badge-status badge-maintenance">BẢO TRÌ</span>
+            </div>
+            <div class="field-content">
+                <div class="field-header">
+                    <h3 class="field-name">Sân 7 người - A2</h3>
+                    <div class="field-actions">
+                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="field-type">
+                    <span class="sport-icon">⚽</span>
+                    <span>Bóng đá</span>
+                </div>
+                <div class="field-info">
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Giá thuê</span>
+                            <span class="info-value price">300,000đ/giờ</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kích thước</span>
+                            <span class="info-value">35m x 25m</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Đặt trong tháng</span>
+                            <span class="info-value">0 lượt</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Doanh thu</span>
+                            <span class="info-value revenue">0đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Field Card 4 -->
+        <div class="field-card">
+            <div class="field-image">
+                <img src="~/asset/images/volleyball-field.jpg" alt="Sân Bóng chuyền - V1" onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text=🏐'">
+                <span class="badge-status badge-active">HOẠT ĐỘNG</span>
+            </div>
+            <div class="field-content">
+                <div class="field-header">
+                    <h3 class="field-name">Sân Bóng chuyền - V1</h3>
+                    <div class="field-actions">
+                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-icon btn-delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="field-type">
+                    <span class="sport-icon">🏐</span>
+                    <span>Bóng chuyền</span>
+                </div>
+                <div class="field-info">
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Giá thuê</span>
+                            <span class="info-value price">180,000đ/giờ</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Kích thước</span>
+                            <span class="info-value">18m x 9m</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-item">
+                            <span class="info-label">Đặt trong tháng</span>
+                            <span class="info-value">142 lượt</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Doanh thu</span>
+                            <span class="info-value revenue">12.4tr</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Field Modal -->
+<div class="modal fade" id="addFieldModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thêm Sân Mới</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addFieldForm">
+                    <div class="form-group">
+                        <label>Tên Sân <span class="required">*</span></label>
+                        <input type="text" class="form-control" placeholder="Ví dụ: Sân 5 người - A1" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Loại Sân <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="">Chọn loại sân</option>
+                                    <option value="football">⚽ Bóng đá</option>
+                                    <option value="tennis">🎾 Tennis</option>
+                                    <option value="volleyball">🏐 Bóng chuyền</option>
+                                    <option value="badminton">🏸 Cầu lông</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Trạng Thái <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="active">Hoạt động</option>
+                                    <option value="maintenance">Bảo trì</option>
+                                    <option value="inactive">Ngưng hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Giá Thuê / Giờ (VND) <span class="required">*</span></label>
+                                <input type="number" class="form-control" placeholder="200000" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Giá Đặt Cọc (VND) <span class="required">*</span></label>
+                                <input type="number" class="form-control" placeholder="100000" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Chiều Dài (m)</label>
+                                <input type="number" class="form-control" placeholder="25">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Chiều Rộng (m)</label>
+                                <input type="number" class="form-control" placeholder="15">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ảnh Sân</label>
+                        <div class="image-upload-area">
+                            <input type="file" id="fieldImageInput" accept="image/*" multiple class="d-none">
+                            <div class="upload-placeholder" onclick="document.getElementById('fieldImageInput').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Nhấn để tải ảnh lên</p>
+                                <small>Chấp nhận: JPG, PNG, GIF (Tối đa 5MB mỗi ảnh)</small>
+                            </div>
+                            <div id="imagePreviewContainer" class="image-preview-container"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="submit" form="addFieldForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu Thông Tin
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Field Modal -->
+<div class="modal fade" id="editFieldModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cập Nhật Thông Tin Sân</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editFieldForm">
+                    <div class="form-group">
+                        <label>Tên Sân <span class="required">*</span></label>
+                        <input type="text" class="form-control" value="Sân 5 người - A1" required>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Loại Sân <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="football" selected>⚽ Bóng đá</option>
+                                    <option value="tennis">🎾 Tennis</option>
+                                    <option value="volleyball">🏐 Bóng chuyền</option>
+                                    <option value="badminton">🏸 Cầu lông</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Trạng Thái <span class="required">*</span></label>
+                                <select class="form-select" required>
+                                    <option value="active" selected>Hoạt động</option>
+                                    <option value="maintenance">Bảo trì</option>
+                                    <option value="inactive">Ngưng hoạt động</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Giá Thuê / Giờ (VND) <span class="required">*</span></label>
+                                <input type="number" class="form-control" value="200000" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Giá Đặt Cọc (VND) <span class="required">*</span></label>
+                                <input type="number" class="form-control" value="100000" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Chiều Dài (m)</label>
+                                <input type="number" class="form-control" value="25">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Chiều Rộng (m)</label>
+                                <input type="number" class="form-control" value="15">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ảnh Sân</label>
+                        <div class="image-upload-area">
+                            <input type="file" id="editFieldImageInput" accept="image/*" multiple class="d-none">
+                            <div class="current-images">
+                                <div class="image-item">
+                                    <img src="https://via.placeholder.com/150/1E293B/10B981?text=⚽" alt="Current">
+                                    <button type="button" class="btn-remove-image">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="upload-placeholder small" onclick="document.getElementById('editFieldImageInput').click()">
+                                <i class="fas fa-plus"></i>
+                                <p>Thêm ảnh mới</p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="submit" form="editFieldForm" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Lưu Thông Tin
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Image upload preview
+        document.getElementById('fieldImageInput')?.addEventListener('change', function(e) {
+            const container = document.getElementById('imagePreviewContainer');
+            container.innerHTML = '';
+
+            Array.from(e.target.files).forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const div = document.createElement('div');
+                    div.className = 'image-item';
+                    div.innerHTML = `
+                        <img src="${event.target.result}" alt="Preview ${index + 1}">
+                        <button type="button" class="btn-remove-image" onclick="this.parentElement.remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    container.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Delete confirmation
+        document.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', function() {
+                if (confirm('Bạn có chắc chắn muốn xóa sân này?')) {
+                    // Handle delete
+                    console.log('Delete field');
+                }
+            });
+        });
+
+        // Filter functionality
+        document.querySelectorAll('.filter-select, .search-input').forEach(input => {
+            input.addEventListener('change', function() {
+                // Handle filtering
+                console.log('Filter changed');
+            });
+        });
+    </script>
+}
