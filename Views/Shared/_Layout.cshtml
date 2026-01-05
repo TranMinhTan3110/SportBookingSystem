@@ -4,11 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SportHub</title>
-
+   
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
     <!-- CSS Files -->
+
     <link rel="stylesheet" href="~/css/site.css" />
 
     @await RenderSectionAsync("Styles", required: false)
@@ -47,7 +48,7 @@
 
                 <!-- Dịch Vụ Dropdown -->
                 <div class="dropdown" id="servicesDropdown">
-                    <button class="dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" || ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
+                    <button type="button" class="dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" || ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")" >
                         🛍️ Dịch vụ
                         <span class="dropdown-arrow">▼</span>
                     </button>
@@ -56,7 +57,7 @@
                             <span class="dropdown-item-icon">🍔</span>
                             <span>Đồ Ăn & Thức Uống</span>
                         </a>
-                        <a href="@Url.Action("Index", "Products")" class="dropdown-item">
+                        <a href="@Url.Action("Index", "Supplies")" class="dropdown-item">
                             <span class="dropdown-item-icon">⚽</span>
                             <span>Đồ Dùng Thể Thao</span>
                         </a>
