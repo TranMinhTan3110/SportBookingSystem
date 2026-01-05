@@ -1,0 +1,451 @@
+﻿/* ==========================================
+   SPORTS BOOKING AUTHENTICATION STYLES
+   Modern Glassmorphism Design
+   ========================================== */
+
+/* ========== CSS VARIABLES ========== */
+:root {
+    --primary-green: #28a745;
+    --neon-green: #00ff88;
+    --dark-navy: #0a1929;
+    --dark-overlay: rgba(10, 25, 41, 0.85);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.7);
+    --input-bg: rgba(255, 255, 255, 0.08);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* ========== GLOBAL STYLES ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ========== BACKGROUND SETUP ========== */
+.auth-container {
+    position: relative;
+    min-height: 100vh;
+    background-image: url("https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?q=80&w=2000");
+    /* background-color: #0a1929; */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+    /* Dark Overlay */
+    .auth-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--dark-overlay);
+        backdrop-filter: blur(3px);
+        z-index: 1;
+    }
+
+    /* Container positioning */
+    .auth-container > .container {
+        position: relative;
+        z-index: 2;
+    }
+
+/* ========== BRAND / LOGO ========== */
+.brand-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-green), var(--neon-green));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 10px 30px rgba(40, 167, 69, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(40, 167, 69, 0.6);
+    }
+}
+
+.brand-title {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.brand-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 400;
+}
+
+/* ========== GLASSMORPHISM CARD ========== */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.glass-card:hover {
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* ========== FORM ELEMENTS ========== */
+.form-title {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.8rem;
+    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.form-label {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Input Group Styling */
+.input-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-green);
+    font-size: 1.1rem;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.glass-input {
+    background: var(--input-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 1rem !important;
+    color: var(--text-primary) !important;
+    padding: 12px 15px 12px 45px !important;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+    .glass-input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .glass-input:focus {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: var(--primary-green) !important;
+        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+        color: var(--text-primary) !important;
+    }
+
+/* ========== CHECKBOX & LINKS ========== */
+.form-check-input {
+    background-color: var(--input-bg);
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+}
+
+    .form-check-input:checked {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+    }
+
+.form-check-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.link-primary {
+    color: var(--neon-green) !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .link-primary:hover {
+        color: var(--primary-green) !important;
+        /* text-decoration: underline; */
+    }
+
+.link-success {
+    color: var(--neon-green) !important;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+    .link-success:hover {
+        color: var(--primary-green) !important;
+    }
+
+.link-secondary {
+    color: var(--text-secondary) !important;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .link-secondary:hover {
+        color: var(--text-primary) !important;
+    }
+
+/* ========== BUTTONS ========== */
+.btn-primary-custom {
+    background: linear-gradient(140deg, var(--primary-green), var(--neon-green));
+    border: none;
+    border-radius: 1rem;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 14px 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 25px rgba(40, 167, 69, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+    /* lớp ánh sáng ảo lướt qua */
+    .btn-primary-custom::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.3), transparent );
+        transition: left 0.5s ease;
+    }
+
+    .btn-primary-custom:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary-custom:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(40, 167, 69, 0.6);
+    }
+
+    .btn-primary-custom:active {
+        transform: translateY(-1px);
+    }
+
+/* ========== DIVIDER ========== */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+    .divider::before,
+    .divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .divider span {
+        padding: 0 15px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+/* ========== FORGOT PASSWORD ICON ========== */
+.forgot-password-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--primary-green), var(--neon-green));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+}
+
+/* ========== CUSTOM ALERT ========== */
+.alert-info-custom {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    color: var(--text-primary);
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+    .alert-info-custom i {
+        color: var(--neon-green);
+        font-size: 1.3rem;
+    }
+
+/* ========== FOOTER TEXT ========== */
+.footer-text {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== RESPONSIVE DESIGN ========== */
+@media (max-width: 768px) {
+    .brand-logo {
+        width: 70px;
+        height: 70px;
+        font-size: 2rem;
+    }
+
+    .brand-title {
+        font-size: 1.5rem;
+    }
+
+    .brand-subtitle {
+        font-size: 0.8rem;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+    }
+
+    .glass-card .card-body {
+        padding: 30px 20px !important;
+    }
+
+    .btn-primary-custom {
+        font-size: 1rem;
+        padding: 12px 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .brand-logo {
+        width: 60px;
+        height: 60px;
+        font-size: 1.8rem;
+    }
+
+    .brand-title {
+        font-size: 1.3rem;
+        letter-spacing: 1px;
+    }
+
+    .form-title {
+        font-size: 1.3rem;
+    }
+
+    .glass-input {
+        font-size: 0.9rem;
+    }
+}
+
+/* ========== SMOOTH SCROLLBAR ========== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-navy);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-green);
+    border-radius: 4px;
+}
+
+    /* scroll-bar's color */
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--neon-green);
+    }
+
+/* ========== ACCESSIBILITY ========== */
+*:focus {
+    outline: none;
+}
+
+/* ========== ADDITIONAL ANIMATIONS ========== */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.form-check,
+.text-center p {
+    animation: slideInRight 0.6s ease;
+}
+
+/* ========== PRINT STYLES ========== */
+@media print {
+    .auth-container::before {
+        display: none;
+    }
+
+    body {
+        background: white;
+    }
+}

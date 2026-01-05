@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -41,8 +41,8 @@
                    class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
                     🏠 Trang chủ
                 </a>
-                <a href="@Url.Action("Index", "Fields")"
-                   class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
+                <a href="@Url.Action("Index", "Booking")"
+                   class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Booking" ? "active" : "")">
                     🏟️ Đặt sân
                 </a>
 
@@ -53,7 +53,7 @@
                         <span class="dropdown-arrow">▼</span>
                     </button>
                     <div class="dropdown-menu">
-                        <a href="@Url.Action("Index", "FoodDrinks")" class="dropdown-item">
+                        <a href="@Url.Action("Index", "Food")" class="dropdown-item">
                             <span class="dropdown-item-icon">🍔</span>
                             <span>Đồ Ăn & Thức Uống</span>
                         </a>
@@ -253,4 +253,8 @@
     <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 0612dcd3632ae46c795368a4a3ffbfc644e56bef
