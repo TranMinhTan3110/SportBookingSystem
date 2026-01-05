@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>@ViewData["Title"] - SportHub Admin</title>
+    <link rel="stylesheet" href="~/css/AdminLayout.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a asp-controller="Dashboard" asp-action="Index" class="logo">
+                    <img src="~/asset/logo.png" alt="SportHub Logo" class="logo-icon" />
+
+                    <div class="logo-text">
+                        <span class="logo-title">TQTSport</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Chính</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a asp-controller="Dashboard" asp-action="Index" class="nav-link active">
+                                <span class="nav-icon">📊</span>
+                                <span class="nav-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Fields" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">🏟️</span>
+                                <span class="nav-text">Quản lý Sân</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Bookings" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">📅</span>
+                                <span class="nav-text">Đặt Sân</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Users" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">👥</span>
+                                <span class="nav-text">Người Dùng</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Dịch Vụ</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a asp-controller="Products" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">⚽</span>
+                                <span class="nav-text">Đồ Dùng Thể Thao</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="FoodDrinks" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">🍔</span>
+                                <span class="nav-text">Đồ Ăn & Thức Uống</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Categories" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">📦</span>
+                                <span class="nav-text">Danh Mục</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Tài Chính</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a asp-controller="Transactions" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">💳</span>
+                                <span class="nav-text">Giao Dịch</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Payments" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">💰</span>
+                                <span class="nav-text">Thanh Toán</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Reports" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">📈</span>
+                                <span class="nav-text">Báo Cáo</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Hệ Thống</div>
+                    <ul class="nav-menu">
+                        <li class="nav-item">
+                            <a asp-controller="Settings" asp-action="Index" class="nav-link">
+                                <span class="nav-icon">⚙️</span>
+                                <span class="nav-text">Cài Đặt</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-controller="Account" asp-action="Logout" class="nav-link">
+                                <span class="nav-icon">🚪</span>
+                                <span class="nav-text">Đăng Xuất</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">☰</button>
+                    <h1>Chào mừng trở lại, Admin</h1>
+                    <p class="header-subtitle">21 /12/2024 14:30</p>
+                </div>
+                <div class="header-right">
+                    <button class="header-btn">🔔</button>
+                    <button class="header-btn">⚙️</button>
+                    <button class="header-btn">👤</button>
+                </div>
+            </header>
+
+            <!-- Content Area - RenderBody() HERE -->
+            <main class="content-wrapper">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('active');
+                sidebarOverlay.classList.toggle('active');
+            });
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', () => {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+            });
+        }
+
+        // Active nav link
+        const navLinks = document.querySelectorAll('.nav-link');
+        const currentPath = window.location.pathname;
+
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+        });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</html>
