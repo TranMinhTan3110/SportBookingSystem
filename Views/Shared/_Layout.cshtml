@@ -31,8 +31,8 @@
 
             <!-- Logo -->
             <a href="@Url.Action("Index", "Home")" class="logo">
-                <div class="logo-icon">⚽</div>
-                <span>SportHub</span>
+                <img src="~/asset/logo.png" alt="SportHub Logo" class="logo-icon" />
+                <span>TQTSport</span>
             </a>
 
             <!-- Desktop Navigation Menu -->
@@ -194,9 +194,67 @@
         @RenderBody()
     </main>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <!-- Brand Column -->
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <div class="logo-icon" style="width: 40px; height: 40px; font-size: 20px;">⚽</div>
+                    <span>SportHub</span>
+                </div>
+                <p class="footer-desc">
+                    Nền tảng đặt sân thể thao trực tuyến hàng đầu Việt Nam.
+                    Đặt sân dễ dàng, thanh toán nhanh chóng, trải nghiệm tuyệt vời.
+                </p>
+            </div>
+
+            <!-- Products Column -->
+            <div class="footer-column">
+                <h4>Sản phẩm</h4>
+                <div class="footer-links">
+                    <a href="@Url.Action("Index", "Fields")" class="footer-link">Đặt sân bóng</a>
+                    <a href="@Url.Action("Index", "Wallet")" class="footer-link">Ví điện tử</a>
+                    <a href="@Url.Action("Index", "FoodDrinks")" class="footer-link">Đồ ăn & thức uống</a>
+                    <a href="@Url.Action("Index", "Products")" class="footer-link">Đồ dùng thể thao</a>
+                </div>
+            </div>
+
+            <!-- Support Column -->
+            <div class="footer-column">
+                <h4>Hỗ trợ</h4>
+                <div class="footer-links">
+                    <a href="@Url.Action("Help", "Support")" class="footer-link">Trung tâm trợ giúp</a>
+                    <a href="@Url.Action("Contact", "Support")" class="footer-link">Liên hệ</a>
+                    <a href="@Url.Action("Terms", "Legal")" class="footer-link">Điều khoản</a>
+                    <a href="@Url.Action("Privacy", "Legal")" class="footer-link">Chính sách</a>
+                </div>
+            </div>
+
+            <!-- Social Column -->
+            <div class="footer-column">
+                <h4>Kết nối</h4>
+                <div class="footer-links">
+                    <a href="#" class="footer-link" target="_blank">Facebook</a>
+                    <a href="#" class="footer-link" target="_blank">Instagram</a>
+                    <a href="#" class="footer-link" target="_blank">Twitter</a>
+                    <a href="#" class="footer-link" target="_blank">YouTube</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Bottom -->
+        <div class="footer-bottom">
+            © @DateTime.Now.Year SportHub. All rights reserved. Made with ⚽ for football lovers.
+        </div>
+    </footer>
 
     <!-- JavaScript -->
     <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 0612dcd3632ae46c795368a4a3ffbfc644e56bef
