@@ -1,0 +1,127 @@
+﻿@{
+    ViewData["Title"] = "Lịch sử";
+}
+@section Styles{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/css/History.css" rel="stylesheet" />
+}
+<main class="history-container">
+
+    <div class="page-header-content">
+        <h2 class="page-title">Hoạt động của tôi</h2>
+
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="openTab(event, 'booking-history')">
+                🏟️ Lịch sử Đặt sân
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'transaction-history')">
+                💳 Lịch sử Giao dịch
+            </button>
+        </div>
+    </div>
+
+    <div id="booking-history" class="tab-content active">
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đặt</th>
+                        <th>Sân bóng</th>
+                        <th>Thời gian đá</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#BK001</td>
+                        <td>
+                            <div class="court-info">
+                                <span class="court-name">Sân A1 (5 người)</span>
+                                <span class="court-date">20/05/2024</span>
+                            </div>
+                        </td>
+                        <td>17:30 - 19:00</td>
+                        <td class="price">450,000₫</td>
+                        <td><span class="badge success">Đã hoàn thành</span></td>
+                        <td><button class="btn-action">Chi tiết</button></td>
+                    </tr>
+                    <tr>
+                        <td>#BK002</td>
+                        <td>
+                            <div class="court-info">
+                                <span class="court-name">Sân VIP (7 người)</span>
+                                <span class="court-date">22/05/2024</span>
+                            </div>
+                        </td>
+                        <td>19:00 - 20:30</td>
+                        <td class="price">800,000₫</td>
+                        <td><span class="badge warning">Sắp tới</span></td>
+                        <td><button class="btn-action">Hủy sân</button></td>
+                    </tr>
+                    <tr>
+                        <td>#BK003</td>
+                        <td>
+                            <div class="court-info">
+                                <span class="court-name">Sân C2 (5 người)</span>
+                                <span class="court-date">15/05/2024</span>
+                            </div>
+                        </td>
+                        <td>06:00 - 07:30</td>
+                        <td class="price">300,000₫</td>
+                        <td><span class="badge danger">Đã hủy</span></td>
+                        <td><button class="btn-action">Đặt lại</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="transaction-history" class="tab-content">
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Mã GD</th>
+                        <th>Loại giao dịch</th>
+                        <th>Thời gian</th>
+                        <th>Số tiền</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#TRX998</td>
+                        <td>
+                            <div class="trans-info">
+                                <span class="trans-type deposit">Nạp tiền vào ví</span>
+                                <span class="trans-method">Qua MoMo</span>
+                            </div>
+                        </td>
+                        <td>20/05/2024 10:30</td>
+                        <td class="amount positive">+5,000,000₫</td>
+                        <td><span class="badge success">Thành công</span></td>
+                    </tr>
+                    <tr>
+                        <td>#TRX999</td>
+                        <td>
+                            <div class="trans-info">
+                                <span class="trans-type payment">Thanh toán đặt sân #BK001</span>
+                                <span class="trans-method">Ví SportHub</span>
+                            </div>
+                        </td>
+                        <td>20/05/2024 14:15</td>
+                        <td class="amount negative">-450,000₫</td>
+                        <td><span class="badge success">Thành công</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+@section Scripts {
+<script src="/js/History.js"></script>
+}
