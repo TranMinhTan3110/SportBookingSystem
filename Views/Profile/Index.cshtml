@@ -1,0 +1,267 @@
+﻿@{
+    ViewData["Title"] = "Profile";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+}
+
+<!-- Profile Container -->
+<div class="profile-container">
+
+    <!-- Profile Header Card -->
+    <div class="profile-header-card">
+        <div class="profile-info">
+            <div class="profile-avatar">
+                <img src="~/asset/avatar-default.png" alt="Avatar" />
+            </div>
+            <div class="profile-details">
+                <h1 class="profile-name">Nguyễn Văn A</h1>
+                <div class="profile-badges">
+                    <span class="badge badge-vip">
+                        <i class="fas fa-crown"></i>
+                        Thành viên Vang
+                    </span>
+                    <span class="badge badge-points">
+                        <i class="fas fa-gift"></i>
+                        150 Điểm thưởng
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-wallet">
+            <div class="wallet-label">Số dư khả dụng</div>
+            <div class="wallet-balances">500.000₫</div>
+            <button class="btn-recharge">
+                <i class="fas fa-plus"></i>
+                Nạp thêm tiền
+            </button>
+        </div>
+    </div>
+
+    <!-- Quick Reminder Section -->
+    <section class="reminder-section">
+        <h2 class="section-title">
+            <i class="fas fa-bookmark"></i>
+            Nhắc nhở quan trọng
+        </h2>
+
+        <div class="reminder-card">
+            <div class="reminder-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="reminder-content">
+                <h3 class="reminder-title">Sân Số 1 (Sân 5 người)</h3>
+                <p class="reminder-time">
+                    <i class="far fa-clock"></i>
+                    17:00 - 18:30 | Hôm nay (21/12)
+                </p>
+                <p class="reminder-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Chưa thanh toán đủ: Thiếu 200k
+                </p>
+            </div>
+            <button class="btn-checkin">
+                <i class="fas fa-qrcode"></i>
+                Lấy mã Check-in
+            </button>
+        </div>
+    </section>
+
+    <!-- Quick Actions Section -->
+    <section class="quick-actions-section">
+        <h2 class="section-title">
+            <i class="fas fa-bolt"></i>
+            Tiện ích nhanh
+        </h2>
+
+        <div class="quick-actions-grid">
+            <a href="#" class="action-card">
+                <div class="action-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <span class="action-label">Đặt Sân Mới</span>
+            </a>
+
+            <a href="#" class="action-card">
+                <div class="action-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <span class="action-label">Menu / Canteen</span>
+            </a>
+
+            <a href="#" class="action-card">
+                <div class="action-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
+                    <i class="fas fa-history"></i>
+                </div>
+                <span class="action-label">Lịch Sử Đã</span>
+            </a>
+
+            <a href="#" class="action-card">
+                <div class="action-icon" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
+                    <i class="fas fa-money-bill-transfer"></i>
+                </div>
+                <span class="action-label">Chuyển Tiền</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- My Bookings Section -->
+    <section class="bookings-section">
+        <h2 class="section-title">
+            <i class="fas fa-list-check"></i>
+            Lịch đặt sân của tôi
+        </h2>
+
+        <div class="bookings-list">
+            <!-- Booking Item 1 -->
+            <div class="booking-card">
+                <div class="booking-header">
+                    <div class="booking-field-info">
+                        <i class="fas fa-futbol"></i>
+                        <span>Sân 5 người - A1</span>
+                    </div>
+                    <span class="booking-status status-confirmed">
+                        <i class="fas fa-check-circle"></i>
+                        Đã xác nhận
+                    </span>
+                </div>
+                <div class="booking-details">
+                    <div class="booking-time">
+                        <i class="far fa-calendar"></i>
+                        <span>21/12/2024</span>
+                    </div>
+                    <div class="booking-time">
+                        <i class="far fa-clock"></i>
+                        <span>17:00 - 18:30</span>
+                    </div>
+                    <div class="booking-price">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>300.000₫</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Booking Item 2 -->
+            <div class="booking-card">
+                <div class="booking-header">
+                    <div class="booking-field-info">
+                        <i class="fas fa-futbol"></i>
+                        <span>Sân 7 người - B2</span>
+                    </div>
+                    <span class="booking-status status-pending">
+                        <i class="fas fa-clock"></i>
+                        Chờ thanh toán
+                    </span>
+                </div>
+                <div class="booking-details">
+                    <div class="booking-time">
+                        <i class="far fa-calendar"></i>
+                        <span>23/12/2024</span>
+                    </div>
+                    <div class="booking-time">
+                        <i class="far fa-clock"></i>
+                        <span>19:00 - 20:30</span>
+                    </div>
+                    <div class="booking-price">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>450.000₫</span>
+                    </div>
+                </div>
+                <button class="btn-pay-now">
+                    <i class="fas fa-credit-card"></i>
+                    Thanh toán ngay
+                </button>
+            </div>
+
+            <!-- Booking Item 3 -->
+            <div class="booking-card">
+                <div class="booking-header">
+                    <div class="booking-field-info">
+                        <i class="fas fa-futbol"></i>
+                        <span>Sân 11 người - C1</span>
+                    </div>
+                    <span class="booking-status status-completed">
+                        <i class="fas fa-check-double"></i>
+                        Hoàn thành
+                    </span>
+                </div>
+                <div class="booking-details">
+                    <div class="booking-time">
+                        <i class="far fa-calendar"></i>
+                        <span>15/12/2024</span>
+                    </div>
+                    <div class="booking-time">
+                        <i class="far fa-clock"></i>
+                        <span>18:00 - 19:30</span>
+                    </div>
+                    <div class="booking-price">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span>600.000₫</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-view-all">
+            Xem tất cả lịch đặt
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </section>
+
+    <!-- Transaction History -->
+    <section class="transaction-section">
+        <h2 class="section-title">
+            <i class="fas fa-receipt"></i>
+            Lịch sử giao dịch
+        </h2>
+
+        <div class="transaction-list">
+            <div class="transaction-item">
+                <div class="transaction-icon transaction-in">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-title">Nạp tiền vào ví</div>
+                    <div class="transaction-date">20/12/2024 14:30</div>
+                </div>
+                <div class="transaction-amount amount-positive">+500.000₫</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-icon transaction-out">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-title">Thanh toán đặt sân A1</div>
+                    <div class="transaction-date">19/12/2024 10:15</div>
+                </div>
+                <div class="transaction-amount amount-negative">-300.000₫</div>
+            </div>
+
+            <div class="transaction-item">
+                <div class="transaction-icon transaction-in">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <div class="transaction-info">
+                    <div class="transaction-title">Hoàn điểm thưởng</div>
+                    <div class="transaction-date">18/12/2024 16:45</div>
+                </div>
+                <div class="transaction-amount amount-positive">+50.000₫</div>
+            </div>
+        </div>
+
+        <button class="btn-view-all">
+            Xem tất cả giao dịch
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </section>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/profile.js"></script>
+}
+
