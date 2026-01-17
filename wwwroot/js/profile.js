@@ -107,30 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ============================================
-    // WALLET BALANCE ANIMATION
-    // ============================================
-    function animateBalance() {
-        const balanceEl = document.querySelector('.wallet-balance');
-        if (!balanceEl) return;
-
-        const finalBalance = parseInt(balanceEl.textContent.replace(/[^\d]/g, ''));
-        let currentBalance = 0;
-        const duration = 1500;
-        const increment = finalBalance / (duration / 16);
-
-        const timer = setInterval(() => {
-            currentBalance += increment;
-            if (currentBalance >= finalBalance) {
-                currentBalance = finalBalance;
-                clearInterval(timer);
-            }
-            balanceEl.textContent = Math.floor(currentBalance).toLocaleString('vi-VN') + '₫';
-        }, 16);
-    }
-
-    // Run animation on page load
-    setTimeout(animateBalance, 500);
 
     // ============================================
     // COPY BOOKING CODE
