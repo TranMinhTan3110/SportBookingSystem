@@ -22,6 +22,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=AdminProfile}/{action=Index}/{id?}");
+    pattern: "{controller=AdminFood}/{action=Index}/{id?}");
 
 app.Run();
