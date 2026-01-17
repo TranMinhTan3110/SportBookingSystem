@@ -109,6 +109,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // ============================================
+    // PERSONAL INFO BUTTONS
+    // ============================================
+    document.querySelectorAll('.btn-change-email').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // TODO: Open Change Email Modal
+            alert('Chức năng đổi Email đang được phát triển');
+        });
+    });
+
+    document.querySelectorAll('.btn-change-phone').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // TODO: Open Change Phone Modal
+            alert('Chức năng đổi Số điện thoại đang được phát triển');
+        });
+    });
+
+    document.querySelectorAll('.btn-change-password').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // TODO: Open Change Password Modal
+            alert('Chức năng đổi Mật khẩu đang được phát triển');
+        });
+    });
+
+    // ============================================
     // COPY BOOKING CODE
     // ============================================
     function copyToClipboard(text) {
