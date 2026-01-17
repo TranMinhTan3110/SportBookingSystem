@@ -7,7 +7,7 @@
    
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- CSS Files -->
 
     <link rel="stylesheet" href="~/css/site.css" />
@@ -26,7 +26,7 @@
         <div class="header-container">
             <!-- Mobile Menu Toggle -->
             <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                ☰
+                <i class="bi bi-list"></i>
             </button>
 
             <!-- Logo -->
@@ -39,26 +39,26 @@
             <nav class="nav-menu">
                 <a href="@Url.Action("Index", "Home")"
                    class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
-                    🏠 Trang chủ
+                    <i class="bi bi-house-door-fill"></i> Trang chủ
                 </a>
                 <a href="@Url.Action("Index", "Fields")"
                    class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
-                    🏟️ Đặt sân
+                    <i class="bi bi-calendar-event-fill"></i> Đặt sân
                 </a>
 
                 <!-- Dịch Vụ Dropdown -->
                 <div class="dropdown" id="servicesDropdown">
                     <button type="button" class="dropdown-toggle @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" || ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")" >
-                        🛍️ Dịch vụ
+                        <i class="bi bi-grid-fill"></i> Dịch vụ
                         <span class="dropdown-arrow">▼</span>
                     </button>
                     <div class="dropdown-menu">
                         <a href="@Url.Action("Index", "FoodDrinks")" class="dropdown-item">
-                            <span class="dropdown-item-icon">🍔</span>
+                            <span class="dropdown-item-icon"><i class="bi bi-cup-hot-fill"></i></span>
                             <span>Đồ Ăn & Thức Uống</span>
                         </a>
                         <a href="@Url.Action("Index", "Supplies")" class="dropdown-item">
-                            <span class="dropdown-item-icon">⚽</span>
+                            <span class="dropdown-item-icon"><i class="bi bi-bag-fill"></i></span>
                             <span>Đồ Dùng Thể Thao</span>
                         </a>
                     </div>
@@ -66,7 +66,7 @@
 
                 <a href="@Url.Action("Index", "History")"
                    class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")">
-                    📜 Lịch sử
+                    <i class="bi bi-clock-history"></i> Lịch sử
                 </a>
             </nav>
 
@@ -74,7 +74,7 @@
             <div class="header-actions">
                 <!-- Wallet Balance -->
                 <div class="wallet-balance" onclick="window.location.href='@Url.Action("Index", "Wallet")'">
-                    💰 <span>@(ViewBag.WalletBalance ?? "2,450,000₫")</span>
+                    <i class="bi bi-wallet-fill"></i> <span>@(ViewBag.WalletBalance ?? "2,450,000₫")</span>
                 </div>
 
                 <!-- User Avatar Dropdown -->
@@ -90,19 +90,19 @@
                         </div>
                         <!-- Menu Items -->
                         <a href="@Url.Action("Index", "Profile")" class="user-dropdown-item">
-                            <span class="dropdown-item-icon">👤</span>
+                            <span class="dropdown-item-icon"><i class="bi bi-person-circle"></i></span>
                             <span>Thông tin cá nhân</span>
                         </a>
                         <a href="@Url.Action("Transactions", "History")" class="user-dropdown-item">
-                            <span class="dropdown-item-icon">📜</span>
+                            <span class="dropdown-item-icon"><i class="bi bi-clock-history"></i></span>
                             <span>Lịch sử giao dịch</span>
                         </a>
                         <a href="@Url.Action("Index", "Settings")" class="user-dropdown-item">
-                            <span class="dropdown-item-icon">⚙️</span>
+                            <span class="dropdown-item-icon"><i class="bi bi-gear-fill"></i></span>
                             <span>Cài đặt</span>
                         </a>
                         <a href="@Url.Action("Logout", "Account")" class="user-dropdown-item danger">
-                            <span class="dropdown-item-icon">🚪</span>
+                            <span class="dropdown-item-icon"><i class="bi bi-box-arrow-right"></i></span>
                             <span>Đăng xuất</span>
                         </a>
                     </div>
@@ -116,7 +116,7 @@
         <!-- Mobile Nav Header -->
         <div class="mobile-nav-header">
             <div class="logo">
-                <div class="logo-icon" style="width: 36px; height: 36px; font-size: 18px;">⚽</div>
+                <div class="logo-icon" style="width: 36px; height: 36px; font-size: 18px;"><i class="bi bi-trophy-fill"></i></div>
                 <span style="font-size: 18px;">SportHub</span>
             </div>
             <button class="mobile-nav-close" id="mobileNavClose">✕</button>
@@ -128,15 +128,15 @@
             <div class="mobile-nav-section">
                 <div class="mobile-nav-section-title">Menu Chính</div>
                 <a href="@Url.Action("Index", "Home")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">
-                    <span>🏠</span>
+                    <span><i class="bi bi-house-door-fill"></i></span>
                     <span>Trang chủ</span>
                 </a>
                 <a href="@Url.Action("Index", "Fields")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
-                    <span>🏟️</span>
+                    <span><i class="bi bi-calendar-event-fill"></i></span>
                     <span>Đặt sân</span>
                 </a>
                 <a href="@Url.Action("Index", "History")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")">
-                    <span>📜</span>
+                    <span><i class="bi bi-clock-history"></i></span>
                     <span>Lịch sử</span>
                 </a>
             </div>
@@ -147,11 +147,11 @@
             <div class="mobile-nav-section">
                 <div class="mobile-nav-section-title">Dịch Vụ</div>
                 <a href="@Url.Action("Index", "FoodDrinks")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" ? "active" : "")">
-                    <span>🍔</span>
+                    <span><i class="bi bi-cup-hot-fill"></i></span>
                     <span>Đồ ăn & thức uống</span>
                 </a>
                 <a href="@Url.Action("Index", "Products")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
-                    <span>⚽</span>
+                    <span><i class="bi bi-bag-fill"></i></span>
                     <span>Đồ dùng thể thao</span>
                 </a>
             </div>
@@ -162,19 +162,19 @@
             <div class="mobile-nav-section">
                 <div class="mobile-nav-section-title">Tài Khoản</div>
                 <a href="@Url.Action("Index", "Wallet")" class="mobile-nav-link">
-                    <span>💰</span>
+                    <span><i class="bi bi-wallet-fill"></i></span>
                     <span>Ví điện tử</span>
                 </a>
                 <a href="@Url.Action("Profile", "Account")" class="mobile-nav-link">
-                    <span>👤</span>
+                    <span><i class="bi bi-person-circle"></i></span>
                     <span>Thông tin cá nhân</span>
                 </a>
                 <a href="@Url.Action("Transactions", "History")" class="mobile-nav-link">
-                    <span>📜</span>
+                    <span><i class="bi bi-clock-history"></i></span>
                     <span>Lịch sử giao dịch</span>
                 </a>
                 <a href="@Url.Action("Index", "Settings")" class="mobile-nav-link">
-                    <span>⚙️</span>
+                    <span><i class="bi bi-gear-fill"></i></span>
                     <span>Cài đặt</span>
                 </a>
             </div>
@@ -183,7 +183,7 @@
 
             <!-- Logout -->
             <a href="@Url.Action("Logout", "Account")" class="mobile-nav-link" style="color: var(--danger);">
-                <span>🚪</span>
+                <span><i class="bi bi-box-arrow-right"></i></span>
                 <span>Đăng xuất</span>
             </a>
         </div>
