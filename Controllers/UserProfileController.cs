@@ -2,7 +2,7 @@
 
 namespace SportBookingSystem.Controllers
 {
-    public class ProfileController : Controller
+    public class UserProfileController : Controller
     {
         public IActionResult Index()
         {
