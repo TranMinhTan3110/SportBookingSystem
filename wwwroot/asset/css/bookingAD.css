@@ -140,7 +140,7 @@
 /* Fields Grid */
 .fields-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
 }
 
@@ -628,8 +628,12 @@ textarea.form-control {
     }
 
     .info-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 12px;
+    }
+
+    .info-item:last-child {
+        text-align: right;
     }
 
     .modal-dialog {
@@ -650,7 +654,7 @@ textarea.form-control {
     .field-name {
         font-size: 18px;
     }
-
+    
     .modal-title {
         font-size: 20px;
     }
@@ -659,5 +663,15 @@ textarea.form-control {
     .form-select {
         padding: 12px 14px;
         font-size: 13px;
+    }
+}
+@media (min-width: 1024px) {
+    .fields-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 768px) {
+    .fields-grid {
+        grid-template-columns: 1fr;
     }
 }

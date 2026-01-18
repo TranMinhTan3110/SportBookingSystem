@@ -1,0 +1,234 @@
+﻿@{
+
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <link href="~/css/SportProduct.css" rel="stylesheet" />
+}
+<!-- Page Content -->
+<div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">⚽ Quản lý Đồ Dùng Thể Thao</h1>
+        <button class="btn-add" onclick="openModal('add')">
+            @* <span>➕</span> *@
+            <span>Thêm Sản Phẩm Mới</span>
+        </button>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">TÌM KIẾM</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo tên sản phẩm...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">LOẠI SẢN PHẨM</label>
+                <select class="form-select" id="filterType">
+                    <option value="">Tất cả</option>
+                    <option value="Shoe">Giày thể thao</option>
+                    <option value="Shirt">Áo thể thao</option>
+                    <option value="Ball">Bóng</option>
+                    <option value="Accessory">Phụ kiện</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">THƯƠNG HIỆU</label>
+                <select class="form-select" id="filterBrand">
+                    <option value="">Tất cả</option>
+                    <option value="Nike">Nike</option>
+                    <option value="Adidas">Adidas</option>
+                    <option value="Puma">Puma</option>
+                    <option value="Mizuno">Mizuno</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">TÌNH TRẠNG KHO</label>
+                <select class="form-select" id="filterStock">
+                    <option value="">Tất cả</option>
+                    <option value="in">Còn hàng</option>
+                    <option value="low">Sắp hết</option>
+                    <option value="out">Hết hàng</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+        <div class="table-wrapper">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>HÌNH ẢNH</th>
+                        <th>TÊN SẢN PHẨM</th>
+                        <th>LOẠI</th>
+                        <th>SIZE</th>
+                        <th>GIÁ BÁN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr>
+                        <td>#001</td>
+                        <td><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&h=200&fit=crop" alt="Product" class="product-img"></td>
+                        <td>
+                            <div class="product-name">Giày Nike Air Max</div>
+                            <div class="product-brand">Nike</div>
+                        </td>
+                        <td><span class="badge badge-shoe">Giày</span></td>
+                        <td>42</td>
+                        <td>2,500,000₫</td>
+                        <td><span class="stock-status stock-in">45 đôi</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#002</td>
+                        <td><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=200&h=200&fit=crop" alt="Product" class="product-img"></td>
+                        <td>
+                            <div class="product-name">Áo Adidas Classic</div>
+                            <div class="product-brand">Adidas</div>
+                        </td>
+                        <td><span class="badge badge-shirt">Áo</span></td>
+                        <td>L</td>
+                        <td>450,000₫</td>
+                        <td><span class="stock-status stock-low">8 cái</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#003</td>
+                        <td><img src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=200&h=200&fit=crop" alt="Product" class="product-img"></td>
+                        <td>
+                            <div class="product-name">Bóng đá Puma</div>
+                            <div class="product-brand">Puma</div>
+                        </td>
+                        <td><span class="badge badge-ball">Bóng</span></td>
+                        <td>Size 5</td>
+                        <td>350,000₫</td>
+                        <td><span class="stock-status stock-in">20 quả</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#004</td>
+                        <td><img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=200&h=200&fit=crop" alt="Product" class="product-img"></td>
+                        <td>
+                            <div class="product-name">Băng đô Nike Pro</div>
+                            <div class="product-brand">Nike</div>
+                        </td>
+                        <td><span class="badge badge-accessory">Phụ kiện</span></td>
+                        <td>Free size</td>
+                        <td>120,000₫</td>
+                        <td><span class="stock-status stock-out">0 cái</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Product Modal -->
+<div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Thêm Sản Phẩm Mới</h3>
+            <nbutton class="btn-close" onclick="closeModal()">✕</nbutton>
+        </div>
+        <div class="modal-body">
+            <form id="productForm">
+                <div class="form-group">
+                    <label class="form-label">TÊN SẢN PHẨM *</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Nhập tên sản phẩm..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">LOẠI SẢN PHẨM *</label>
+                    <select class="form-select" id="productType" required>
+                        <option value="">Chọn loại sản phẩm</option>
+                        <option value="Shoe">Giày thể thao</option>
+                        <option value="Shirt">Áo thể thao</option>
+                        <option value="Ball">Bóng</option>
+                        <option value="Accessory">Phụ kiện</option>
+                    </select>
+                </div>
+
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label class="form-label">THƯƠNG HIỆU</label>
+                        <select class="form-select" id="productBrand">
+                            <option value="">Chọn thương hiệu</option>
+                            <option value="Nike">Nike</option>
+                            <option value="Adidas">Adidas</option>
+                            <option value="Puma">Puma</option>
+                            <option value="Mizuno">Mizuno</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SIZE</label>
+                        <input type="text" class="form-control" id="productSize" placeholder="VD: 42, L, XL...">
+                    </div>
+                </div>
+
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label class="form-label">GIÁ BÁN (VNĐ) *</label>
+                        <input type="number" class="form-control" id="productPrice" placeholder="Nhập giá..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SỐ LƯỢNG *</label>
+                        <input type="number" class="form-control" id="productStock" placeholder="Nhập số lượng..." required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ĐƠN VỊ</label>
+                    <input type="text" class="form-control" id="productUnit" placeholder="VD: Đôi, Cái, Quả...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">URL HÌNH ẢNH</label>
+                    <input type="text" class="form-control" id="productImage" placeholder="Nhập link hình ảnh...">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-save" onclick="saveProduct()">Lưu</button>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/SportProduct.js"></script>
+}

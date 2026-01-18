@@ -1,0 +1,219 @@
+﻿@{
+    ViewData["Title"] = "Quản lý Người Dùng";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+@section Styles{
+    <link rel="stylesheet" href="~/css/UserAD.css" />
+
+}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<div class="users-container">
+    <div class="page-header">
+        <div class="page-header-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="page-header-content">
+            <h1>Quản lý Người Dùng</h1>
+            <p>Quản lý thông tin và trạng thái người dùng trong hệ thống</p>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon total"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+                <h3 id="totalUsers">5</h3><p>Tổng Người Dùng</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon active"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-content">
+                <h3 id="activeUsers">4</h3><p>Đang Hoạt Động</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon blocked"><i class="fas fa-ban"></i></div>
+            <div class="stat-content">
+                <h3 id="blockedUsers">1</h3><p>Bị Khóa</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon new"><i class="fas fa-star"></i></div>
+            <div class="stat-content">
+                <h3 id="newUsers">1</h3><p>Mới Tháng Này</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="filter-section">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên, email, số điện thoại...">
+        </div>
+        <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-list"></i> Tất cả
+            </button>
+            <button class="filter-btn" data-filter="active">
+                <i class="fas fa-check-circle"></i> Hoạt động
+            </button>
+            <button class="filter-btn" data-filter="blocked">
+                <i class="fas fa-ban"></i> Bị khóa
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Người Dùng</th>
+                        <th>Số Điện Thoại</th>
+                        <th>Email</th>
+                        <th>Phân Quyền</th>
+                        <th>Ngày Tham Gia</th>
+                        <th>Trạng Thái</th>
+                        <th>Thao Tác</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <tr data-status="active" data-id="1" data-username="nguyenvana" data-fullname="Nguyễn Văn A" data-email="nguyenvana@email.com" data-phone="0901234567" data-role="Customer" data-roleid="2" data-joindate="15/01/2024" data-lastlogin="20/12/2024 14:30" data-wallet="500000" data-points="120" data-bookings="15" data-spent="2500000">
+                        <td>#1</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">N</div>
+                                <div class="user-details">
+                                    <h4>Nguyễn Văn A</h4>
+                                    <p>@@nguyenvana</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>0901234567</td>
+                        <td>nguyenvana@email.com</td>
+                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
+                        <td>15/01/2024</td>
+                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
+                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-status="active" data-id="2" data-username="tranthib" data-fullname="Trần Thị B" data-email="tranthib@email.com" data-phone="0912345678" data-role="Customer" data-roleid="2" data-joindate="20/02/2024" data-lastlogin="19/12/2024 09:15" data-wallet="250000" data-points="85" data-bookings="8" data-spent="1200000">
+                        <td>#2</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">T</div>
+                                <div class="user-details">
+                                    <h4>Trần Thị B</h4>
+                                    <p>@@tranthib</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>0912345678</td>
+                        <td>tranthib@email.com</td>
+                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
+                        <td>20/02/2024</td>
+                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
+                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-status="blocked" data-id="3" data-username="levanc" data-fullname="Lê Văn C" data-email="levanc@email.com" data-phone="0923456789" data-role="Customer" data-roleid="2" data-joindate="10/03/2024" data-lastlogin="15/11/2024 16:20" data-wallet="0" data-points="0" data-bookings="2" data-spent="300000">
+                        <td>#3</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">L</div>
+                                <div class="user-details">
+                                    <h4>Lê Văn C</h4>
+                                    <p>@@levanc</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>0923456789</td>
+                        <td>levanc@email.com</td>
+                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
+                        <td>10/03/2024</td>
+                        <td><span class="status-badge blocked"><i class="fas fa-ban"></i> Bị khóa</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
+                                <button class="btn btn-unblock"><i class="fas fa-unlock"></i> Mở</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-status="active" data-id="4" data-username="admin" data-fullname="Quản Trị Viên" data-email="admin@sporthub.com" data-phone="0934567890" data-role="Admin" data-roleid="1" data-joindate="01/12/2023" data-lastlogin="21/12/2024 08:00" data-wallet="1000000" data-points="500" data-bookings="0" data-spent="0">
+                        <td>#4</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">Q</div>
+                                <div class="user-details">
+                                    <h4>Quản Trị Viên</h4>
+                                    <p>@@admin</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>0934567890</td>
+                        <td>admin@sporthub.com</td>
+                        <td><span class="role-badge admin"><i class="fas fa-user-shield"></i> Admin</span></td>
+                        <td>01/12/2023</td>
+                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
+                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr data-status="active" data-id="5" data-username="phamthid" data-fullname="Phạm Thị D" data-email="phamthid@email.com" data-phone="0945678901" data-role="Customer" data-roleid="2" data-joindate="15/12/2024" data-lastlogin="21/12/2024 10:45" data-wallet="750000" data-points="200" data-bookings="3" data-spent="450000">
+                        <td>#5</td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">P</div>
+                                <div class="user-details">
+                                    <h4>Phạm Thị D</h4>
+                                    <p>@@phamthid</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>0945678901</td>
+                        <td>phamthid@email.com</td>
+                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
+                        <td>15/12/2024</td>
+                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
+                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results">
+                <i class="fas fa-search"></i>
+                <p>Không tìm thấy kết quả phù hợp</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="userModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-user-circle"></i> Chi Tiết Người Dùng</h2>
+            <button class="close-modal" onclick="closeModal()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter"></div>
+    </div>
+</div>
