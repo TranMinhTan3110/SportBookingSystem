@@ -9,7 +9,7 @@
     <Folder Include="wwwroot\asset\js\" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.22" />
     <Folder Include="wwwroot\img\" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.22" />
+
   </ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\img\" />

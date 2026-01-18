@@ -1,5 +1,344 @@
-﻿
+﻿@model SportBookingSystem.Controllers.PaymentDashboardViewModel
+
 @{
-	ViewData["Title"] = "Admin Payment Management";
+    ViewData["Title"] = "Quản lý Thanh Toán";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
 }
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/AdminPayment.css" />
+}
+
+<div class="payment-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h2 class="page-title">Quản lý Thanh Toán</h2>
+        </div>
+        <div class="header-actions">
+            <button class="btn-export">
+                <i class="bi bi-download"></i> Xuất báo cáo
+            </button>
+        </div>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="stats-grid">
+        <!-- Revenue Card -->
+        <div class="stat-card revenue-card">
+            <div class="stat-icon-wrapper">
+                <i class="bi bi-graph-up-arrow"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Doanh thu Thực tế</h6>
+                <h3 class="stat-value">@Model.Revenue.ToString("N0")đ</h3>
+                <div class="stat-trend positive">
+                    <i class="bi bi-arrow-up-short"></i> 
+                    <span>+12.5% so với tuần trước</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deposits Card -->
+        <div class="stat-card deposit-card">
+            <div class="stat-icon-wrapper">
+                <i class="bi bi-wallet2"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Tổng tiền Nạp (User)</h6>
+                <h3 class="stat-value">@Model.TotalDeposits.ToString("N0")đ</h3>
+                <div class="stat-trend neutral">
+                    <i class="bi bi-dash"></i> 
+                    <span>Ổn định</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Transactions Card -->
+        <div class="stat-card pending-card">
+            <div class="stat-icon-wrapper">
+                <i class="bi bi-receipt"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Tổng số giao dịch</h6>
+                <h3 class="stat-value">@Model.TransactionCount</h3>
+                <div class="stat-trend neutral">
+                    <i class="bi bi-bar-chart"></i> 
+                    <span>Tất cả loại giao dịch</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reward Settings Card -->
+        <div class="stat-card settings-card">
+            <div class="stat-icon-wrapper">
+                <i class="bi bi-gear-fill"></i>
+            </div>
+            <div class="stat-content">
+                <h6 class="stat-label">Cài đặt điểm thưởng</h6>
+                <p class="settings-description">Quản lý tỷ lệ quy đổi và chính sách điểm thưởng</p>
+                <button class="btn-settings">
+                    <i class="bi bi-arrow-right-circle"></i> Cấu hình
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="filter-bar">
+        <div class="filter-row">
+            <div class="search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Tìm theo Mã GD hoặc User...">
+            </div>
+            <select id="typeFilter" class="filter-select">
+                <option value="all">Tất cả loại GD</option>
+                <option value="Nạp tiền">Nạp tiền</option>
+                <option value="Thanh toán">Thanh toán (Booking/Order)</option>
+                <option value="Hoàn tiền">Hoàn tiền</option>
+            </select>
+            <select id="statusFilter" class="filter-select">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="Completed">Thành công</option>
+                <option value="Pending">Chờ xử lý</option>
+                <option value="Cancelled">Đã hủy</option>
+            </select>
+            <input type="date" id="dateFilter" class="filter-date">
+            <button id="resetFilters" class="btn-reset">
+                <i class="bi bi-arrow-counterclockwise"></i> Đặt lại
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Table -->
+    <div class="table-card">
+        <div class="table-wrapper">
+            <table class="payment-table">
+                <thead>
+                    <tr>
+                        <th>Mã Giao Dịch</th>
+                        <th>Người dùng</th>
+                        <th>Loại giao dịch</th>
+                        <th class="text-right">Số tiền</th>
+                        <th>Nguồn/Phương thức</th>
+                        <th>Thời gian</th>
+                        <th>Trạng thái</th>
+                        <th class="text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    @foreach (var item in Model.Payments)
+                    {
+                        <tr class="payment-row">
+                            <td class="transaction-code">@item.Code</td>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="avatar-circle">@item.User?.Substring(0,1).ToUpper()</div>
+                                    <span class="user-name">@item.User</span>
+                                </div>
+                            </td>
+                            <td>
+                                @if(item.Type == "Nạp tiền")
+                                {
+                                    <span class="badge badge-success">@item.Type</span>
+                                }
+                                else if(item.Type != null && item.Type.Contains("Hoàn tiền"))
+                                {
+                                     <span class="badge badge-info">@item.Type</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-default">@item.Type</span>
+                                }
+                            </td>
+                            <td class="text-right">
+                                @if(item.Type == "Nạp tiền" || (item.Type != null && item.Type.Contains("Hoàn tiền")))
+                                {
+                                    <span class="amount-positive">+@item.Amount.ToString("N0")đ</span>
+                                }
+                                else
+                                {
+                                    <span class="amount-negative">-@item.Amount.ToString("N0")đ</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="payment-source">@item.Source</span>
+                            </td>
+                            <td>
+                                <div class="date-cell">
+                                    <div class="date-main">@item.Date.ToString("dd/MM/yyyy")</div>
+                                    <div class="date-time">@item.Date.ToString("HH:mm")</div>
+                                </div>
+                            </td>
+                            <td>
+                                @switch(item.Status)
+                                {
+                                    case "Completed":
+                                        <span class="status-indicator">
+                                            <span class="status-dot status-success"></span>
+                                            <span class="status-text status-success-text">Thành công</span>
+                                        </span>
+                                        break;
+                                    case "Pending":
+                                        <span class="status-indicator">
+                                            <span class="status-dot status-warning"></span>
+                                            <span class="status-text status-warning-text">Chờ xử lý</span>
+                                        </span>
+                                        break;
+                                    case "Cancelled":
+                                        <span class="status-indicator">
+                                            <span class="status-dot status-danger"></span>
+                                            <span class="status-text status-danger-text">Đã hủy</span>
+                                        </span>
+                                        break;
+                                    default:
+                                        <span>@item.Status</span>
+                                        break;
+                                }
+                            </td>
+                            <td class="text-right">
+                                <button class="btn-icon" title="Chi tiết"><i class="bi bi-eye"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination-wrapper">
+            <small class="pagination-info">Hiển thị <span id="visibleCount">@Model.Payments.Count</span> bản ghi</small>
+            <nav class="pagination-nav">
+                <ul class="pagination">
+                    <li class="page-item disabled"><a href="#" class="page-link">Trước</a></li>
+                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                    <li class="page-item"><a href="#" class="page-link">2</a></li>
+                    <li class="page-item"><a href="#" class="page-link">Sau</a></li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Transaction Management Section -->
+    <div class="transaction-management-section">
+        <div class="section-header">
+            <h3 class="section-title">Quản lý Giao dịch</h3>
+            <p class="section-subtitle">Nhập tay giao dịch nạp tiền hoặc tạo đơn hàng</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-btn active" data-tab="deposit">
+                <i class="bi bi-cash-coin"></i> Nạp tiền
+            </button>
+            <button class="tab-btn" data-tab="purchase">
+                <i class="bi bi-cart-plus"></i> Mua sản phẩm
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content-wrapper">
+            <!-- Deposit Tab -->
+            <div class="tab-content active" id="deposit-tab">
+                <form id="depositForm" class="transaction-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="depositUser">Số điện thoại khách hàng <span class="required">*</span></label>
+                            <input type="text" id="depositUser" class="form-input" placeholder="Nhập số điện thoại khách hàng" required>
+                            <small class="form-hint">Số dư hiện tại: <span id="depositUserBalance">0đ</span></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="depositAmount">Số tiền nạp <span class="required">*</span></label>
+                            <input type="number" id="depositAmount" class="form-input" placeholder="Nhập số tiền" min="1000" step="1000" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="depositMethod">Phương thức thanh toán <span class="required">*</span></label>
+                            <select id="depositMethod" class="form-input" required>
+                                <option value="">-- Chọn phương thức --</option>
+                                <option value="Cash">Tiền mặt</option>
+                                <option value="Banking">Chuyển khoản</option>
+                                <option value="Momo">Momo</option>
+                                <option value="VNPAY">VNPAY</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="depositMessage">Ghi chú</label>
+                            <textarea id="depositMessage" class="form-input" rows="3" placeholder="Nhập ghi chú (không bắt buộc)"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-check-circle"></i> Tạo giao dịch nạp tiền
+                        </button>
+                        <button type="reset" class="btn-reset-form">
+                            <i class="bi bi-x-circle"></i> Đặt lại
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Purchase Tab -->
+            <div class="tab-content" id="purchase-tab">
+                <form id="purchaseForm" class="transaction-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="purchaseUser">Số điện thoại khách hàng <span class="required">*</span></label>
+                            <input type="text" id="purchaseUser" class="form-input" placeholder="Nhập số điện thoại khách hàng" required>
+                            <small class="form-hint">Số dư hiện tại: <span id="purchaseUserBalance">0đ</span></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="purchaseProduct">Chọn sản phẩm <span class="required">*</span></label>
+                            <select id="purchaseProduct" class="form-input" required>
+                                <option value="">-- Chọn sản phẩm --</option>
+                            </select>
+                            <small class="form-hint">Tồn kho: <span id="productStock">0</span></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="purchaseQuantity">Số lượng <span class="required">*</span></label>
+                            <input type="number" id="purchaseQuantity" class="form-input" placeholder="Nhập số lượng" min="1" value="1" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="purchasePrice">Đơn giá</label>
+                            <input type="text" id="purchasePrice" class="form-input" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="purchaseTotal">Tổng tiền</label>
+                            <input type="text" id="purchaseTotal" class="form-input total-amount" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="purchaseMethod">Phương thức thanh toán <span class="required">*</span></label>
+                            <select id="purchaseMethod" class="form-input" required>
+                                <option value="">-- Chọn phương thức --</option>
+                                <option value="Cash">Tiền mặt</option>
+                                <option value="Banking">Chuyển khoản</option>
+                                <option value="Wallet">Ví nội bộ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">
+                            <i class="bi bi-check-circle"></i> Tạo đơn hàng
+                        </button>
+                        <button type="reset" class="btn-reset-form">
+                            <i class="bi bi-x-circle"></i> Đặt lại
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/AdminPayment.js"></script>
+}

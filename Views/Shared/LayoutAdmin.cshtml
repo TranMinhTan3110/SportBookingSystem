@@ -30,7 +30,7 @@
                     <div class="nav-section-title">Menu Chính</div>
                     <ul class="nav-menu">
                         <li class="nav-item">
-                            <a asp-controller="Dashboard" asp-action="Index" class="nav-link active">
+                            <a asp-controller="Dashboard" asp-action="Index" class="nav-link">
                                 <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                                 <span class="nav-text">Dashboard</span>
                             </a>
@@ -84,15 +84,9 @@
                     <div class="nav-section-title">Tài Chính</div>
                     <ul class="nav-menu">
                         <li class="nav-item">
-                            <a asp-controller="Transactions" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-credit-card-fill"></i></span>
-                                <span class="nav-text">Giao Dịch</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Payments" asp-action="Index" class="nav-link">
+                            <a asp-controller="AdminPayment" asp-action="Index" class="nav-link">
                                 <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
-                                <span class="nav-text">Thanh Toán</span>
+                                <span class="nav-text">Giao Dịch & Thanh Toán</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -107,12 +101,6 @@
                 <div class="nav-section">
                     <div class="nav-section-title">Hệ Thống</div>
                     <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a asp-controller="Settings" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-gear-fill"></i></span>
-                                <span class="nav-text">Cài Đặt</span>
-                            </a>
-                        </li>
                         <li class="nav-item">
                             <a asp-controller="Account" asp-action="Logout" class="nav-link">
                                 <span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span>
@@ -134,9 +122,7 @@
                     <p class="header-subtitle">21 /12/2024 14:30</p>
                 </div>
                 <div class="header-right">
-                    <button class="header-btn"><i class="bi bi-bell-fill"></i></button>
-                    <button class="header-btn"><i class="bi bi-gear-fill"></i></button>
-                    <button class="header-btn"><i class="bi bi-person-circle"></i></button>
+                    <button class="header-btn"><i class="bi bi-person-circle"><a asp-controller="AdminProfile" asp-action="Index" class="nav-link"></i></button>
                 </div>
             </header>
 
@@ -170,11 +156,19 @@
         }
 
         // Active nav link
+        // Active nav link
         const navLinks = document.querySelectorAll('.nav-link');
-        const currentPath = window.location.pathname;
+        
+        // Normalize path (remove trailing slash for consistency)
+        const normalizePath = (path) => path.replace(/\/+$/, "").toLowerCase();
+        const currentPath = normalizePath(window.location.pathname);
 
         navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
+            const linkPath = normalizePath(new URL(link.href).pathname);
+            
+            // Match if paths are identical OR if current path starts with link path (for sub-pages)
+             // Exception: Dashboard (/) should only match exact root or dashboard
+            if (linkPath === currentPath || (currentPath.startsWith(linkPath) && linkPath !== '/' && linkPath.length > 1)) {
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
             }

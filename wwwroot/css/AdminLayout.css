@@ -44,8 +44,9 @@ body {
     border-right: 1px solid var(--border);
     position: fixed;
     left: 0;
+    left: 0;
     top: 0;
-    height: 100vh;
+    bottom: 0;
     overflow-y: auto;
     z-index: 1000;
     transition: transform 0.3s ease;
@@ -173,6 +174,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 /* ============================================
