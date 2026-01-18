@@ -1,0 +1,19 @@
+﻿version: '3.8'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_SportBooking
+    environment:
+      - ACCEPT_EULA=Y
+      - TZ=Asia/Bangkok
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_PID=Developer
+    ports:
+      - "${SQL_PORT}:1433" 
+    volumes:
+      - sql_data:/var/opt/mssql 
+    restart: unless-stopped
+
+volumes:
+  sql_data:  
+    driver: local
