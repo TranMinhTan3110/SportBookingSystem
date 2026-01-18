@@ -39,7 +39,7 @@ namespace SportBookingSystem.Controllers
 
                 if (user.Role.RoleName == "Admin")
                 {
-                    redirectUrl = "/Admin/Dashboard/Index"; 
+                    redirectUrl = "/Dashboard/Index"; 
                 }
                 else if (user.Role.RoleName == "User")
                 {
@@ -95,6 +95,15 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Mã OTP không đúng hoặc đã hết hạn." });
         }
         [HttpGet]
+        public async Task<IActionResult> SignOut()
+        {
+            // Xóa Cookie xác thực
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Chuyển hướng về trang đăng nhập
+            return RedirectToAction("SignIn", "Login");
+        }
+        [HttpGet]
         public IActionResult SignIn()
         {
             return View();
@@ -108,6 +117,10 @@ namespace SportBookingSystem.Controllers
             return View();
         }
         public IActionResult ResetPassword()
+        {
+            return View();
+        }
+        public IActionResult AccessDenied()
         {
             return View();
         }

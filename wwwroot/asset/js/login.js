@@ -1,4 +1,19 @@
 ﻿$(document).ready(function () {
+    // Xử lý ẩn/hiện mật khẩu
+    $("#togglePassword").click(function () {
+        const passwordField = $("#password");
+        const eyeIcon = $("#eyeIcon");
+
+        const type = passwordField.attr("type") === "password" ? "text" : "password";
+
+        passwordField.attr("type", type);
+
+        if (type === "text") {
+            eyeIcon.removeClass("bi-eye").addClass("bi-eye-slash");
+        } else {
+            eyeIcon.removeClass("bi-eye-slash").addClass("bi-eye");
+        }
+    });
     $("#login_form").on("submit", function (e) {
         e.preventDefault();
 
