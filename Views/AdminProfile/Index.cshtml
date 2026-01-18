@@ -1,4 +1,5 @@
-﻿@{
+﻿@model SportBookingSystem.Models.Entities.Users
+@{
     ViewData["Title"] = "Hồ sơ Admin";
     Layout = "~/Views/Shared/LayoutAdmin.cshtml";
 }
@@ -13,14 +14,14 @@
     <div class="profile-header-card">
         <div class="profile-info">
             <div class="profile-avatar">
-                <img src="~/asset/img/user.jpg" alt="Admin Avatar" />
+                <div class="avatar-initials">@Model.FullName?[0]</div>
             </div>
             <div class="profile-details">
-                <h1 class="profile-name">Administrator</h1>
+                <h1 class="profile-name">@Model.FullName</h1>
                 <div class="profile-badges">
                     <span class="badge badge-vip">
                         <i class="fas fa-user-shield"></i>
-                        Quản trị viên hệ thống
+                        @Model.Role.RoleName
                     </span>
                 </div>
             </div>
@@ -41,7 +42,7 @@
                 </div>
                 <div class="info-content">
                     <span class="info-label">Email</span>
-                    <span class="info-value">admin@sporthub.vn</span>
+                    <span class="info-value">@Model.Email</span>
                 </div>
                 <button class="btn-change btn-change-email">
                     <i class="fas fa-pen"></i> Đổi
@@ -56,7 +57,7 @@
                 </div>
                 <div class="info-content">
                     <span class="info-label">Số điện thoại</span>
-                    <span class="info-value">0909999999</span>
+                    <span class="info-value">@Model.Phone</span>
                 </div>
                 <button class="btn-change btn-change-phone">
                     <i class="fas fa-pen"></i> Đổi
@@ -79,6 +80,74 @@
             </div>
         </div>
     </section>
+</div>
+
+<!-- Modal Đổi Email -->
+<div id="emailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Đổi Email</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Email mới</label>
+                <input type="email" id="newEmail" placeholder="Nhập email mới..." value="@Model.Email">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="saveEmail">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Đổi Số điện thoại -->
+<div id="phoneModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Đổi Số điện thoại</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Số điện thoại mới</label>
+                <input type="text" id="newPhone" placeholder="Nhập số điện thoại mới..." value="@Model.Phone">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="savePhone">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Đổi Mật khẩu -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Đổi mật khẩu</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Mật khẩu hiện tại</label>
+                <input type="password" id="currentPassword" placeholder="Nhập mật khẩu hiện tại...">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu mới</label>
+                <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới...">
+            </div>
+            <div class="form-group">
+                <label>Xác nhận mật khẩu</label>
+                <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới...">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="savePassword">Đổi mật khẩu</button>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

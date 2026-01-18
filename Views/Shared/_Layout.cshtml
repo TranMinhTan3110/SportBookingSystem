@@ -1,3 +1,15 @@
+@using System.Security.Claims
+@using SportBookingSystem.Services
+@inject ILoginServices LoginService
+
+@{
+    var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+    SportBookingSystem.Models.Entities.Users currentUser = null;
+    if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+    {
+        currentUser = await LoginService.GetUserByIdAsync(userId);
+    }
+}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -72,41 +84,65 @@
 
             <!-- Header Actions -->
             <div class="header-actions">
-                <!-- Wallet Balance -->
-                <div class="wallet-balance" onclick="window.location.href='@Url.Action("Index", "Wallet")'">
-                    <i class="bi bi-wallet-fill"></i> <span>@(ViewBag.WalletBalance ?? "2,450,000₫")</span>
-                </div>
+                @if (User.Identity.IsAuthenticated && currentUser != null)
+                {
+                    <!-- Wallet Balance -->
+                    <div class="wallet-balance" onclick="window.location.href='@Url.Action("Index", "Wallet")'">
+                        <i class="bi bi-wallet-fill"></i> <span>@currentUser.WalletBalance.ToString("N0")₫</span>
+                    </div>
 
-                <!-- User Avatar Dropdown -->
-                <div class="user-dropdown" id="userDropdown">
-                    <div class="user-avatar">
-                        @(ViewBag.UserInitials ?? "NV")
-                    </div>
-                    <div class="user-dropdown-menu">
-                        <!-- User Info -->
-                        <div class="user-dropdown-header">
-                            <div class="user-dropdown-name">@(ViewBag.UserName ?? "Nguyễn Văn A")</div>
-                            <div class="user-dropdown-email">@(ViewBag.UserEmail ?? "user@sporthub.vn")</div>
+                    <!-- User Avatar Dropdown -->
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-avatar">
+                            @{
+                                var nameParts = currentUser.FullName?.Split(' ');
+                                var initials = "";
+                                if (nameParts != null && nameParts.Length > 0)
+                                {
+                                    if (nameParts.Length >= 2)
+                                    {
+                                        initials = nameParts[0][0].ToString().ToUpper() + nameParts[nameParts.Length - 1][0].ToString().ToUpper();
+                                    }
+                                    else
+                                    {
+                                        initials = nameParts[0][0].ToString().ToUpper();
+                                    }
+                                }
+                            }
+                            @initials
                         </div>
-                        <!-- Menu Items -->
-                        <a href="@Url.Action("Index", "UserProfile")" class="user-dropdown-item">
-                            <span class="dropdown-item-icon"><i class="bi bi-person-circle"></i></span>
-                            <span>Thông tin cá nhân</span>
-                        </a>
-                        <a href="@Url.Action("Index", "History")" class="user-dropdown-item">
-                            <span class="dropdown-item-icon"><i class="bi bi-clock-history"></i></span>
-                            <span>Lịch sử giao dịch</span>
-                        </a>
-                        <a href="@Url.Action("Index", "Settings")" class="user-dropdown-item">
-                            <span class="dropdown-item-icon"><i class="bi bi-gear-fill"></i></span>
-                            <span>Cài đặt</span>
-                        </a>
-                        <a href="@Url.Action("Signout", "Login")" class="user-dropdown-item danger">
-                            <span class="dropdown-item-icon"><i class="bi bi-box-arrow-right"></i></span>
-                            <span>Đăng xuất</span>
-                        </a>
+                        <div class="user-dropdown-menu">
+                            <!-- User Info -->
+                            <div class="user-dropdown-header">
+                                <div class="user-dropdown-name">@currentUser.FullName</div>
+                                <div class="user-dropdown-email">@currentUser.Email</div>
+                            </div>
+                            <!-- Menu Items -->
+                            <a href="@Url.Action("Index", "UserProfile")" class="user-dropdown-item">
+                                <span class="dropdown-item-icon"><i class="bi bi-person-circle"></i></span>
+                                <span>Thông tin cá nhân</span>
+                            </a>
+                            <a href="@Url.Action("Index", "History")" class="user-dropdown-item">
+                                <span class="dropdown-item-icon"><i class="bi bi-clock-history"></i></span>
+                                <span>Lịch sử giao dịch</span>
+                            </a>
+                            <a href="@Url.Action("Index", "Settings")" class="user-dropdown-item">
+                                <span class="dropdown-item-icon"><i class="bi bi-gear-fill"></i></span>
+                                <span>Cài đặt</span>
+                            </a>
+                            <a href="@Url.Action("Signout", "Login")" class="user-dropdown-item danger">
+                                <span class="dropdown-item-icon"><i class="bi bi-box-arrow-right"></i></span>
+                                <span>Đăng xuất</span>
+                            </a>
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <a href="/Login/SignIn" class="btn-signin" style="text-decoration: none; background: var(--primary); color: white; padding: 8px 20px; border-radius: 10px; font-weight: 600;">
+                        Đăng nhập
+                    </a>
+                }
             </div>
         </div>
     </header>
@@ -154,22 +190,34 @@
 
             <div class="mobile-nav-divider"></div>
 
-            <!-- Wallet -->
-            <div class="mobile-nav-section">
-                <div class="mobile-nav-section-title">Tài Khoản</div>
-                <a href="@Url.Action("Index", "Wallet")" class="mobile-nav-link">
-                    <span><i class="bi bi-wallet-fill"></i></span>
-                    <span>Ví điện tử</span>
-                </a>
-                <a href="@Url.Action("index", "UserProfile")" class="mobile-nav-link">
-                    <span><i class="bi bi-person-circle"></i></span>
-                    <span>Thông tin cá nhân</span>
-                </a>
-                <a href="@Url.Action("Index", "History")" class="mobile-nav-link">
-                    <span><i class="bi bi-clock-history"></i></span>
-                    <span>Lịch sử giao dịch</span>
-                </a>
-            </div>
+            @if (User.Identity.IsAuthenticated && currentUser != null)
+            {
+                <!-- Wallet -->
+                <div class="mobile-nav-section">
+                    <div class="mobile-nav-section-title">Tài Khoản</div>
+                    <a href="@Url.Action("Index", "Wallet")" class="mobile-nav-link">
+                        <span><i class="bi bi-wallet-fill"></i></span>
+                        <span>Ví điện tử (@currentUser.WalletBalance.ToString("N0")₫)</span>
+                    </a>
+                    <a href="@Url.Action("index", "UserProfile")" class="mobile-nav-link">
+                        <span><i class="bi bi-person-circle"></i></span>
+                        <span>Thông tin cá nhân (@currentUser.FullName)</span>
+                    </a>
+                    <a href="@Url.Action("Index", "History")" class="mobile-nav-link">
+                        <span><i class="bi bi-clock-history"></i></span>
+                        <span>Lịch sử giao dịch</span>
+                    </a>
+                </div>
+            }
+            else
+            {
+                 <div class="mobile-nav-section">
+                    <a href="/Login/SignIn" class="mobile-nav-link">
+                        <span><i class="bi bi-box-arrow-in-right"></i></span>
+                        <span>Đăng nhập</span>
+                    </a>
+                </div>
+            }
 
             <div class="mobile-nav-divider"></div>
 
