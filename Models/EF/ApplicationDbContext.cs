@@ -38,6 +38,10 @@ namespace SportBookingSystem.Models.EF
                 .HasIndex(u => u.Phone)
                 .IsUnique();
 
+            modelBuilder.Entity<Users>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
             modelBuilder.Entity<Bookings>()
                 .HasIndex(b => b.CheckInCode)
                 .IsUnique();
