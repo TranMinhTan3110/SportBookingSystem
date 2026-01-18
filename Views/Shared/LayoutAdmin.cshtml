@@ -43,12 +43,6 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Bookings" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-calendar-check-fill"></i></span>
-                                <span class="nav-text">Đặt Sân</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a asp-controller="UserAD" asp-action="Index" class="nav-link">
                                 <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
                                 <span class="nav-text">Người Dùng</span>
@@ -117,7 +111,9 @@
                     <p class="header-subtitle">21 /12/2024 14:30</p>
                 </div>
                 <div class="header-right">
+                    <a asp-controller="Adminprofile" asp-action="Index" class="nav-link">
                     <button class="header-btn"><i class="bi bi-person-circle"></i></button>
+                    </a>
                 </div>
             </header>
 

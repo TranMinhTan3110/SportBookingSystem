@@ -93,7 +93,7 @@
                             <span class="dropdown-item-icon"><i class="bi bi-person-circle"></i></span>
                             <span>Thông tin cá nhân</span>
                         </a>
-                        <a href="@Url.Action("Transactions", "History")" class="user-dropdown-item">
+                        <a href="@Url.Action("Index", "History")" class="user-dropdown-item">
                             <span class="dropdown-item-icon"><i class="bi bi-clock-history"></i></span>
                             <span>Lịch sử giao dịch</span>
                         </a>
@@ -131,13 +131,9 @@
                     <span><i class="bi bi-house-door-fill"></i></span>
                     <span>Trang chủ</span>
                 </a>
-                <a href="@Url.Action("Index", "Fields")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
+                <a href="@Url.Action("Index", "Booking")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Fields" ? "active" : "")">
                     <span><i class="bi bi-calendar-event-fill"></i></span>
                     <span>Đặt sân</span>
-                </a>
-                <a href="@Url.Action("Index", "History")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "History" ? "active" : "")">
-                    <span><i class="bi bi-clock-history"></i></span>
-                    <span>Lịch sử</span>
                 </a>
             </div>
 
@@ -146,11 +142,11 @@
             <!-- Services -->
             <div class="mobile-nav-section">
                 <div class="mobile-nav-section-title">Dịch Vụ</div>
-                <a href="@Url.Action("Index", "FoodDrinks")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" ? "active" : "")">
+                <a href="@Url.Action("Index", "Food")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "FoodDrinks" ? "active" : "")">
                     <span><i class="bi bi-cup-hot-fill"></i></span>
                     <span>Đồ ăn & thức uống</span>
                 </a>
-                <a href="@Url.Action("Index", "Products")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
+                <a href="@Url.Action("Index", "Supplies")" class="mobile-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Products" ? "active" : "")">
                     <span><i class="bi bi-bag-fill"></i></span>
                     <span>Đồ dùng thể thao</span>
                 </a>
@@ -165,17 +161,13 @@
                     <span><i class="bi bi-wallet-fill"></i></span>
                     <span>Ví điện tử</span>
                 </a>
-                <a href="@Url.Action("Profile", "Account")" class="mobile-nav-link">
+                <a href="@Url.Action("index", "UserProfile")" class="mobile-nav-link">
                     <span><i class="bi bi-person-circle"></i></span>
                     <span>Thông tin cá nhân</span>
                 </a>
-                <a href="@Url.Action("Transactions", "History")" class="mobile-nav-link">
+                <a href="@Url.Action("Index", "History")" class="mobile-nav-link">
                     <span><i class="bi bi-clock-history"></i></span>
                     <span>Lịch sử giao dịch</span>
-                </a>
-                <a href="@Url.Action("Index", "Settings")" class="mobile-nav-link">
-                    <span><i class="bi bi-gear-fill"></i></span>
-                    <span>Cài đặt</span>
                 </a>
             </div>
 
