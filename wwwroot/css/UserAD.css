@@ -1,4 +1,4 @@
-﻿*{
+﻿* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -186,12 +186,19 @@ body {
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     overflow: hidden;
+    width: 100%;
 }
 
 .table-wrapper {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
-
+#userTableBody td {
+    color: black;
+    padding: 14px 16px;
+    font-size: 1.1em;
+}
 table {
     width: 100%;
     border-collapse: collapse;
@@ -246,7 +253,7 @@ tbody tr.hidden {
 }
 
 .user-details h4 {
-    font-size: 13px;
+    font-size: 1.1em;
     font-weight: 600;
     color: #1a1a1a;
 }
@@ -529,21 +536,31 @@ tbody tr.hidden {
         flex: 1;
     }
 
+    .table-container {
+        width: 100%;
+        margin: 0;
+    }
+
     .table-wrapper {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
     }
 
     table {
-        min-width: 800px;
+        min-width: 900px;
+        display: table;
     }
 
     .action-buttons {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: nowrap;
     }
 
     .btn {
-        width: 100%;
-        justify-content: center;
+        white-space: nowrap;
+        font-size: 11px;
+        padding: 6px 10px;
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/Home.css" />
@@ -14,8 +15,8 @@
         <h1>Đặt Sân Bóng<br>Dễ Dàng & Nhanh Chóng</h1>
         <p>Hệ thống đặt sân thể thao trực tuyến hiện đại với thanh toán ví điện tử tiện lợi</p>
         <div class="hero-actions">
-            <a href="#fields" class="btn btn-primary">🏟️ Đặt sân ngay</a>
-            <a href="#features" class="btn btn-secondary">🎯 Tìm hiểu thêm</a>
+            <a href="#fields" class="btn btn-primary"><i class="bi bi-calendar-check-fill"></i> Đặt sân ngay</a>
+            <a href="#features" class="btn btn-secondary"><i class="bi bi-info-circle-fill"></i> Tìm hiểu thêm</a>
         </div>
     </div>
 </section>
@@ -29,7 +30,7 @@
                 <div>
                     <div class="wallet-title">Ví Điện Tử</div>
                 </div>
-                <div class="wallet-icon">💳</div>
+                <div class="wallet-icon"><i class="bi bi-wallet-fill"></i></div>
             </div>
 
             <div class="wallet-balance-display">
@@ -38,9 +39,9 @@
             </div>
 
             <div class="wallet-actions">
-                <button class="wallet-btn">➕ Nạp tiền</button>
-                <button class="wallet-btn">💸 Chuyển khoản</button>
-                <button class="wallet-btn">📊 Chi tiết</button>
+                <button class="wallet-btn"><i class="bi bi-plus-circle-fill"></i> Nạp tiền</button>
+                <button class="wallet-btn"><i class="bi bi-cash-coin"></i> Chuyển khoản</button>
+                <button class="wallet-btn"><i class="bi bi-graph-up-arrow"></i> Chi tiết</button>
             </div>
         </div>
 
@@ -48,7 +49,7 @@
             <h3 class="quick-actions-title">Thao tác nhanh</h3>
             <div class="action-list">
                 <a href="#" class="action-item">
-                    <div class="action-icon">📅</div>
+                    <div class="action-icon"><i class="bi bi-calendar-event-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Lịch đặt sân của tôi</div>
                         <div class="action-desc">3 lịch sắp tới</div>
@@ -57,7 +58,7 @@
                 </a>
 
                 <a href="#" class="action-item">
-                    <div class="action-icon">🎁</div>
+                    <div class="action-icon"><i class="bi bi-gift-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Điểm thưởng</div>
                         <div class="action-desc">1,250 điểm</div>
@@ -66,7 +67,7 @@
                 </a>
 
                 <a href="#" class="action-item">
-                    <div class="action-icon">⚙️</div>
+                    <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Cài đặt</div>
                         <div class="action-desc">Quản lý tài khoản</div>
@@ -81,7 +82,7 @@
     <section id="fields" class="fade-in-up delay-1">
         <div class="section-header">
             <div class="section-header-content">
-                <h2 class="section-title">🏟️ Chọn Sân Yêu Thích</h2>
+                <h2 class="section-title"><i class="bi bi-trophy-fill"></i> Chọn Sân Yêu Thích</h2>
                 <p class="section-subtitle">Đa dạng loại sân, giá cả hợp lý, đặt sân dễ dàng</p>
             </div>
             <a href="@Url.Action("Index", "Fields")" class="view-all-btn">
@@ -92,7 +93,7 @@
             <!-- Field Card 1 -->
             <div class="field-card">
                 <div class="field-image">
-                    <span class="field-badge">🌟 Phổ biến</span>
+                    <span class="field-badge"><i class="bi bi-star-fill"></i> Phổ biến</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -115,7 +116,7 @@
             <!-- Field Card 2 -->
             <div class="field-card">
                 <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">
-                    <span class="field-badge">🔥 Hot</span>
+                    <span class="field-badge"><i class="bi bi-fire"></i> Hot</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -138,7 +139,7 @@
             <!-- Field Card 3 -->
             <div class="field-card">
                 <div class="field-image" style="background: linear-gradient(135deg, #8B5CF6, #EC4899);">
-                    <span class="field-badge">💎 VIP</span>
+                    <span class="field-badge"><i class="bi bi-gem"></i> VIP</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -161,7 +162,7 @@
             <!-- Field Card 4 -->
             <div class="field-card">
                 <div class="field-image" style="background: linear-gradient(135deg, #06B6D4, #3B82F6);">
-                    <span class="field-badge">💰 Giá tốt</span>
+                    <span class="field-badge"><i class="bi bi-cash-coin"></i> Giá tốt</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -184,7 +185,7 @@
             <!-- Field Card 5 -->
             <div class="field-card">
                 <div class="field-image" style="background: linear-gradient(135deg, #14B8A6, #10B981);">
-                    <span class="field-badge">🆕 Mới</span>
+                    <span class="field-badge"><i class="bi bi-newspaper"></i> Mới</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -207,7 +208,7 @@
             <!-- Field Card 6 -->
             <div class="field-card">
                 <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #10B981);">
-                    <span class="field-badge">⭐ Top rated</span>
+                    <span class="field-badge"><i class="bi bi-star-fill"></i> Top rated</span>
                 </div>
                 <div class="field-content">
                     <div class="field-header">
@@ -233,7 +234,7 @@
     <section id="food-drinks" class="products-section fade-in-up delay-2">
         <div class="section-header">
             <div class="section-header-content">
-                <h2 class="section-title">🍔 Đồ Ăn & Thức Uống Nổi Bật</h2>
+                <h2 class="section-title"><i class="bi bi-cup-hot-fill"></i> Đồ Ăn & Thức Uống Nổi Bật</h2>
                 <p class="section-subtitle">Gọi món giao tận sân, không lo gián đoạn trận đấu</p>
             </div>
             <a href="@Url.Action("Index", "FoodDrinks")" class="view-all-btn">
@@ -245,8 +246,8 @@
             <!-- Food Item 1 -->
             <div class="product-card">
                 <div class="product-image food-bg-1">
-                    <span class="product-badge hot">🔥 Bán chạy</span>
-                    <div class="product-emoji">🍔</div>
+                    <span class="product-badge hot"><i class="bi bi-fire"></i> Bán chạy</span>
+                    <div class="product-emoji"><i class="bi bi-cup-hot-fill"></i></div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -261,10 +262,10 @@
                         </div>
                         <div class="product-actions">
                             <button class="btn-add-cart">
-                                🛒 Giỏ hàng
+                                <i class="bi bi-cart-plus-fill"></i> Giỏ hàng
                             </button>
                             <button class="btn-buy-now">
-                                💳 Mua ngay
+                                <i class="bi bi-credit-card-fill"></i> Mua ngay
                             </button>
                         </div>
                     </div>
@@ -274,8 +275,8 @@
             <!-- Food Item 2 -->
             <div class="product-card">
                 <div class="product-image food-bg-2">
-                    <span class="product-badge new">⭐ Mới</span>
-                    <div class="product-emoji">🍕</div>
+                    <span class="product-badge new"><i class="bi bi-newspaper"></i> Mới</span>
+                    <div class="product-emoji"><i class="bi bi-pie-chart-fill"></i></div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -290,10 +291,10 @@
                         </div>
                         <div class="product-actions">
                             <button class="btn-add-cart">
-                                🛒 Giỏ hàng
+                                <i class="bi bi-cart-plus-fill"></i> Giỏ hàng
                             </button>
                             <button class="btn-buy-now">
-                                💳 Mua ngay
+                                <i class="bi bi-credit-card-fill"></i> Mua ngay
                             </button>
                         </div>
                     </div>
@@ -303,8 +304,8 @@
             <!-- Food Item 3 -->
             <div class="product-card">
                 <div class="product-image food-bg-3">
-                    <span class="product-badge discount">💰 Giảm giá</span>
-                    <div class="product-emoji">🥤</div>
+                    <span class="product-badge discount"><i class="bi bi-cash-coin"></i> Giảm giá</span>
+                    <div class="product-emoji"><i class="bi bi-cup-straw"></i></div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -319,10 +320,10 @@
                         </div>
                         <div class="product-actions">
                             <button class="btn-add-cart">
-                                🛒 Giỏ hàng
+                                <i class="bi bi-cart-plus-fill"></i> Giỏ hàng
                             </button>
                             <button class="btn-buy-now">
-                                💳 Mua ngay
+                                <i class="bi bi-cart-plus-fill"></i> Mua ngay
                             </button>
                         </div>
                     </div>
@@ -335,7 +336,7 @@
     <section id="products" class="products-section fade-in-up delay-3">
         <div class="section-header">
             <div class="section-header-content">
-                <h2 class="section-title">⚽ Đồ Dùng Thể Thao Nổi Bật</h2>
+                <h2 class="section-title"><i class="bi bi-trophy-fill"></i> Đồ Dùng Thể Thao Nổi Bật</h2>
                 <p class="section-subtitle">Trang bị chuyên nghiệp cho người chơi</p>
             </div>
             <a href="@Url.Action("Index", "Products")" class="view-all-btn">
@@ -347,8 +348,8 @@
             <!-- Product Item 1 -->
             <div class="product-card">
                 <div class="product-image product-bg-1">
-                    <span class="product-badge hot">🔥 Hot</span>
-                    <div class="product-emoji">👟</div>
+                    <span class="product-badge hot"><i class="bi bi-fire"></i> Hot</span>
+                    <div class="product-emoji"><i class="bi bi-tag-fill"></i></div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -362,7 +363,7 @@
                             <span class="price-value">1.2 Tr</span>
                         </div>
                         <button class="btn-rent-now">
-                            🏃 Thuê ngay
+                            <i class="bi bi-bag-check-fill"></i> Thuê ngay
                         </button>
                     </div>
                 </div>
@@ -371,8 +372,8 @@
             <!-- Product Item 2 -->
             <div class="product-card">
                 <div class="product-image product-bg-2">
-                    <span class="product-badge popular">⭐ Phổ biến</span>
-                    <div class="product-emoji">👕</div>
+                    <span class="product-badge popular"><i class="bi bi-star-fill"></i> Phổ biến</span>
+                    <div class="product-emoji"><i class="bi bi-bag-fill"></i></div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -386,7 +387,7 @@
                             <span class="price-value">250K</span>
                         </div>
                         <button class="btn-rent-now">
-                            🏃 Thuê ngay
+                            <i class="bi bi-bag-check-fill"></i> Thuê ngay
                         </button>
                     </div>
                 </div>
@@ -395,8 +396,8 @@
             <!-- Product Item 3 -->
             <div class="product-card">
                 <div class="product-image product-bg-3">
-                    <span class="product-badge new">🆕 Mới về</span>
-                    <div class="product-emoji">🧤</div>
+                    <span class="product-badge new"><i class="bi bi-newspaper"></i> Mới về</span>
+                    <div class="product-emoji"><i class="bi bi-shield-fill"></i></div>
                 </div>
                 <div class="product-content">
                     <div class="product-header">
@@ -410,7 +411,7 @@
                             <span class="price-value">350K</span>
                         </div>
                         <button class="btn-rent-now">
-                            🏃 Thuê ngay
+                            <i class="bi bi-bag-check-fill"></i> Thuê ngay
                         </button>
                     </div>
                 </div>
@@ -421,13 +422,13 @@
     <!-- History Section -->
     <section id="history" class="history-card fade-in-up delay-3">
         <div class="history-header">
-            <h2 class="history-title">📜 Lịch Sử Giao Dịch Gần Đây</h2>
+            <h2 class="history-title"><i class="bi bi-clock-history"></i> Lịch Sử Giao Dịch Gần Đây</h2>
             <button class="btn btn-secondary">Xem tất cả</button>
         </div>
 
         <div class="history-list">
             <div class="history-item">
-                <div class="history-icon">🏟️</div>
+                <div class="history-icon"><i class="bi bi-building"></i></div>
                 <div class="history-details">
                     <div class="history-item-title">Đặt Sân A1 - Premium</div>
                     <div class="history-item-date">20/12/2024 14:30 • 2 giờ</div>
@@ -437,7 +438,7 @@
             </div>
 
             <div class="history-item">
-                <div class="history-icon">🍔</div>
+                <div class="history-icon"><i class="bi bi-cup-hot-fill"></i></div>
                 <div class="history-details">
                     <div class="history-item-title">Đơn Canteen #456</div>
                     <div class="history-item-date">20/12/2024 15:00</div>
@@ -447,7 +448,7 @@
             </div>
 
             <div class="history-item">
-                <div class="history-icon">💰</div>
+                <div class="history-icon"><i class="bi bi-cash-coin"></i></div>
                 <div class="history-details">
                     <div class="history-item-title">Nạp tiền vào ví</div>
                     <div class="history-item-date">19/12/2024 10:20</div>
@@ -457,7 +458,7 @@
             </div>
 
             <div class="history-item">
-                <div class="history-icon">🏟️</div>
+                <div class="history-icon"><i class="bi bi-building"></i></div>
                 <div class="history-details">
                     <div class="history-item-title">Đặt Sân B3 - Standard</div>
                     <div class="history-item-date">18/12/2024 18:00 • 1.5 giờ</div>
@@ -467,7 +468,7 @@
             </div>
 
             <div class="history-item">
-                <div class="history-icon">🎁</div>
+                <div class="history-icon"><i class="bi bi-gift-fill"></i></div>
                 <div class="history-details">
                     <div class="history-item-title">Nhận điểm thưởng</div>
                     <div class="history-item-date">18/12/2024 19:30</div>
@@ -481,31 +482,31 @@
     <!-- Features Section -->
     <section id="features" class="features-section fade-in-up delay-2">
         <div class="section-header" style="text-align: center;">
-            <h2 class="section-title">🎯 Tại Sao Chọn SportHub?</h2>
+            <h2 class="section-title"><i class="bi bi-gem"></i> Tại Sao Chọn SportHub?</h2>
             <p class="section-subtitle">Trải nghiệm đặt sân hiện đại với nhiều tiện ích vượt trội</p>
         </div>
 
         <div class="features-grid">
             <div class="feature-item">
-                <div class="feature-icon">⚡</div>
+                <div class="feature-icon"><i class="bi bi-lightning-fill"></i></div>
                 <h3 class="feature-title">Đặt Sân Nhanh Chóng</h3>
                 <p class="feature-desc">Chỉ 3 bước đơn giản, đặt sân trong vòng 30 giây</p>
             </div>
 
             <div class="feature-item">
-                <div class="feature-icon">💳</div>
+                <div class="feature-icon"><i class="bi bi-credit-card-fill"></i></div>
                 <h3 class="feature-title">Thanh Toán Linh Hoạt</h3>
                 <p class="feature-desc">Ví điện tử, chuyển khoản, thẻ tín dụng - đa dạng phương thức</p>
             </div>
 
             <div class="feature-item">
-                <div class="feature-icon">🎁</div>
+                <div class="feature-icon"><i class="bi bi-gift-fill"></i></div>
                 <h3 class="feature-title">Tích Điểm Thưởng</h3>
                 <p class="feature-desc">Tích điểm mỗi lần đặt sân, đổi quà hấp dẫn</p>
             </div>
 
             <div class="feature-item">
-                <div class="feature-icon">🍔</div>
+                <div class="feature-icon"><i class="bi bi-cup-hot-fill"></i></div>
                 <h3 class="feature-title">Canteen Tiện Lợi</h3>
                 <p class="feature-desc">Đặt đồ ăn uống giao tận sân, không lo gián đoạn</p>
             </div>

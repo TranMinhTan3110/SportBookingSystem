@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Lịch sử";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles{
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -13,10 +14,10 @@
 
         <div class="tabs-container">
             <button class="tab-btn active" onclick="openTab(event, 'booking-history')">
-                🏟️ Lịch sử Đặt sân
+                <i class="bi bi-calendar-check-fill"></i> Lịch sử Đặt sân
             </button>
             <button class="tab-btn" onclick="openTab(event, 'transaction-history')">
-                💳 Lịch sử Giao dịch
+                <i class="bi bi-credit-card-fill"></i> Lịch sử Giao dịch
             </button>
         </div>
     </div>

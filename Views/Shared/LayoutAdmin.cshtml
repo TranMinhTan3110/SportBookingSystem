@@ -2,12 +2,13 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>@ViewData["Title"] - SportHub Admin</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/AdminLayout.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -17,7 +18,7 @@
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a asp-controller="Dashboard" asp-action="Index" class="logo">
-                    <img src="~/asset/logo.png" alt="SportHub Logo" class="logo-icon" />
+                    <img src="~/asset/img/logo.png" alt="SportHub Logo" class="logo-icon" />
 
                     <div class="logo-text">
                         <span class="logo-title">TQTSport</span>
@@ -30,26 +31,20 @@
                     <div class="nav-section-title">Menu Chính</div>
                     <ul class="nav-menu">
                         <li class="nav-item">
-                            <a asp-controller="Dashboard" asp-action="Index" class="nav-link active">
-                                <span class="nav-icon">📊</span>
+                            <a asp-controller="Dashboard" asp-action="Index" class="nav-link">
+                                <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
                                 <span class="nav-text">Dashboard</span>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a asp-controller="BookingAD" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">🏟️</span>
+                                <span class="nav-icon"><i class="bi bi-calendar-event-fill"></i></span>
                                 <span class="nav-text">Quản lý Sân</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Bookings" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">📅</span>
-                                <span class="nav-text">Đặt Sân</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
                             <a asp-controller="UserAD" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">👥</span>
+                                <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
                                 <span class="nav-text">Người Dùng</span>
                             </a>
                         </li>
@@ -61,13 +56,13 @@
                     <ul class="nav-menu">
                         <li class="nav-item">
                             <a asp-controller="SportProduct" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">⚽</span>
+                                <span class="nav-icon"><i class="bi bi-bag-fill"></i></span>
                                 <span class="nav-text">Đồ Dùng Thể Thao</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="FoodDrinks" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">🍔</span>
+                            <a asp-controller="FoodAD" asp-action="Index" class="nav-link">
+                                <span class="nav-icon"><i class="bi bi-cup-hot-fill"></i></span>
                                 <span class="nav-text">Đồ Ăn & Thức Uống</span>
                             </a>
                         </li>
@@ -78,20 +73,14 @@
                     <div class="nav-section-title">Tài Chính</div>
                     <ul class="nav-menu">
                         <li class="nav-item">
-                            <a asp-controller="Transactions" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">💳</span>
-                                <span class="nav-text">Giao Dịch</span>
+                            <a asp-controller="AdminPayment" asp-action="Index" class="nav-link">
+                                <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
+                                <span class="nav-text">Giao Dịch & Thanh Toán</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Payments" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">💰</span>
-                                <span class="nav-text">Thanh Toán</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="Reports" asp-action="Index" class="nav-link">
-                                <span class="nav-icon">📈</span>
+                            <a asp-controller="ReportAD" asp-action="Index" class="nav-link">
+                                <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
                                 <span class="nav-text">Báo Cáo</span>
                             </a>
                         </li>
@@ -101,10 +90,9 @@
                 <div class="nav-section">   
                     <div class="nav-section-title">Hệ Thống</div>
                     <ul class="nav-menu">
-                     
                         <li class="nav-item">
                             <a asp-controller="Account" asp-action="Logout" class="nav-link">
-                                <span class="nav-icon">🚪</span>
+                                <span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span>
                                 <span class="nav-text">Đăng Xuất</span>
                             </a>
                         </li>
@@ -123,8 +111,9 @@
                     <p class="header-subtitle">21 /12/2024 14:30</p>
                 </div>
                 <div class="header-right">
-          
-                    <button class="header-btn">👤</button>
+                    <a asp-controller="Adminprofile" asp-action="Index" class="nav-link">
+                    <button class="header-btn"><i class="bi bi-person-circle"></i></button>
+                    </a>
                 </div>
             </header>
 
@@ -158,11 +147,19 @@
         }
 
         // Active nav link
+        // Active nav link
         const navLinks = document.querySelectorAll('.nav-link');
-        const currentPath = window.location.pathname;
+        
+        // Normalize path (remove trailing slash for consistency)
+        const normalizePath = (path) => path.replace(/\/+$/, "").toLowerCase();
+        const currentPath = normalizePath(window.location.pathname);
 
         navLinks.forEach(link => {
-            if (link.getAttribute('href') === currentPath) {
+            const linkPath = normalizePath(new URL(link.href).pathname);
+            
+            // Match if paths are identical OR if current path starts with link path (for sub-pages)
+             // Exception: Dashboard (/) should only match exact root or dashboard
+            if (linkPath === currentPath || (currentPath.startsWith(linkPath) && linkPath !== '/' && linkPath.length > 1)) {
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
             }

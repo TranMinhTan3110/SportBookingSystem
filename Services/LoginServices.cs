@@ -1,0 +1,147 @@
+﻿using Microsoft.EntityFrameworkCore;
+using SportBookingSystem.Models.EF;
+using SportBookingSystem.Models.Entities;
+using SportBookingSystem.Models.ViewModels;
+using BC = BCrypt.Net.BCrypt;
+using MailKit.Net.Smtp;
+using MimeKit;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
+
+namespace SportBookingSystem.Services
+{
+    public class LoginServices : ILoginServices
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly IMemoryCache _cache; 
+
+        public LoginServices(ApplicationDbContext context, IConfiguration configuration, IMemoryCache cache)
+        {
+            _context = context;
+            _configuration = configuration;
+            _cache = cache;
+        }
+        public async Task<Users> CheckLoginAsync(string phone, string password)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role) 
+                .FirstOrDefaultAsync(u => u.Phone == phone && u.IsActive == true);
+
+            if (user != null && BC.Verify(password, user.Password))
+            {
+                return user;
+            }
+            return null;
+        }
+        public async Task<bool> IsPhoneExistsAsync(string phone)
+        {
+            return await _context.Users.AnyAsync(u => u.Phone == phone);
+        }
+
+        public async Task<bool> IsEmailExistsAsync(string email)
+        {
+            return await _context.Users.AnyAsync(u => u.Email == email);
+        }
+        public async Task<bool> RegisterUserAsync(SignUpViewModel model)
+        {
+            try
+            {
+                var newUser = new Users
+                {
+                    FullName = model.FullName,
+                    Username = model.Phone,
+                    Phone = model.Phone,
+                    Email = model.Email, // Kiểm tra xem model.Email có giá trị không
+                    Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
+                    RoleId = 2,
+                    IsActive = true
+                    // ... các trường khác
+                };
+
+                _context.Users.Add(newUser);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Dòng này sẽ in lỗi chi tiết ra cửa sổ "Output" của Visual Studio
+                var msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+                System.Diagnostics.Debug.WriteLine("LỖI ĐĂNG KÝ: " + msg);
+                return false;
+            }
+        }
+        public async Task<bool> SendOtpEmailAsync(string email)
+        {
+            // 1. Kiểm tra user có tồn tại với email (Username) này không
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return false;
+
+            // 2. Lấy cấu hình MailSettings từ appsettings.json
+            var mailSettings = _configuration.GetSection("MailSettings");
+
+            // 3. Tạo mã OTP thật
+            string otp = new Random().Next(100000, 999999).ToString();
+
+            // 4. Lưu OTP vào Cache trong 5 phút để xác thực
+            _cache.Set("OTP_" + email, otp, TimeSpan.FromMinutes(5));
+
+            // 5. Cấu hình nội dung Email
+            var emailMessage = new MimeMessage();
+            emailMessage.From.Add(new MailboxAddress(mailSettings["DisplayName"], mailSettings["Mail"]));
+            emailMessage.To.Add(new MailboxAddress("", email));
+            emailMessage.Subject = "Mã xác thực đặt lại mật khẩu";
+            emailMessage.Body = new TextPart("html")
+            {
+                Text = $@"<div style='font-family: Arial; padding: 20px; border: 1px solid #ddd;'>
+                        <h2>Xác thực đặt lại mật khẩu</h2>
+                        <p>Mã OTP của bạn là: <b style='font-size: 24px; color: #28a745;'>{otp}</b></p>
+                        <p>Mã này có hiệu lực trong 5 phút. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>
+                      </div>"
+            };
+
+            // 6. Gửi Mail thật qua SMTP Gmail
+            using var client = new SmtpClient();
+            try
+            {
+                await client.ConnectAsync(mailSettings["Host"], int.Parse(mailSettings["Port"]), MailKit.Security.SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(mailSettings["Mail"], mailSettings["Password"]);
+                await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi gửi mail: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword)
+        {
+            // 1. Lấy mã OTP đã lưu trong Cache ra để so khớp
+            if (!_cache.TryGetValue("OTP_" + email, out string savedOtp))
+            {
+                return false; // OTP đã hết hạn
+            }
+
+            if (savedOtp != otp)
+            {
+                return false; // Sai mã OTP
+            }
+
+            // 2. Tìm User và cập nhật mật khẩu thật
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return false;
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            // 3. Xóa mã OTP sau khi dùng xong
+            _cache.Remove("OTP_" + email);
+
+            return true;
+        }
+    }
+}

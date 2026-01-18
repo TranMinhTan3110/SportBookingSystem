@@ -1,0 +1,274 @@
+﻿@{
+    ViewData["Title"] = "Quản Lý Đồ Ăn";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="~/asset/css/foodAD.css" />
+}
+
+<!-- Page Content -->
+<div class="page-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1 class="page-title">🍔 Quản lý Đồ Ăn & Thức Uống</h1>
+        <button class="btn-add" onclick="openModal('add')">
+            <span>Thêm Sản Phẩm Mới</span>
+        </button>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-grid">
+            <div class="form-group">
+                <label class="form-label">TÌM KIẾM</label>
+                <input type="text" class="form-control" id="searchInput" placeholder="Tìm theo tên sản phẩm...">
+            </div>
+            <div class="form-group">
+                <label class="form-label">LOẠI SẢN PHẨM</label>
+                <select class="form-select" id="filterType">
+                    <option value="">Tất cả</option>
+                    <option value="Food">Đồ ăn</option>
+                    <option value="Drink">Thức uống</option>
+                    <option value="Snack">Đồ ăn vặt</option>
+                    <option value="Dessert">Tráng miệng</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">TÌNH TRẠNG KHO</label>
+                <select class="form-select" id="filterStock">
+                    <option value="">Tất cả</option>
+                    <option value="in">Còn hàng</option>
+                    <option value="low">Sắp hết</option>
+                    <option value="out">Hết hàng</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Section -->
+    <div class="table-section">
+        <div class="table-wrapper">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>HÌNH ẢNH</th>
+                        <th>TÊN SẢN PHẨM</th>
+                        <th>LOẠI</th>
+                        <th>GIÁ BÁN</th>
+                        <th>SỐ LƯỢNG</th>
+                        <th>THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr>
+                        <td>#001</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop" alt="Product" class="product-img">
+                        </td>
+                        <td>
+                            <div class="product-name">Hamburger Bò</div>
+                            <div class="product-category">Món chính</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-food">Đồ ăn</span>
+                        </td>
+                        <td>45,000₫</td>
+                        <td>
+                            <span class="stock-status stock-in">50 phần</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#002</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1554866585-cd94860890b7?w=200&h=200&fit=crop" alt="Product" class="product-img">
+                        </td>
+                        <td>
+                            <div class="product-name">Coca Cola</div>
+                            <div class="product-category">Nước ngọt có ga</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-drink">Thức uống</span>
+                        </td>
+                        <td>15,000₫</td>
+                        <td>
+                            <span class="stock-status stock-in">120 lon</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#003</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=200&h=200&fit=crop" alt="Product" class="product-img">
+                        </td>
+                        <td>
+                            <div class="product-name">Redbull</div>
+                            <div class="product-category">Nước tăng lực</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-drink">Thức uống</span>
+                        </td>
+                        <td>20,000₫</td>
+                        <td>
+                            <span class="stock-status stock-in">8 lon</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#004</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop" alt="Product" class="product-img">
+                        </td>
+                        <td>
+                            <div class="product-name">Pizza Hải Sản</div>
+                            <div class="product-category">Món chính</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-food">Đồ ăn</span>
+                        </td>
+                        <td>85,000₫</td>
+                        <td>
+                            <span class="stock-status stock-in">30 phần</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#005</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=200&h=200&fit=crop" alt="Product" class="product-img">
+                        </td>
+                        <td>
+                            <div class="product-name">Khoai Tây Chiên</div>
+                            <div class="product-category">Món phụ</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-snack">Đồ ăn vặt</span>
+                        </td>
+                        <td>25,000₫</td>
+                        <td>
+                            <span class="stock-status stock-in">45 phần</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>#006</td>
+                        <td>
+                            <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=200&h=200&fit=crop" alt="Product" class="product-img">
+                        </td>
+                        <td>
+                            <div class="product-name">Kem Vani</div>
+                            <div class="product-category">Tráng miệng</div>
+                        </td>
+                        <td>
+                            <span class="badge badge-dessert">Tráng miệng</span>
+                        </td>
+                        <td>30,000₫</td>
+                        <td>
+                            <span class="stock-status stock-out">0 phần</span>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
+                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
+                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Product Modal -->
+<div class="modal-overlay" id="productModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Thêm Sản Phẩm Mới</h3>
+            <button class="btn-close" onclick="closeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <form id="productForm">
+                <div class="form-group">
+                    <label class="form-label">TÊN SẢN PHẨM *</label>
+                    <input type="text" class="form-control" id="productName" placeholder="Nhập tên sản phẩm..." required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">LOẠI SẢN PHẨM *</label>
+                    <select class="form-select" id="productType" required>
+                        <option value="">Chọn loại sản phẩm</option>
+                        <option value="Food">Đồ ăn</option>
+                        <option value="Drink">Thức uống</option>
+                        <option value="Snack">Đồ ăn vặt</option>
+                        <option value="Dessert">Tráng miệng</option>
+                    </select>
+                </div>
+
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label class="form-label">GIÁ BÁN (VNĐ) *</label>
+                        <input type="number" class="form-control" id="productPrice" placeholder="Nhập giá..." required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">SỐ LƯỢNG *</label>
+                        <input type="number" class="form-control" id="productStock" placeholder="Nhập số lượng..." required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">ĐƠN VỊ</label>
+                    <input type="text" class="form-control" id="productUnit" placeholder="VD: Phần, Ly, Lon, Chai...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">URL HÌNH ẢNH</label>
+                    <input type="text" class="form-control" id="productImage" placeholder="Nhập link hình ảnh...">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">MÔ TẢ NGẮN</label>
+                    <textarea class="form-control" id="productDescription" placeholder="Nhập mô tả sản phẩm..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">Hủy</button>
+            <button class="btn-save" onclick="saveProduct()">Lưu</button>
+        </div>
+    </div>
+</div>
+<script src="~/asset/js/foodAD.js"></script>

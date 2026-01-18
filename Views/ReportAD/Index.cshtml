@@ -1,0 +1,303 @@
+﻿@{
+    ViewData["Title"] = "Báo cáo - Thống kê";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="~/asset/css/reportAD.css" />
+}
+<body>
+    <div class="container-fluid px-4 report-page">
+        <!-- Header -->
+        <div class="header-section">
+            <div>
+                <h1 class="page-title">
+                    <i class="fas fa-chart-line me-2"></i>Báo Cáo - Phân Tích
+                </h1>
+                <p class="page-subtitle">Tổng quan doanh thu và xu hướng kinh doanh</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="glass-card stat-card card-total">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-label">Tổng Doanh Thu</div>
+                <div class="stat-value" id="totalRevenue">285,500,000₫</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+15.2% so với kỳ trước</span>
+                </div>
+            </div>
+
+            <div class="glass-card stat-card card-booking">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-label">Đặt Sân</div>
+                <div class="stat-value" id="bookingRevenue">198,850,000₫</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+18.3% so với kỳ trước</span>
+                </div>
+            </div>
+
+            <div class="glass-card stat-card card-service">
+                <div class="stat-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-label">Dịch Vụ</div>
+                <div class="stat-value" id="serviceRevenue">86,650,000₫</div>
+                <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+9.7% so với kỳ trước</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Section -->
+        <div class="glass-card filter-section">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">
+                        <i class="fas fa-calendar me-1"></i>Từ Ngày
+                    </label>
+                    <input type="date" class="form-control" id="fromDate" value="2025-01-01">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">
+                        <i class="fas fa-calendar me-1"></i>Đến Ngày
+                    </label>
+                    <input type="date" class="form-control" id="toDate" value="2025-01-17">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small text-muted mb-2">
+                        <i class="fas fa-filter me-1"></i>Kỳ Báo Cáo
+                    </label>
+                    <select class="form-select" id="reportPeriod">
+                        <option selected>Tháng này</option>
+                        <option value="lastmonth">Tháng trước</option>
+                        <option value="quarter">Quý này</option>
+                        <option value="year">Năm nay</option>
+                        <option value="custom">Tùy chỉnh</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-apply w-100" onclick="applyFilter()">
+                        <i class="fas fa-sync-alt me-2"></i>Áp Dụng
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="glass-card chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-area text-primary"></i>
+                        Doanh Thu Theo Thời Gian
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="glass-card chart-container">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie text-success"></i>
+                        Doanh Thu Theo Nguồn
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Performing Sports -->
+        <div class="glass-card summary-section">
+            <div class="section-title">
+                <i class="fas fa-trophy text-warning"></i>
+                Môn Thể Thao Hoạt Động Tốt Nhất
+            </div>
+            <div class="sports-grid">
+                <div class="glass-card sport-card football">
+                    <div class="sport-header">
+                        <div class="sport-icon">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <div class="sport-name">Bóng Đá</div>
+                    </div>
+                    <div class="sport-stats">
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Doanh thu</span>
+                            <span class="sport-stat-value">128,500,000₫</span>
+                        </div>
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Số lượt đặt</span>
+                            <span class="sport-stat-value">342</span>
+                        </div>
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Tăng trưởng</span>
+                            <span class="growth-badge growth-positive">
+                                <i class="fas fa-arrow-up"></i>18.5%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card sport-card tennis">
+                    <div class="sport-header">
+                        <div class="sport-icon">
+                            <i class="fas fa-table-tennis"></i>
+                        </div>
+                        <div class="sport-name">Tennis</div>
+                    </div>
+                    <div class="sport-stats">
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Doanh thu</span>
+                            <span class="sport-stat-value">89,200,000₫</span>
+                        </div>
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Số lượt đặt</span>
+                            <span class="sport-stat-value">256</span>
+                        </div>
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Tăng trưởng</span>
+                            <span class="growth-badge growth-positive">
+                                <i class="fas fa-arrow-up"></i>12.3%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card sport-card badminton">
+                    <div class="sport-header">
+                        <div class="sport-icon">
+                            <i class="fas fa-volleyball-ball"></i>
+                        </div>
+                        <div class="sport-name">Cầu Lông</div>
+                    </div>
+                    <div class="sport-stats">
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Doanh thu</span>
+                            <span class="sport-stat-value">67,800,000₫</span>
+                        </div>
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Số lượt đặt</span>
+                            <span class="sport-stat-value">189</span>
+                        </div>
+                        <div class="sport-stat-row">
+                            <span class="sport-stat-label">Tăng trưởng</span>
+                            <span class="growth-badge growth-negative">
+                                <i class="fas fa-arrow-down"></i>3.2%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Summary Table -->
+        <div class="glass-card summary-section">
+            <div class="section-title">
+                <i class="fas fa-calendar-alt text-info"></i>
+                Tổng Kết Theo Tháng
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Tháng</th>
+                            <th>Tổng Doanh Thu</th>
+                            <th>Số Giao Dịch</th>
+                            <th>Doanh Thu TB/GD</th>
+                            <th>Tăng Trưởng</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">Tháng 1/2025</div>
+                                <div class="text-muted small">01/01 - 17/01</div>
+                            </td>
+                            <td class="amount-cell">285,500,000₫</td>
+                            <td>787</td>
+                            <td>362,900₫</td>
+                            <td>
+                                <span class="growth-badge growth-positive">
+                                    <i class="fas fa-arrow-up"></i>15.2%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">Tháng 12/2024</div>
+                                <div class="text-muted small">Toàn tháng</div>
+                            </td>
+                            <td class="amount-cell">512,800,000₫</td>
+                            <td>1,456</td>
+                            <td>352,200₫</td>
+                            <td>
+                                <span class="growth-badge growth-positive">
+                                    <i class="fas fa-arrow-up"></i>8.7%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">Tháng 11/2024</div>
+                                <div class="text-muted small">Toàn tháng</div>
+                            </td>
+                            <td class="amount-cell">471,600,000₫</td>
+                            <td>1,324</td>
+                            <td>356,200₫</td>
+                            <td>
+                                <span class="growth-badge growth-negative">
+                                    <i class="fas fa-arrow-down"></i>2.4%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">Tháng 10/2024</div>
+                                <div class="text-muted small">Toàn tháng</div>
+                            </td>
+                            <td class="amount-cell">483,200,000₫</td>
+                            <td>1,389</td>
+                            <td>347,900₫</td>
+                            <td>
+                                <span class="growth-badge growth-positive">
+                                    <i class="fas fa-arrow-up"></i>11.5%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="fw-semibold">Tháng 9/2024</div>
+                                <div class="text-muted small">Toàn tháng</div>
+                            </td>
+                            <td class="amount-cell">433,500,000₫</td>
+                            <td>1,267</td>
+                            <td>342,100₫</td>
+                            <td>
+                                <span class="growth-badge growth-positive">
+                                    <i class="fas fa-arrow-up"></i>6.8%
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="~/asset/js/reportAD.js"></script>
