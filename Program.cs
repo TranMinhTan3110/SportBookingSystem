@@ -45,6 +45,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Login}/{action=SignIn}/{id?}");
+    pattern: "{controller=Dashboard}/{action=index}/{id?}");
 
 app.Run();
