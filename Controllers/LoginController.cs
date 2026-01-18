@@ -97,10 +97,8 @@ namespace SportBookingSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> SignOut()
         {
-            // Xóa Cookie xác thực
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // Chuyển hướng về trang đăng nhập
             return RedirectToAction("SignIn", "Login");
         }
         [HttpGet]
