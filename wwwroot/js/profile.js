@@ -27,17 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ============================================
-    // QUICK ACTION CARDS
-    // ============================================
-    const actionCards = document.querySelectorAll('.action-card');
-    actionCards.forEach(card => {
-        card.addEventListener('click', function (e) {
-            e.preventDefault();
-            const label = this.querySelector('.action-label').textContent;
-            console.log('Action clicked:', label);
-            // TODO: Navigate to appropriate page
-        });
-    });
+
 
     // ============================================
     // PAY NOW BUTTONS
@@ -109,27 +99,153 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // ============================================
-    // PERSONAL INFO BUTTONS
+    // PERSONAL INFO BUTTONS & MODAL LOGIC
     // ============================================
-    document.querySelectorAll('.btn-change-email').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // TODO: Open Change Email Modal
-            alert('Chức năng đổi Email đang được phát triển');
+    const emailModal = document.getElementById('emailModal');
+    const phoneModal = document.getElementById('phoneModal');
+    const passwordModal = document.getElementById('passwordModal');
+
+    function openModal(modal) {
+        if (modal) {
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // Reset fields
+            const inputs = modal.querySelectorAll('input');
+            inputs.forEach(input => input.value = '');
+        }
+    }
+
+    function closeModal(modal) {
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+    }
+
+    // Close on click close button or cancel button or outside modal
+    document.querySelectorAll('.close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const modal = this.closest('.modal');
+            closeModal(modal);
         });
+    });
+
+    window.addEventListener('click', function (e) {
+        if (e.target.classList.contains('modal')) {
+            closeModal(e.target);
+        }
+    });
+
+    document.querySelectorAll('.btn-change-email').forEach(btn => {
+        btn.addEventListener('click', () => openModal(emailModal));
     });
 
     document.querySelectorAll('.btn-change-phone').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // TODO: Open Change Phone Modal
-            alert('Chức năng đổi Số điện thoại đang được phát triển');
-        });
+        btn.addEventListener('click', () => openModal(phoneModal));
     });
 
     document.querySelectorAll('.btn-change-password').forEach(btn => {
-        btn.addEventListener('click', () => {
-            // TODO: Open Change Password Modal
-            alert('Chức năng đổi Mật khẩu đang được phát triển');
-        });
+        btn.addEventListener('click', () => openModal(passwordModal));
+    });
+
+    // Handle AJAX submissions
+    document.getElementById('saveEmail')?.addEventListener('click', function () {
+        const newEmail = document.getElementById('newEmail').value;
+        if (!newEmail) return showNotification('Vui lòng nhập email', 'error');
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        fetch('/UserProfile/ChangeEmail', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `newEmail=${encodeURIComponent(newEmail)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    closeModal(emailModal);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.textContent = 'Lưu thay đổi';
+            });
+    });
+
+    document.getElementById('savePhone')?.addEventListener('click', function () {
+        const newPhone = document.getElementById('newPhone').value;
+        if (!newPhone) return showNotification('Vui lòng nhập số điện thoại', 'error');
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        fetch('/UserProfile/ChangePhone', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `newPhone=${encodeURIComponent(newPhone)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    closeModal(phoneModal);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.textContent = 'Lưu thay đổi';
+            });
+    });
+
+    document.getElementById('savePassword')?.addEventListener('click', function () {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return showNotification('Vui lòng nhập đầy đủ thông tin', 'error');
+        }
+
+        if (newPassword !== confirmPassword) {
+            return showNotification('Mật khẩu xác nhận không khớp', 'error');
+        }
+
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
+
+        fetch('/UserProfile/ChangePassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `currentPassword=${encodeURIComponent(currentPassword)}&newPassword=${encodeURIComponent(newPassword)}&confirmPassword=${encodeURIComponent(confirmPassword)}`
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification(data.message, 'success');
+                    closeModal(passwordModal);
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.textContent = 'Lưu thay đổi';
+            });
     });
 
     // ============================================
@@ -152,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: ${type === 'success' ? '#10B981' : '#3B82F6'};
+            background: ${type === 'success' ? '#10B981' : (type === 'error' ? '#EF4444' : '#3B82F6')};
             color: white;
             padding: 16px 24px;
             border-radius: 12px;
