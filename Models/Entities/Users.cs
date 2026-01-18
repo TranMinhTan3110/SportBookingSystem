@@ -20,6 +20,11 @@ namespace SportBookingSystem.Models.Entities
         public string? FullName { get; set; }
 
         [Required]
+        [EmailAddress]
+        [StringLength(100)]
+        public string? Email { get; set; }
+
+        [Required]
         [StringLength(15)]
         public string Phone { get; set; }
 
