@@ -52,11 +52,10 @@ namespace SportBookingSystem.Services
                     FullName = model.FullName,
                     Username = model.Phone,
                     Phone = model.Phone,
-                    Email = model.Email, // Kiểm tra xem model.Email có giá trị không
+                    Email = model.Email, 
                     Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
                     RoleId = 2,
                     IsActive = true
-                    // ... các trường khác
                 };
 
                 _context.Users.Add(newUser);
@@ -65,7 +64,6 @@ namespace SportBookingSystem.Services
             }
             catch (Exception ex)
             {
-                // Dòng này sẽ in lỗi chi tiết ra cửa sổ "Output" của Visual Studio
                 var msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 System.Diagnostics.Debug.WriteLine("LỖI ĐĂNG KÝ: " + msg);
                 return false;
