@@ -330,7 +330,7 @@
     overflow: hidden;
 }
 
-    .field-image::before {
+/*    .field-image::before {
         content: '🏟️';
         position: absolute;
         top: 50%;
@@ -338,7 +338,7 @@
         transform: translate(-50%, -50%);
         font-size: 100px;
         opacity: 0.3;
-    }
+    }*/
 
 .field-status-badge {
     position: absolute;

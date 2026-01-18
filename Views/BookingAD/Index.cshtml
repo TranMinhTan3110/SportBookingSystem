@@ -1,9 +1,11 @@
-﻿@section Styles {
+﻿@model List<SportBookingSystem.Models.Entities.Pitches>
+
+@section Styles {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="~/asset/css/bookingAD.css" />
 }
+
 @{
-    
     Layout = "~/Views/Shared/LayoutAdmin.cshtml";
 }
 
@@ -20,226 +22,134 @@
     </div>
 
     <!-- Filters -->
-    <div class="filters-section">
-        <div class="filter-group">
-            <label>LOẠI SÂN</label>
-            <select class="form-select filter-select">
-                <option value="">Tất cả</option>
-                <option value="football">Bóng đá</option>
-                <option value="tennis">Tennis</option>
-                <option value="volleyball">Bóng chuyền</option>
-                <option value="badminton">Cầu lông</option>
-            </select>
-        </div>
+    <form method="get" asp-action="Index">
+        <div class="filters-section">
+            <!-- Filter Category -->
+            <div class="filter-group">
+                <label>LOẠI SÂN</label>
+                <select name="categoryId" class="form-select filter-select" onchange="this.form.submit()">
+                    <option value="">Tất cả</option>
+                    @if (ViewBag.Categories != null)
+                    {
+                        foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.CategoryId"
+                                    selected="@(ViewBag.SelectedCategoryId == category.CategoryId)">
+                                @category.CategoryName
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
 
-        <div class="filter-group">
-            <label>TRẠNG THÁI</label>
-            <select class="form-select filter-select">
-                <option value="">Tất cả</option>
-                <option value="active">Hoạt động</option>
-                <option value="maintenance">Bảo trì</option>
-                <option value="inactive">Ngưng hoạt động</option>
-            </select>
-        </div>
+            <!-- Filter Status -->
+            <div class="filter-group">
+                <label>TRẠNG THÁI</label>
+                <select name="status" class="form-select filter-select" onchange="this.form.submit()">
+                    <option value="">Tất cả</option>
+                    <option value="Sẵn sàng" selected="@(ViewBag.SelectedStatus == "Sẵn sàng")">Sẵn sàng</option>
+                    <option value="Bảo trì" selected="@(ViewBag.SelectedStatus == "Bảo trì")">Bảo trì</option>
+                    <option value="Đã đặt" selected="@(ViewBag.SelectedStatus == "Đã đặt")">Đã đặt</option>
+                </select>
+            </div>
 
-        <div class="filter-group search-group">
-            <label>TÌM KIẾM</label>
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" class="form-control search-input" placeholder="Tìm theo tên sân..." style="padding-left:48px">
+            <!-- Search Box -->
+            <div class="filter-group search-group">
+                <label>TÌM KIẾM</label>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" name="searchTerm" value="@ViewBag.SearchTerm"
+                           class="form-control search-input"
+                           placeholder="Tìm theo tên sân..."
+                           style="padding-left:48px">
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 
-    <!-- Fields Grid -->
+    <!-- Fields Grid - HIỂN THỊ ĐỘNG TỪ DATABASE -->
     <div class="fields-grid">
-        <!-- Field Card 1 -->
-        <div class="field-card">
-            <div class="field-image">
-                <img src="~/asset/img/SanNamNguoi.webp" alt="Sân 5 người - A1" onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text=⚽'">
-                <span class="badge-status badge-active">HOẠT ĐỘNG</span>
-            </div>
-            <div class="field-content">
-                <div class="field-header">
-                    <h3 class="field-name">Sân 5 người - A1</h3>
-                    <div class="field-actions">
-                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="field-type">
-                    <span class="sport-icon"></span>
-                    <span>Bóng đá</span>
-                </div>
-                <div class="field-info">
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Giá thuê</span>
-                            <span class="info-value price">200,000đ/giờ</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Kích thước</span>
-                            <span class="info-value">25m x 15m</span>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Đặt trong tháng</span>
-                            <span class="info-value">248 lượt</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Doanh thu</span>
-                            <span class="info-value revenue">24.8tr</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var pitch in Model)
+            {
+                <!-- Xác định CSS class cho badge status -->
+                var badgeClass = pitch.Status switch
+                {
+                    "Sẵn sàng" => "badge-active",
+                    "Bảo trì" => "badge-maintenance",
+                    "Đã đặt" => "badge-inactive",
+                    _ => "badge-active"
+                };
 
-        <!-- Field Card 2 -->
-        <div class="field-card">
-            <div class="field-image">
-                <img src="~/asset/img/SanTennis.jpg" alt="Sân Tennis - T1" onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text=🎾'">
-                <span class="badge-status badge-active">HOẠT ĐỘNG</span>
-            </div>
-            <div class="field-content">
-                <div class="field-header">
-                    <h3 class="field-name">Sân Tennis - T1</h3>
-                    <div class="field-actions">
-                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="field-type">
-                    <span class="sport-icon"></span>
-                    <span>Tennis</span>
-                </div>
-                <div class="field-info">
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Giá thuê</span>
-                            <span class="info-value price">150,000đ/giờ</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Kích thước</span>
-                            <span class="info-value">23.8m x 10.9m</span>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Đặt trong tháng</span>
-                            <span class="info-value">186 lượt</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Doanh thu</span>
-                            <span class="info-value revenue">18.6tr</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                var statusText = pitch.Status switch
+                {
+                    "Sẵn sàng" => "HOẠT ĐỘNG",
+                    "Bảo trì" => "BẢO TRÌ",
+                    "Đã đặt" => "ĐÃ ĐẶT",
+                    _ => "HOẠT ĐỘNG"
+                };
 
-        <!-- Field Card 3 -->
-        <div class="field-card">
-            <div class="field-image">
-                <img src="~/asset/img/SanBayNguoi.jpg" alt="Sân 7 người - A2" onerror="this.src='https://via.placeholder.com/400x250/1E293B/F59E0B?text=⚽'">
-                <span class="badge-status badge-maintenance">BẢO TRÌ</span>
+                <div class="field-card">
+                    <div class="field-image">
+                        <img src="@(string.IsNullOrEmpty(pitch.ImageUrl) ? "/asset/img/default-pitch.jpg" : pitch.ImageUrl)"
+                             alt="@pitch.PitchName"
+                             onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text='">
+                        <span class="badge-status @badgeClass">@statusText</span>
+                    </div>
+                    <div class="field-content">
+                        <div class="field-header">
+                            <h3 class="field-name">@pitch.PitchName</h3>
+                            <div class="field-actions">
+                                <button class="btn-icon btn-edit"
+                                        data-pitch-id="@pitch.PitchId"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editFieldModal">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn-icon btn-delete" data-pitch-id="@pitch.PitchId">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="field-type">
+                            <span class="sport-icon"></span>
+                            <span>@pitch.Category?.CategoryName</span>
+                        </div>
+                        <div class="field-info">
+                            <div class="info-row">
+                                <div class="info-item">
+                                    <span class="info-label">Giá thuê</span>
+                                    <span class="info-value price">@pitch.PricePerHour.ToString("N0")đ/giờ</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Sức chứa</span>
+                                    <span class="info-value">@pitch.Capacity người</span>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-item">
+                                    <span class="info-label">Trạng thái</span>
+                                    <span class="info-value">@pitch.Status</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Loại</span>
+                                    <span class="info-value revenue">@pitch.Category?.CategoryName</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">Chưa có sân nào</h4>
+                <p class="text-muted">Nhấn "Thêm Sân Mới" để bắt đầu</p>
             </div>
-            <div class="field-content">
-                <div class="field-header">
-                    <h3 class="field-name">Sân 7 người - A2</h3>
-                    <div class="field-actions">
-                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="field-type">
-                    <span class="sport-icon"></span>
-                    <span>Bóng đá</span>
-                </div>
-                <div class="field-info">
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Giá thuê</span>
-                            <span class="info-value price">300,000đ/giờ</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Kích thước</span>
-                            <span class="info-value">35m x 25m</span>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Đặt trong tháng</span>
-                            <span class="info-value">0 lượt</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Doanh thu</span>
-                            <span class="info-value revenue">0đ</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Field Card 4 -->
-        <div class="field-card">
-            <div class="field-image">
-                <img src="~/asset/img/SanBongChuyen.jpg" alt="Sân Bóng chuyền - V1" onerror="this.src='https://via.placeholder.com/400x250/1E293B/10B981?text=🏐'">
-                <span class="badge-status badge-active">HOẠT ĐỘNG</span>
-            </div>
-            <div class="field-content">
-                <div class="field-header">
-                    <h3 class="field-name">Sân Bóng chuyền - V1</h3>
-                    <div class="field-actions">
-                        <button class="btn-icon btn-edit" data-bs-toggle="modal" data-bs-target="#editFieldModal">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-icon btn-delete">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="field-type">
-                    <span class="sport-icon"></span>
-                    <span>Bóng chuyền</span>
-                </div>
-                <div class="field-info">
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Giá thuê</span>
-                            <span class="info-value price">180,000đ/giờ</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Kích thước</span>
-                            <span class="info-value">18m x 9m</span>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-item">
-                            <span class="info-label">Đặt trong tháng</span>
-                            <span class="info-value">142 lượt</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Doanh thu</span>
-                            <span class="info-value revenue">12.4tr</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        }
     </div>
 </div>
 
@@ -252,32 +162,37 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addFieldForm">
+                <form id="addFieldForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
                     <div class="form-group">
                         <label>Tên Sân <span class="required">*</span></label>
-                        <input type="text" class="form-control" placeholder="Ví dụ: Sân 5 người - A1" required>
+                        <input type="text" name="PitchName" class="form-control" placeholder="Ví dụ: Sân 5 người - A1" required>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Loại Sân <span class="required">*</span></label>
-                                <select class="form-select" required>
+                                <select name="CategoryId" class="form-select" required>
                                     <option value="">Chọn loại sân</option>
-                                    <option value="football">Bóng đá</option>
-                                    <option value="tennis">Tennis</option>
-                                    <option value="volleyball">Bóng chuyền</option>
-                                    <option value="badminton">Cầu lông</option>
+                                    @if (ViewBag.Categories != null)
+                                    {
+                                        foreach (var category in ViewBag.Categories)
+                                        {
+                                            <option value="@category.CategoryId">@category.CategoryName</option>
+                                        }
+                                    }
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Trạng Thái <span class="required">*</span></label>
-                                <select class="form-select" required>
-                                    <option value="active">Hoạt động</option>
-                                    <option value="maintenance">Bảo trì</option>
-                                    <option value="inactive">Ngưng hoạt động</option>
+                                <select name="Status" class="form-select" required>
+                                    <option value="Sẵn sàng" selected>Sẵn sàng</option>
+                                    <option value="Đã đặt">Đã đặt</option>
+                                    <option value="Bảo trì">Bảo trì</option>
                                 </select>
                             </div>
                         </div>
@@ -287,40 +202,30 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Giá Thuê / Giờ (VND) <span class="required">*</span></label>
-                                <input type="number" class="form-control" placeholder="200000" required>
+                                <input type="number" name="PricePerHour" class="form-control" placeholder="200000" min="0" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Giá Đặt Cọc (VND) <span class="required">*</span></label>
-                                <input type="number" class="form-control" placeholder="100000" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Chiều Dài (m)</label>
-                                <input type="number" class="form-control" placeholder="25">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Chiều Rộng (m)</label>
-                                <input type="number" class="form-control" placeholder="15">
+                                <label>Sức chứa (người) <span class="required">*</span></label>
+                                <input type="number" name="Capacity" class="form-control" placeholder="10" min="1" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea name="Description" class="form-control" rows="3" placeholder="Mô tả chi tiết về sân..."></textarea>
+                    </div>
+
+                    <div class="form-group">
                         <label>Ảnh Sân</label>
                         <div class="image-upload-area">
-                            <input type="file" id="fieldImageInput" accept="image/*" multiple class="d-none">
+                            <input type="file" id="fieldImageInput" name="ImageFile" accept="image/*" class="d-none">
                             <div class="upload-placeholder" onclick="document.getElementById('fieldImageInput').click()">
                                 <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Nhấn để tải ảnh lên</p>
-                                <small>Chấp nhận: JPG, PNG, GIF (Tối đa 5MB mỗi ảnh)</small>
+                                <small>Chấp nhận: JPG, PNG, GIF (Tối đa 5MB)</small>
                             </div>
                             <div id="imagePreviewContainer" class="image-preview-container"></div>
                         </div>
@@ -329,7 +234,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                <button type="submit" form="addFieldForm" class="btn btn-primary">
+                <button type="submit" form="addFieldForm" id="btnAddField" class="btn btn-primary">
                     <i class="fas fa-save"></i> Lưu Thông Tin
                 </button>
             </div>
@@ -346,31 +251,38 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="editFieldForm">
+                <form id="editFieldForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="PitchId" id="editPitchId">
+
                     <div class="form-group">
                         <label>Tên Sân <span class="required">*</span></label>
-                        <input type="text" class="form-control" value="Sân 5 người - A1" required>
+                        <input type="text" name="PitchName" id="editPitchName" class="form-control" required>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Loại Sân <span class="required">*</span></label>
-                                <select class="form-select" required>
-                                    <option value="football" selected>Bóng đá</option>
-                                    <option value="tennis">Tennis</option>
-                                    <option value="volleyball">Bóng chuyền</option>
-                                    <option value="badminton">Cầu lông</option>
+                                <select name="CategoryId" id="editCategoryId" class="form-select" required>
+                                    <option value="">Chọn loại sân</option>
+                                    @if (ViewBag.Categories != null)
+                                    {
+                                        foreach (var category in ViewBag.Categories)
+                                        {
+                                            <option value="@category.CategoryId">@category.CategoryName</option>
+                                        }
+                                    }
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Trạng Thái <span class="required">*</span></label>
-                                <select class="form-select" required>
-                                    <option value="active" selected>Hoạt động</option>
-                                    <option value="maintenance">Bảo trì</option>
-                                    <option value="inactive">Ngưng hoạt động</option>
+                                <select name="Status" id="editStatus" class="form-select" required>
+                                    <option value="Sẵn sàng">Sẵn sàng</option>
+                                    <option value="Đã đặt">Đã đặt</option>
+                                    <option value="Bảo trì">Bảo trì</option>
                                 </select>
                             </div>
                         </div>
@@ -380,47 +292,30 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Giá Thuê / Giờ (VND) <span class="required">*</span></label>
-                                <input type="number" class="form-control" value="200000" required>
+                                <input type="number" name="PricePerHour" id="editPricePerHour" class="form-control" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Giá Đặt Cọc (VND) <span class="required">*</span></label>
-                                <input type="number" class="form-control" value="100000" required>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Chiều Dài (m)</label>
-                                <input type="number" class="form-control" value="25">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Chiều Rộng (m)</label>
-                                <input type="number" class="form-control" value="15">
+                                <label>Sức chứa (người) <span class="required">*</span></label>
+                                <input type="number" name="Capacity" id="editCapacity" class="form-control" required>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
+                        <label>Mô tả</label>
+                        <textarea name="Description" id="editDescription" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-group">
                         <label>Ảnh Sân</label>
                         <div class="image-upload-area">
-                            <input type="file" id="editFieldImageInput" accept="image/*" multiple class="d-none">
-                            <div class="current-images">
-                                <div class="image-item">
-                                    <img src="https://via.placeholder.com/150/1E293B/10B981?text=" alt="Current">
-                                    <button type="button" class="btn-remove-image">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
+                            <input type="file" id="editFieldImageInput" name="ImageFile" accept="image/*" class="d-none">
+                            <div id="currentImageContainer" class="current-images"></div>
                             <div class="upload-placeholder small" onclick="document.getElementById('editFieldImageInput').click()">
                                 <i class="fas fa-plus"></i>
-                                <p>Thêm ảnh mới</p>
+                                <p>Thay đổi ảnh</p>
                             </div>
                         </div>
                     </div>
@@ -428,8 +323,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                <button type="submit" form="editFieldForm" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Lưu Thông Tin
+                <button type="submit" form="editFieldForm" id="btnEditField" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Cập Nhật
                 </button>
             </div>
         </div>
@@ -438,5 +333,6 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/asset/js/bookingAD.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/asset/js/bookingAD.js"></script>
 }
