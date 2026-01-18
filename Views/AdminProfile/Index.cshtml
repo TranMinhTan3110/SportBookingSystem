@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Hồ sơ Admin";
+    Layout = "~/Views/Shared/LayoutAdmin.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/admin-profile.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+}
+
+<div class="profile-container">
+    <!-- Admin Header Card -->
+    <div class="profile-header-card">
+        <div class="profile-info">
+            <div class="profile-avatar">
+                <img src="~/asset/img/user.jpg" alt="Admin Avatar" />
+            </div>
+            <div class="profile-details">
+                <h1 class="profile-name">Administrator</h1>
+                <div class="profile-badges">
+                    <span class="badge badge-vip">
+                        <i class="fas fa-user-shield"></i>
+                        Quản trị viên hệ thống
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Information Section -->
+    <section class="personal-info-section">
+        <h2 class="section-title">
+            <i class="fas fa-user-cog"></i>
+            Thông tin cá nhân
+        </h2>
+
+        <div class="info-card">
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="info-content">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">admin@sporthub.vn</span>
+                </div>
+                <button class="btn-change btn-change-email">
+                    <i class="fas fa-pen"></i> Đổi
+                </button>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="info-content">
+                    <span class="info-label">Số điện thoại</span>
+                    <span class="info-value">0909999999</span>
+                </div>
+                <button class="btn-change btn-change-phone">
+                    <i class="fas fa-pen"></i> Đổi
+                </button>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-item">
+                <div class="info-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="info-content">
+                    <span class="info-label">Mật khẩu</span>
+                    <span class="info-value">••••••••</span>
+                </div>
+                <button class="btn-change btn-change-password">
+                    <i class="fas fa-key"></i> Đổi mật khẩu
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-profile.js"></script>
+}
