@@ -32,13 +32,17 @@
         public List<int>? CategoryIds { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
-        public List<string>? StatusFilter { get; set; } // "available", "booked", "maintenance"
+        public List<string>? StatusFilter { get; set; } // "available", "booked"
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 9;
     }
 
     public class FilterPitchesResponse
     {
         public List<PitchSlotViewModel> PitchSlots { get; set; }
-        public int TotalCount { get; set; }
-        public int DisplayCount { get; set; }
+        public int TotalCount { get; set; } // Tổng số sân
+        public int DisplayCount { get; set; } // Số kết quả hiện tại
+        public int TotalPages { get; set; } // Tổng số trang
+        public int CurrentPage { get; set; } // Trang hiện tại
     }
 }

@@ -5,6 +5,9 @@ dateInput.value = today;
 
 // Time slot selection
 let selectedSlotId = null;
+let currentPage = 1;
+const pageSize = 9;
+
 document.querySelectorAll('.time-slot').forEach(slot => {
     slot.addEventListener('click', function () {
         document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
@@ -45,7 +48,9 @@ function getFilterData() {
         categoryIds: categoryIds.length > 0 ? categoryIds : null,
         statusFilter: statusFilter.length > 0 ? statusFilter : null,
         minPrice: minPrice,
-        maxPrice: maxPrice
+        maxPrice: maxPrice,
+        page: currentPage,
+        pageSize: pageSize
     };
 }
 
@@ -248,6 +253,61 @@ async function loadPitches() {
             grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #ef4444;">Không thể tải dữ liệu. Vui lòng thử lại sau.</div>';
         }
     }
+}
+
+// Hàm render phân trang
+function renderPagination(totalPages, currentPageNum) {
+    const grid = document.querySelector('.fields-grid');
+    if (!grid) return;
+
+    // Xóa pagination cũ (nếu có)
+    const oldPagination = document.querySelector('.pagination-container');
+    if (oldPagination) oldPagination.remove();
+
+    if (totalPages <= 1) return; // Không cần phân trang nếu chỉ có 1 trang
+
+    const paginationHTML = `
+        <div class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; padding: 20px;">
+            <button class="pagination-btn" data-page="prev" ${currentPageNum === 1 ? 'disabled' : ''} 
+                style="padding: 10px 15px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px;">
+                ← Trước
+            </button>
+            <div class="pagination-numbers" style="display: flex; gap: 5px;">
+                ${Array.from({ length: totalPages }, (_, i) => i + 1).map(page => `
+                    <button class="pagination-btn ${page === currentPageNum ? 'active' : ''}" data-page="${page}"
+                        style="padding: 10px 15px; border: 1px solid #ddd; background: ${page === currentPageNum ? '#10B981' : 'white'}; 
+                        color: ${page === currentPageNum ? 'white' : 'black'}; cursor: pointer; border-radius: 5px; min-width: 40px;">
+                        ${page}
+                    </button>
+                `).join('')}
+            </div>
+            <button class="pagination-btn" data-page="next" ${currentPageNum === totalPages ? 'disabled' : ''}
+                style="padding: 10px 15px; border: 1px solid #ddd; background: white; cursor: pointer; border-radius: 5px;">
+                Sau →
+            </button>
+        </div>
+    `;
+
+    grid.insertAdjacentHTML('afterend', paginationHTML);
+
+    // Gắn sự kiện cho các nút phân trang
+    document.querySelectorAll('.pagination-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+            if (this.disabled) return;
+
+            const page = this.getAttribute('data-page');
+            if (page === 'prev') {
+                currentPage = Math.max(1, currentPage - 1);
+            } else if (page === 'next') {
+                currentPage = Math.min(totalPages, currentPage + 1);
+            } else {
+                currentPage = parseInt(page);
+            }
+
+            loadPitches();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
 }
 
 // Filter clear

@@ -20,29 +20,44 @@ namespace SportBookingSystem.Services
             decimal? minPrice,
             decimal? maxPrice)
         {
-            // Lấy tất cả sân với Category
-            var pitchesQuery = _context.Pitches
+            // Lấy TẤT CẢ sân trước, sau đó filter trong memory để xử lý Unicode đúng
+            var allPitches = await _context.Pitches
                 .Include(p => p.Category)
-                .AsQueryable();
+                .ToListAsync();
+
+            // Debug: Log tất cả sân
+            Console.WriteLine("=== TẤT CẢ SÂN TRONG DB ===");
+            foreach (var p in allPitches)
+            {
+                Console.WriteLine($"ID: {p.PitchId}, Tên: {p.PitchName}, Status: [{p.Status}], Length: {p.Status?.Length}");
+            }
+
+            // Filter CHỈ LẤY sân "Sẵn sàng" - so sánh trong memory (C#)
+            var pitches = allPitches
+                .Where(p => p.Status != null && p.Status.Trim() == "Sẵn sàng")
+                .ToList();
+
+            Console.WriteLine($"Số sân SAU KHI LỌC 'Sẵn sàng': {pitches.Count}");
+            Console.WriteLine("========================");
 
             // Lọc theo danh mục
             if (categoryIds != null && categoryIds.Any())
             {
-                pitchesQuery = pitchesQuery.Where(p => categoryIds.Contains(p.CategoryId));
+                pitches = pitches.Where(p => categoryIds.Contains(p.CategoryId)).ToList();
             }
 
             // Lọc theo khoảng giá
             if (minPrice.HasValue)
             {
-                pitchesQuery = pitchesQuery.Where(p => p.PricePerHour >= minPrice.Value);
+                pitches = pitches.Where(p => p.PricePerHour >= minPrice.Value).ToList();
             }
 
             if (maxPrice.HasValue)
             {
-                pitchesQuery = pitchesQuery.Where(p => p.PricePerHour <= maxPrice.Value);
+                pitches = pitches.Where(p => p.PricePerHour <= maxPrice.Value).ToList();
             }
 
-            var pitches = await pitchesQuery.ToListAsync();
+            var totalCount = pitches.Count;
 
             // Lấy tất cả TimeSlots hoạt động
             var timeSlotsQuery = _context.TimeSlots
@@ -68,35 +83,51 @@ namespace SportBookingSystem.Services
 
             foreach (var pitch in pitches)
             {
+                // Bỏ qua sân đang bảo trì (double check)
+                if (pitch.Status == "Bảo trì")
+                {
+                    continue;
+                }
+
                 foreach (var timeSlot in timeSlots)
                 {
+                    bool isAvailable = true;
+                    string status = "available";
+                    string statusText = "✓ Còn trống";
+
                     // Kiểm tra trạng thái của sân trong khung giờ này
                     var pitchSlot = pitchSlots.FirstOrDefault(ps =>
                         ps.PitchId == pitch.PitchId &&
                         ps.SlotId == timeSlot.SlotId);
 
-                    bool isAvailable = true;
-                    string status = "available";
-                    string statusText = "✓ Còn trống";
-
+                    // Xử lý trạng thái cụ thể của slot
                     if (pitchSlot != null)
                     {
+                        // Chỉ có 2 trạng thái: Trống (0) hoặc Đã đặt (1)
                         if (pitchSlot.Status == 1)
                         {
                             // Đã đặt
-                            isAvailable = false;
                             status = "booked";
-                            statusText = "✕ Đã hết sân";
+                            statusText = "✕ Đã đặt";
+                            isAvailable = false;
                         }
-                        else if (pitchSlot.Status == 2)
+                        else
                         {
-                            // Đang giữ chỗ
-                            status = "limited";
-                            statusText = "⚠️ Sắp hết";
+                            // Còn trống (Status = 0 hoặc bất kỳ giá trị nào khác)
+                            status = "available";
+                            statusText = "✓ Còn trống";
+                            isAvailable = true;
                         }
                     }
+                    else
+                    {
+                        // Không có dữ liệu trong PitchSlots → Mặc định còn trống
+                        status = "available";
+                        statusText = "✓ Còn trống";
+                        isAvailable = true;
+                    }
 
-                    // Tính thời gian của slot (giả sử mỗi slot là 1.5 giờ)
+                    // Tính thời gian của slot
                     var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
                     decimal fullPrice = pitch.PricePerHour * (decimal)duration;
                     decimal depositPrice = fullPrice * 0.3m;
@@ -127,13 +158,12 @@ namespace SportBookingSystem.Services
                 }
             }
 
-            var totalCount = result.Count;
             var displayCount = result.Count;
 
             return new FilterPitchesResponse
             {
                 PitchSlots = result,
-                TotalCount = totalCount,
+                TotalCount = pitches.Count, // Số sân thực (không phải số kết quả)
                 DisplayCount = displayCount
             };
         }
@@ -155,9 +185,39 @@ namespace SportBookingSystem.Services
                 response.PitchSlots = response.PitchSlots
                     .Where(p => statusFilter.Contains(p.Status))
                     .ToList();
-
-                response.DisplayCount = response.PitchSlots.Count;
             }
+
+            response.DisplayCount = response.PitchSlots.Count;
+
+            return response;
+        }
+
+        public async Task<FilterPitchesResponse> GetFilteredPitchesWithPaginationAsync(
+            DateTime date,
+            int? slotId,
+            List<int>? categoryIds,
+            decimal? minPrice,
+            decimal? maxPrice,
+            List<string>? statusFilter,
+            int page,
+            int pageSize)
+        {
+            // Lấy tất cả kết quả
+            var response = await GetFilteredPitchesAsync(date, slotId, categoryIds, minPrice, maxPrice, statusFilter);
+
+            // Tính phân trang
+            var totalItems = response.PitchSlots.Count;
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+            // Lấy dữ liệu theo trang
+            response.PitchSlots = response.PitchSlots
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            response.TotalPages = totalPages;
+            response.CurrentPage = page;
+            response.DisplayCount = response.PitchSlots.Count;
 
             return response;
         }
