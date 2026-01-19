@@ -1,4 +1,5 @@
-﻿@{
+﻿@model SportBookingSystem.Models.ViewModels.UserProfileViewModel
+@{
     ViewData["Title"] = "UserProfile";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -18,15 +19,30 @@
                 <img src="~/asset/img/user.jpg" alt="Avatar" />
             </div>
             <div class="profile-details">
-                <h1 class="profile-name">Nguyễn Văn A</h1>
+                <h1 class="profile-name">@Model.User.FullName</h1>
                 <div class="profile-badges">
                     <span class="badge badge-vip">
                         <i class="fas fa-crown"></i>
-                        Thành viên Vang
+                         @if(Model.User.RewardPoints >= 1000)
+                         {
+                             <span>Thành viên Kim Cương</span>
+                         }
+                         else if(Model.User.RewardPoints >= 500)
+                         {
+                             <span>Thành viên Bạch Kim</span>
+                         }
+                         else if(Model.User.RewardPoints >= 100)
+                         {
+                             <span>Thành viên Vàng</span>
+                         }
+                         else
+                         {
+                             <span>Thành viên Mới</span>
+                         }
                     </span>
                     <span class="badge badge-points">
                         <i class="fas fa-gift"></i>
-                        150 Điểm thưởng
+                        @Model.User.RewardPoints Điểm thưởng
                     </span>
                 </div>
             </div>
@@ -34,7 +50,7 @@
 
         <div class="profile-wallet">
             <div class="wallet-label">Số dư khả dụng</div>
-            <div class="wallet-balances">500.000₫</div>
+            <div class="wallet-balances">@Model.User.WalletBalance.ToString("N0")₫</div>
             <button class="btn-recharge">
                 <i class="fas fa-plus"></i>
                 Nạp thêm tiền
@@ -49,26 +65,48 @@
             Nhắc nhở quan trọng
         </h2>
 
-        <div class="reminder-card">
-            <div class="reminder-icon">
-                <i class="fas fa-calendar-check"></i>
+        @if (Model.UpcomingBooking != null)
+        {
+            <div class="reminder-card">
+                <div class="reminder-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="reminder-content">
+                    <h3 class="reminder-title">@Model.UpcomingBooking.Pitch.PitchName</h3>
+                    <p class="reminder-time">
+                        <i class="far fa-clock"></i>
+                        @Model.UpcomingBooking.StartTime.ToString("HH:mm") - @Model.UpcomingBooking.EndTime.ToString("HH:mm") | @Model.UpcomingBooking.StartTime.ToString("dd/MM")
+                    </p>
+                    <p class="reminder-warning">
+                        @if (Model.UpcomingBooking.TotalPrice > Model.UpcomingBooking.PaidAmount)
+                        {
+                            <i class="fas fa-exclamation-triangle"></i>
+                             <span>Chưa thanh toán đủ: Thiếu @((Model.UpcomingBooking.TotalPrice - Model.UpcomingBooking.PaidAmount)?.ToString("N0"))₫</span>
+                        }
+                        else
+                        {
+                            <i class="fas fa-check-circle"></i>
+                            <span>Đã thanh toán đủ</span>
+                        }
+                    </p>
+                </div>
+                 @if (!string.IsNullOrEmpty(Model.UpcomingBooking.CheckInCode))
+                 {
+                    <button class="btn-checkin">
+                        <i class="fas fa-qrcode"></i>
+                        Lấy mã Check-in
+                    </button>
+                 }
             </div>
-            <div class="reminder-content">
-                <h3 class="reminder-title">Sân Số 1 (Sân 5 người)</h3>
-                <p class="reminder-time">
-                    <i class="far fa-clock"></i>
-                    17:00 - 18:30 | Hôm nay (21/12)
-                </p>
-                <p class="reminder-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Chưa thanh toán đủ: Thiếu 200k
-                </p>
-            </div>
-            <button class="btn-checkin">
-                <i class="fas fa-qrcode"></i>
-                Lấy mã Check-in
-            </button>
-        </div>
+        }
+        else
+        {
+             <div class="reminder-card">
+                 <div class="reminder-content">
+                     <p>Bạn không có lịch đặt sân nào sắp tới.</p>
+                 </div>
+             </div>
+        }
     </section>
 
     <!-- Quick Actions Section -->
@@ -79,28 +117,28 @@
         </h2>
 
         <div class="quick-actions-grid">
-            <a href="#" class="action-card">
+            <a href="@Url.Action("Index", "Booking")" class="action-card">
                 <div class="action-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
                     <i class="fas fa-calendar-plus"></i>
                 </div>
                 <span class="action-label">Đặt Sân Mới</span>
             </a>
 
-            <a href="#" class="action-card">
+            <a href="@Url.Action("Index", "Food")" class="action-card">
                 <div class="action-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
                     <i class="fas fa-utensils"></i>
                 </div>
                 <span class="action-label">Menu / Canteen</span>
             </a>
 
-            <a href="#" class="action-card">
+            <a href="@Url.Action("Index", "History")" class="action-card">
                 <div class="action-icon" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
                     <i class="fas fa-history"></i>
                 </div>
                 <span class="action-label">Lịch Sử Giao Dịch</span>
             </a>
 
-            <a href="#" class="action-card">
+            <a href="@Url.Action("Index", "Transaction")" class="action-card">
                 <div class="action-icon" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
                     <i class="fas fa-money-bill-transfer"></i>
                 </div>
@@ -123,8 +161,9 @@
                 </div>
                 <div class="info-content">
                     <span class="info-label">Email</span>
-                    <span class="info-value">nguyenvana@example.com</span>
+                    <span class="info-value">@Model.User.Email</span>
                 </div>
+                <!-- Email usually shouldn't be changed easily, but keeping UI as requested -->
                 <button class="btn-change btn-change-email">
                     <i class="fas fa-pen"></i> Đổi
                 </button>
@@ -137,8 +176,9 @@
                 </div>
                 <div class="info-content">
                     <span class="info-label">Số điện thoại</span>
-                    <span class="info-value">0901234567</span>
+                    <span class="info-value">@Model.User.Phone</span>
                 </div>
+                <!-- Phone usually shouldn't be changed easily if it's login ID -->
                 <button class="btn-change btn-change-phone">
                     <i class="fas fa-pen"></i> Đổi
                 </button>
@@ -160,11 +200,74 @@
         </div>
     </section>
 
-    
+</div>
 
+<!-- Modals -->
+<div id="emailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Đổi Email</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Email mới</label>
+                <input type="email" id="newEmail" placeholder="Nhập email mới..." class="form-control">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="saveEmail">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<div id="phoneModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Đổi Số điện thoại</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Số điện thoại mới</label>
+                <input type="text" id="newPhone" placeholder="Nhập số điện thoại mới..." class="form-control">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="savePhone">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Đổi Mật khẩu</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label>Mật khẩu hiện tại</label>
+                <input type="password" id="currentPassword" placeholder="Nhập mật khẩu cũ..." class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu mới</label>
+                <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới..." class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Xác nhận mật khẩu</label>
+                <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới..." class="form-control">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="savePassword">Lưu thay đổi</button>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script src="~/js/profile.js"></script>
 }
-

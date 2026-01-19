@@ -1,8 +1,4 @@
-﻿/* ============================================
-   DASHBOARD CSS - COMPLETE WITH CHART
-   ============================================ */
-
-/* Dashboard Container */
+﻿/* Dashboard Container */
 .dashboard-container {
     width: 100%;
     max-width: 100%;
@@ -39,23 +35,23 @@
     transition: all 0.3s ease;
 }
 
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 100px;
-        height: 100px;
-        background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent);
-        border-radius: 50%;
-        transform: translate(30%, -30%);
-    }
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1), transparent);
+    border-radius: 50%;
+    transform: translate(30%, -30%);
+}
 
-    .stat-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 12px 40px rgba(16, 185, 129, 0.2);
-        border-color: var(--primary);
-    }
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(16, 185, 129, 0.2);
+    border-color: var(--primary);
+}
 
 .stat-header {
     display: flex;
@@ -74,25 +70,25 @@
     font-size: 22px;
 }
 
-    .stat-icon.money {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
-        color: var(--primary);
-    }
+.stat-icon.money {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    color: var(--primary);
+}
 
-    .stat-icon.booking {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
-        color: var(--secondary);
-    }
+.stat-icon.booking {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    color: var(--secondary);
+}
 
-    .stat-icon.field {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
-        color: #3B82F6;
-    }
+.stat-icon.field {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
+    color: #3B82F6;
+}
 
-    .stat-icon.users {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
-        color: #A855F7;
-    }
+.stat-icon.users {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
+    color: #A855F7;
+}
 
 .stat-trend {
     display: flex;
@@ -103,13 +99,13 @@
     font-family: 'Inter', sans-serif;
 }
 
-    .stat-trend.up {
-        color: var(--primary);
-    }
+.stat-trend.up {
+    color: var(--primary);
+}
 
-    .stat-trend.down {
-        color: #EF4444;
-    }
+.stat-trend.down {
+    color: #EF4444;
+}
 
 .stat-value {
     font-size: 32px;
@@ -143,9 +139,9 @@
     transition: all 0.3s ease;
 }
 
-    .card:hover {
-        border-color: var(--primary);
-    }
+.card:hover {
+    border-color: var(--primary);
+}
 
 .card-header {
     display: flex;
@@ -182,15 +178,13 @@
     white-space: nowrap;
 }
 
-    .card-action:hover {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: white;
-    }
+.card-action:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
 
-/* ============================================
-   CHART SECTION - SIMPLE & WORKING
-   ============================================ */
+
 
 .chartjs-container {
     position: relative;
@@ -200,6 +194,7 @@
     border-radius: 16px;
     padding: 20px;
 }
+
 #revenueChart {
     width: 100% !important;
     height: 100% !important;
@@ -219,6 +214,7 @@
         padding: 14px;
     }
 }
+
 /* Activity List */
 .activity-list {
     display: flex;
@@ -235,10 +231,10 @@
     transition: all 0.3s ease;
 }
 
-    .activity-item:hover {
-        background: rgba(16, 185, 129, 0.1);
-        transform: translateX(4px);
-    }
+.activity-item:hover {
+    background: rgba(16, 185, 129, 0.1);
+    transform: translateX(4px);
+}
 
 .activity-icon {
     width: 40px;
@@ -251,25 +247,25 @@
     flex-shrink: 0;
 }
 
-    .activity-icon.money {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
-        color: var(--primary);
-    }
+.activity-icon.money {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    color: var(--primary);
+}
 
-    .activity-icon.booking {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
-        color: var(--secondary);
-    }
+.activity-icon.booking {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    color: var(--secondary);
+}
 
-    .activity-icon.users {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
-        color: #A855F7;
-    }
+.activity-icon.users {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
+    color: #A855F7;
+}
 
-    .activity-icon.food {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
-        color: #3B82F6;
-    }
+.activity-icon.food {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
+    color: #3B82F6;
+}
 
 .activity-content {
     flex: 1;
@@ -310,11 +306,11 @@
     transition: all 0.3s ease;
 }
 
-    .booking-item:hover {
-        background: rgba(16, 185, 129, 0.05);
-        border-color: var(--primary);
-        transform: translateX(4px);
-    }
+.booking-item:hover {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
 
 .booking-time {
     display: flex;
@@ -370,20 +366,20 @@
     flex-shrink: 0;
 }
 
-    .booking-status.confirmed {
-        background: rgba(16, 185, 129, 0.2);
-        color: var(--primary);
-    }
+.booking-status.confirmed {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--primary);
+}
 
-    .booking-status.pending {
-        background: rgba(245, 158, 11, 0.2);
-        color: var(--secondary);
-    }
+.booking-status.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--secondary);
+}
 
-    .booking-status.completed {
-        background: rgba(59, 130, 246, 0.2);
-        color: #3B82F6;
-    }
+.booking-status.completed {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3B82F6;
+}
 
 /* Bottom Grid */
 .bottom-grid {
@@ -410,10 +406,10 @@
     transition: all 0.3s ease;
 }
 
-    .field-item:hover {
-        background: rgba(16, 185, 129, 0.05);
-        transform: translateX(4px);
-    }
+.field-item:hover {
+    background: rgba(16, 185, 129, 0.05);
+    transform: translateX(4px);
+}
 
 .field-rank {
     width: 36px;
@@ -429,20 +425,20 @@
     color: var(--text-primary);
 }
 
-    .field-rank.gold {
-        background: linear-gradient(135deg, #FFD700, #FFA500);
-        color: #0F172A;
-    }
+.field-rank.gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #0F172A;
+}
 
-    .field-rank.silver {
-        background: linear-gradient(135deg, #C0C0C0, #808080);
-        color: #0F172A;
-    }
+.field-rank.silver {
+    background: linear-gradient(135deg, #C0C0C0, #808080);
+    color: #0F172A;
+}
 
-    .field-rank.bronze {
-        background: linear-gradient(135deg, #CD7F32, #8B4513);
-        color: white;
-    }
+.field-rank.bronze {
+    background: linear-gradient(135deg, #CD7F32, #8B4513);
+    color: white;
+}
 
 .field-details {
     flex: 1;
@@ -490,11 +486,11 @@
     color: var(--text-primary);
 }
 
-    .action-btn:hover {
-        transform: translateY(-4px);
-        border-color: var(--primary);
-        background: rgba(16, 185, 129, 0.08);
-    }
+.action-btn:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    background: rgba(16, 185, 129, 0.08);
+}
 
 .action-icon {
     width: 56px;
@@ -507,25 +503,25 @@
     margin-bottom: 12px;
 }
 
-    .action-icon.add {
-        background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
-        color: var(--primary);
-    }
+.action-icon.add {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    color: var(--primary);
+}
 
-    .action-icon.field {
-        background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
-        color: var(--secondary);
-    }
+.action-icon.field {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    color: var(--secondary);
+}
 
-    .action-icon.users {
-        background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
-        color: #A855F7;
-    }
+.action-icon.users {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
+    color: #A855F7;
+}
 
-    .action-icon.report {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
-        color: #3B82F6;
-    }
+.action-icon.report {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
+    color: #3B82F6;
+}
 
 .action-label {
     font-size: 14px;
