@@ -1,9 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SportBookingSystem.Controllers
 {
-    public class UserADController : Controller
+    [Authorize]
+    public class UserADController : Controller  
     {
+        [HttpGet]
+        [Route("UserAD/Index")]
         public IActionResult Index()
         {
             return View();

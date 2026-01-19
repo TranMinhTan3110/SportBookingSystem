@@ -1,195 +1,170 @@
-﻿const searchInput = document.getElementById('searchInput');
-const tableBody = document.getElementById('userTableBody');
-const noResults = document.getElementById('noResults');
-const rows = tableBody.getElementsByTagName('tr');
+﻿let allUsersData = []; // Biến lưu trữ danh sách gốc từ server
+async function loadAllUser() {
+    try {
+        const [countRes, userRes] = await Promise.all([
+            fetch('/api/user/getCount'),
+            fetch('/api/user/allUsers')
+        ]);
 
-// Xử lý tìm kiếm
-searchInput.addEventListener('input', function () {
-    const searchTerm = this.value.toLowerCase();
-    filterData();
-});
+        if (!countRes.ok || !userRes.ok) throw new Error('Lỗi tải dữ liệu');
 
-// Xử lý nút lọc (Filter)
-const filterBtns = document.querySelectorAll('.filter-btn');
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', function () {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        filterData();
-    });
-});
+        const countUser = await countRes.json();
+        allUsersData = await userRes.json(); 
 
-// Hàm lọc dữ liệu chung
-function filterData() {
-    const searchTerm = searchInput.value.toLowerCase();
-    const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
-    let visibleCount = 0;
+        renderStats(countUser); 
+        renderUserTable(allUsersData); 
 
-    for (let row of rows) {
-        const text = row.textContent.toLowerCase();
-        const rowStatus = row.dataset.status;
-
-        const matchSearch = text.includes(searchTerm);
-        let matchFilter = currentFilter === 'all' || rowStatus === currentFilter;
-
-        if (matchSearch && matchFilter) {
-            row.classList.remove('hidden');
-            visibleCount++;
-        } else {
-            row.classList.add('hidden');
-        }
+    } catch (error) {
+        console.error('Lỗi:', error);
     }
-
-    noResults.style.display = visibleCount === 0 ? 'block' : 'none';
-    updateStats();
 }
 
-// Hàm cập nhật thống kê
-function updateStats() {
-    let total = 0, active = 0, blocked = 0;
-
-    for (let row of rows) {
-        if (!row.classList.contains('hidden')) {
-            total++;
-            if (row.dataset.status === 'active') active++;
-            else blocked++;
-        }
+function renderStats(countUser) {
+    document.getElementById('totalUsers').innerText = countUser.totalUsers ?? countUser.TotalUsers ?? 0;
+    document.getElementById('activeUsers').innerText = countUser.activeUsers ?? countUser.ActiveUsers ?? 0;
+    document.getElementById('blockedUsers').innerText = countUser.lockedUsers ?? countUser.LockedUsers ?? 0;
+    const newUsersElem = document.getElementById('newUsers');
+    if (newUsersElem) {
+        newUsersElem.innerText = countUser.newUsers ?? countUser.NewUsers ?? 0;
     }
-
-    document.getElementById('totalUsers').textContent = total;
-    document.getElementById('activeUsers').textContent = active;
-    document.getElementById('blockedUsers').textContent = blocked;
 }
 
-// Định dạng tiền tệ
-const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-        currency: 'VND'
-    }).format(amount);
-};
+function renderUserTable(data) {
+    const tbody = document.getElementById('userTableBody');
+    tbody.innerHTML = '';
 
-// Xem chi tiết User (Mở Modal)
-function viewUser(button) {
-    const row = button.closest('tr');
+    if (data.length === 0) {
+        document.getElementById('noResults').style.display = 'block';
+        return;
+    }
+    document.getElementById('noResults').style.display = 'none';
 
-    // Đã sửa lỗi cú pháp ở đoạn này
-    const userData = {
-        id: row.dataset.id,
-        username: row.dataset.username,
-        fullname: row.dataset.fullname,
-        email: row.dataset.email,
-        phone: row.dataset.phone,
-        role: row.dataset.role,
-        roleId: row.dataset.roleid,
-        status: row.dataset.status,
-        joinDate: row.dataset.joindate,
-        lastLogin: row.dataset.lastlogin,
-        wallet: row.dataset.wallet,
-        points: row.dataset.points,
-        bookings: row.dataset.bookings,
-        spent: row.dataset.spent
-    };
-
-    const modalBody = document.getElementById('modalBody');
-    modalBody.innerHTML = `
-        <div class="info-section">
-            <div class="section-title">
-                <i class="fas fa-id-card"></i> Thông Tin Cơ Bản
-            </div>
-            <div class="info-row"><div class="info-label">ID Người dùng</div><div class="info-value">#${userData.id}</div></div>
-            <div class="info-row"><div class="info-label">Tên đăng nhập</div><div class="info-value">@${userData.username}</div></div>
-            <div class="info-row"><div class="info-label">Họ và tên</div><div class="info-value">${userData.fullname}</div></div>
-            <div class="info-row"><div class="info-label">Email</div><div class="info-value">${userData.email}</div></div>
-            <div class="info-row"><div class="info-label">Số điện thoại</div><div class="info-value">${userData.phone}</div></div>
-            <div class="info-row"><div class="info-label">Phân quyền</div><div class="info-value">
-                <span class="role-badge ${userData.roleId == 1 ? 'admin' : ''}">
-                    <i class="fas ${userData.roleId == 1 ? 'fa-user-shield' : 'fa-user'}"></i>
-                    ${userData.role}
+    data.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>#${user.id}</td>
+            <td>
+                <div class="user-info">
+                    <div class="user-avatar">${(user.fullName || 'U').charAt(0)}</div>
+                    <div class="user-details"><h4>${user.fullName}</h4></div>
+                </div>
+            </td>
+            <td>${user.phoneNumber || 'N/A'}</td>
+            <td>${user.email}</td>
+            <td><span class="role-badge"><i class="fas fa-user"></i> ${user.role}</span></td>
+            <td>${user.createdAt}</td>
+            <td>
+                <span class="status-badge ${user.isActive ? 'active' : 'blocked'}">
+                    <i class="fas ${user.isActive ? 'fa-check-circle' : 'fa-ban'}"></i> 
+                    ${user.isActive ? 'Hoạt động' : 'Bị khóa'}
                 </span>
-            </div></div>
-            <div class="info-row">
-                <div class="info-label">Trạng thái</div>
-                <div class="info-value">
-                    <span class="status-badge ${userData.status === 'active' ? 'active' : 'blocked'}">
-                        <i class="fas ${userData.status === 'active' ? 'fa-check-circle' : 'fa-ban'}"></i>
-                        ${userData.status === 'active' ? 'Hoạt động' : 'Bị khóa'}
-                    </span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                   
+                    <button class="btn ${user.isActive ? 'btn-block' : 'btn-unblock'}" onclick="ToggleStatus('${user.id}', ${user.isActive})">
+                        <i class="fas ${user.isActive ? 'fa-lock' : 'fa-unlock'}"></i>
+                    </button>
                 </div>
-            </div>
-        </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
 
-        <div class="info-section">
-            <div class="section-title">
-                <i class="fas fa-wallet"></i> Thông Tin Tài Chính
-            </div>
-            <div class="financial-info">
-                <div class="financial-grid">
-                    <div class="financial-item">
-                        <div class="financial-label">
-                            <i class="fas fa-money-bill-wave"></i> Số Dư Ví
-                        </div>
-                        <div class="financial-value money">${formatCurrency(userData.wallet)}</div>
-                    </div>
-                    <div class="financial-item">
-                        <div class="financial-label">
-                            <i class="fas fa-gift"></i> Điểm Thưởng
-                        </div>
-                        <div class="financial-value points">${userData.points}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="info-row" style="margin-top: 10px;">
-                <div class="info-label">Tổng chi tiêu</div>
-                <div class="info-value">${formatCurrency(userData.spent)}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Tổng đặt sân</div>
-                <div class="info-value">${userData.bookings} lần</div>
-            </div>
-        </div>
 
-        <div class="info-section">
-            <div class="section-title">
-                <i class="fas fa-clock"></i> Hoạt Động
-            </div>
-            <div class="info-row">
-                <div class="info-label">Ngày tham gia</div>
-                <div class="info-value">${userData.joinDate}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Đăng nhập lần cuối</div>
-                <div class="info-value">${userData.lastLogin}</div>
-            </div>
-        </div>
-    `;
-
-    const modalFooter = document.getElementById('modalFooter');
-    modalFooter.innerHTML = `
-        <button class="btn btn-secondary" onclick="closeModal()">
-            <i class="fas fa-times"></i> Đóng
-        </button>
-        ${userData.status === 'active'
-            ? `<button class="btn btn-danger" onclick="closeModal()">
-                <i class="fas fa-lock"></i> Khóa Tài Khoản
-                </button>`
-            : `<button class="btn btn-success" onclick="closeModal()">
-                <i class="fas fa-unlock"></i> Mở Khóa
-                </button>`
+//hàm khóa
+function ToggleStatus(userId, isActive) {
+    const actionText = isActive ? "khóa" : "mở khóa";
+    Swal.fire({
+        title: "Xác nhận thay đổi?",
+        text: `Bạn có chắc muốn ${actionText} người dùng này?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: isActive ? "#d33" : "#3085d6",
+        confirmButtonText: "Đồng ý",
+        cancelButtonText: "Hủy"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            executeToggleStatus(userId);
         }
-    `;
+    });
+}
+async function executeToggleStatus(userId) {
+    try {
 
-    document.getElementById('userModal').classList.add('active');
+
+        const response = await fetch(`/api/user/toggleStatus/${userId}`,
+            {
+                method:'POST'
+            });
+        if (response.ok) {
+            Swal.fire({
+                title: "Thành công!",
+                text: "Trạng thái người dùng đã được thay đổi.",
+                icon: "success",
+                timer: 1500
+            });
+            // Tải lại bảng để cập nhật giao diện mới
+            loadAllUser();
+        } else {
+            Swal.fire("Lỗi!", "Có lỗi xảy ra khi cập nhật.", "error");
+        }
+    } catch (error) {
+        console.error("Lỗi kết nối:", error);
+    
+        }
+    
 }
 
-// Đóng Modal
-function closeModal() {
-    document.getElementById('userModal').classList.remove('active');
-}
+// Gọi hàm ngay khi file JS được tải
+document.addEventListener("DOMContentLoaded", () => {
+    loadAllUser();
 
-// Đóng modal khi click ra ngoài vùng nội dung
-document.getElementById('userModal').addEventListener('click', function (e) {
-    if (e.target === this) {
-        closeModal();
-    }
+    // Các nút lọc
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            applyFilters(); // Gọi hàm lọc chung
+        });
+    });
+
+    // Ô tìm kiếm
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
 });
+
+    // Xử lý sự kiện tìm kiếm (Search)
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const keyword = this.value.toLowerCase();
+        const filtered = allUsersData.filter(u =>
+            u.fullName.toLowerCase().includes(keyword) ||
+            u.email.toLowerCase().includes(keyword) ||
+            u.phoneNumber.includes(keyword)
+        );
+        renderUserTable(filtered);
+    });
+
+//hàm để tìm kiếm theo lọc
+function applyFilters() {
+    const keyword = document.getElementById('searchInput').value.toLowerCase();
+    const activeFilterBtn = document.querySelector('.filter-btn.active');
+    const filterType = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+
+    const filtered = allUsersData.filter(u => {
+        // Điều kiện tìm kiếm
+        const matchesSearch = u.fullName.toLowerCase().includes(keyword) ||
+            u.email.toLowerCase().includes(keyword) ||
+            (u.phoneNumber && u.phoneNumber.includes(keyword));
+
+        // Điều kiện bộ lọc trạng thái
+        let matchesFilter = true;
+        if (filterType === 'active') matchesFilter = u.isActive === true;
+        if (filterType === 'blocked') matchesFilter = u.isActive === false;
+
+        return matchesSearch && matchesFilter;
+    });
+
+    renderUserTable(filtered);
+}
