@@ -15,5 +15,6 @@ namespace SportBookingSystem.Services
         //forgot password
         Task<bool> SendOtpEmailAsync(string email);
         Task<bool> VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword);
+        Task<Users?> GetUserByIdAsync(int userId);
     }
 }

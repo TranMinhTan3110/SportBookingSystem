@@ -1,4 +1,6 @@
-﻿@{
+﻿@using SportBookingSystem.Models.ViewModels
+@model HomeViewModel
+@{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
@@ -35,24 +37,24 @@
 
             <div class="wallet-balance-display">
                 <div class="balance-label">Số dư khả dụng</div>
-                <div class="balance-amount">2,450,000₫</div>
+                <div class="balance-amount">@Model.User.WalletBalance.ToString("N0")₫</div>
             </div>
 
             <div class="wallet-actions">
-                <button class="wallet-btn"><i class="bi bi-plus-circle-fill"></i> Nạp tiền</button>
-                <button class="wallet-btn"><i class="bi bi-cash-coin"></i> Chuyển khoản</button>
-                <button class="wallet-btn"><i class="bi bi-graph-up-arrow"></i> Chi tiết</button>
+                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-plus-circle-fill"></i> Nạp tiền</button>
+                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-cash-coin"></i> Chuyển khoản</button>
+                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-graph-up-arrow"></i> Chi tiết</button>
             </div>
         </div>
 
         <div class="quick-actions">
             <h3 class="quick-actions-title">Thao tác nhanh</h3>
             <div class="action-list">
-                <a href="#" class="action-item">
+                <a href="@Url.Action("Index", "History")" class="action-item">
                     <div class="action-icon"><i class="bi bi-calendar-event-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Lịch đặt sân của tôi</div>
-                        <div class="action-desc">3 lịch sắp tới</div>
+                        <div class="action-desc">@Model.UpcomingBookingsCount lịch sắp tới</div>
                     </div>
                     <span>→</span>
                 </a>
@@ -61,12 +63,12 @@
                     <div class="action-icon"><i class="bi bi-gift-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Điểm thưởng</div>
-                        <div class="action-desc">1,250 điểm</div>
+                        <div class="action-desc">@Model.User.RewardPoints.ToString("N0") điểm</div>
                     </div>
                     <span>→</span>
                 </a>
 
-                <a href="#" class="action-item">
+                <a href="@Url.Action("Index", "UserProfile")" class="action-item">
                     <div class="action-icon"><i class="bi bi-gear-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Cài đặt</div>
@@ -423,59 +425,40 @@
     <section id="history" class="history-card fade-in-up delay-3">
         <div class="history-header">
             <h2 class="history-title"><i class="bi bi-clock-history"></i> Lịch Sử Giao Dịch Gần Đây</h2>
-            <button class="btn btn-secondary">Xem tất cả</button>
+            <button class="btn btn-secondary" onclick="window.location.href='@Url.Action("Index", "History")'">Xem tất cả</button>
         </div>
 
         <div class="history-list">
-            <div class="history-item">
-                <div class="history-icon"><i class="bi bi-building"></i></div>
-                <div class="history-details">
-                    <div class="history-item-title">Đặt Sân A1 - Premium</div>
-                    <div class="history-item-date">20/12/2024 14:30 • 2 giờ</div>
-                </div>
-                <div class="history-amount negative">-600,000₫</div>
-                <span class="history-status success">Hoàn thành</span>
-            </div>
+            @if (Model.RecentTransactions != null && Model.RecentTransactions.Any())
+            {
+                foreach (var transaction in Model.RecentTransactions)
+                {
+                    var isNegative = transaction.UserId == Model.User.UserId && transaction.ReceiverId != null && transaction.ReceiverId != Model.User.UserId;
+                    var amountClass = isNegative ? "negative" : "positive";
+                    var amountPrefix = isNegative ? "-" : "+";
+                    
+                    var iconClass = "bi-cash-coin";
+                    if (transaction.TransactionType?.Contains("Sân") == true || transaction.Message?.Contains("Đặt sân") == true) iconClass = "bi-building";
+                    else if (transaction.TransactionType?.Contains("Thức ăn") == true || transaction.Message?.Contains("Canteen") == true) iconClass = "bi-cup-hot-fill";
 
-            <div class="history-item">
-                <div class="history-icon"><i class="bi bi-cup-hot-fill"></i></div>
-                <div class="history-details">
-                    <div class="history-item-title">Đơn Canteen #456</div>
-                    <div class="history-item-date">20/12/2024 15:00</div>
+                    <div class="history-item">
+                        <div class="history-icon"><i class="bi @iconClass"></i></div>
+                        <div class="history-details">
+                            <div class="history-item-title">@transaction.Message</div>
+                            <div class="history-item-date">@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                        <div class="history-amount @amountClass">@amountPrefix@transaction.Amount.ToString("N0")₫</div>
+                        <span class="history-status success">Hoàn thành</span>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="history-empty" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i class="bi bi-inbox" style="font-size: 48px; display: block; margin-bottom: 10px;"></i>
+                    <p>Chưa có giao dịch nào gần đây</p>
                 </div>
-                <div class="history-amount negative">-85,000₫</div>
-                <span class="history-status success">Hoàn thành</span>
-            </div>
-
-            <div class="history-item">
-                <div class="history-icon"><i class="bi bi-cash-coin"></i></div>
-                <div class="history-details">
-                    <div class="history-item-title">Nạp tiền vào ví</div>
-                    <div class="history-item-date">19/12/2024 10:20</div>
-                </div>
-                <div class="history-amount positive">+2,000,000₫</div>
-                <span class="history-status success">Thành công</span>
-            </div>
-
-            <div class="history-item">
-                <div class="history-icon"><i class="bi bi-building"></i></div>
-                <div class="history-details">
-                    <div class="history-item-title">Đặt Sân B3 - Standard</div>
-                    <div class="history-item-date">18/12/2024 18:00 • 1.5 giờ</div>
-                </div>
-                <div class="history-amount negative">-675,000₫</div>
-                <span class="history-status success">Hoàn thành</span>
-            </div>
-
-            <div class="history-item">
-                <div class="history-icon"><i class="bi bi-gift-fill"></i></div>
-                <div class="history-details">
-                    <div class="history-item-title">Nhận điểm thưởng</div>
-                    <div class="history-item-date">18/12/2024 19:30</div>
-                </div>
-                <div class="history-amount positive">+150 điểm</div>
-                <span class="history-status success">Đã cộng</span>
-            </div>
+            }
         </div>
     </section>
 
