@@ -33,7 +33,10 @@ namespace SportBookingSystem.Models.EF
                 .HasIndex(u => u.Username)
                 .IsUnique();
 
-         
+            modelBuilder.Entity<Users>()
+        .Property(u => u.CreatedAt)
+        .HasDefaultValueSql("GETDATE()");
+
             modelBuilder.Entity<Users>()
                 .HasIndex(u => u.Phone)
                 .IsUnique();

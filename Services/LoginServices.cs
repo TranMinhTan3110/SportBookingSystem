@@ -24,13 +24,15 @@ namespace SportBookingSystem.Services
         }
         public async Task<Users> CheckLoginAsync(string phone, string password)
         {
+            
             var user = await _context.Users
-                .Include(u => u.Role) 
-                .FirstOrDefaultAsync(u => u.Phone == phone && u.IsActive == true);
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Phone == phone);
 
+           
             if (user != null && BC.Verify(password, user.Password))
             {
-                return user;
+                return user; 
             }
             return null;
         }
@@ -52,11 +54,10 @@ namespace SportBookingSystem.Services
                     FullName = model.FullName,
                     Username = model.Phone,
                     Phone = model.Phone,
-                    Email = model.Email, // Kiểm tra xem model.Email có giá trị không
+                    Email = model.Email, 
                     Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
                     RoleId = 2,
                     IsActive = true
-                    // ... các trường khác
                 };
 
                 _context.Users.Add(newUser);
@@ -65,7 +66,6 @@ namespace SportBookingSystem.Services
             }
             catch (Exception ex)
             {
-                // Dòng này sẽ in lỗi chi tiết ra cửa sổ "Output" của Visual Studio
                 var msg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
                 System.Diagnostics.Debug.WriteLine("LỖI ĐĂNG KÝ: " + msg);
                 return false;

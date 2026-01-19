@@ -18,36 +18,47 @@ namespace SportBookingSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> SignIn(string phoneNumber, string password)
         {
+            // 1. Gọi service kiểm tra thông tin đăng nhập
             var user = await _loginServices.CheckLoginAsync(phoneNumber, password);
 
             if (user != null)
             {
-                var claims = new List<Claim>
+                // 2. KIỂM TRA KHÓA: Nếu tài khoản bị khóa (IsActive == false) thì chặn lại ngay
+                if (user.IsActive == false)
                 {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                    new Claim(ClaimTypes.Role, user.Role.RoleName),
-                    new Claim("FullName", user.FullName ?? "")
-                };
+                    return Json(new
+                    {
+                        status = "error",
+                        message = "Tài khoản của bạn đã bị khóa bởi quản trị viên. Vui lòng liên hệ hỗ trợ!"
+                    });
+                }
+
+                // 3. Tạo danh sách quyền (Claims)
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Role, user.Role.RoleName),
+            new Claim("FullName", user.FullName ?? "")
+        };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+                // 4. Lưu phiên đăng nhập vào Cookie
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
-                string redirectUrl = "/Dashboard/Index"; 
-
+                // 5. Xác định trang chuyển hướng dựa trên Role
+                string redirectUrl = "/Home/Index"; // Mặc định cho người dùng
                 if (user.Role.RoleName == "Admin")
                 {
-                    redirectUrl = "/Admin/Dashboard/Index"; 
+                    redirectUrl = "/Dashboard/Index";
                 }
-                else if (user.Role.RoleName == "User")
-                {
-                    redirectUrl = "/Home/Index"; 
-                }
+
                 return Json(new { status = "success", redirect = redirectUrl });
             }
 
+            // Nếu thông tin sai
             return Json(new { status = "error", message = "Số điện thoại hoặc mật khẩu không chính xác!" });
         }
 
@@ -95,6 +106,13 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Mã OTP không đúng hoặc đã hết hạn." });
         }
         [HttpGet]
+        public async Task<IActionResult> SignOut()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return RedirectToAction("SignIn", "Login");
+        }
+        [HttpGet]
         public IActionResult SignIn()
         {
             return View();
@@ -108,6 +126,10 @@ namespace SportBookingSystem.Controllers
             return View();
         }
         public IActionResult ResetPassword()
+        {
+            return View();
+        }
+        public IActionResult AccessDenied()
         {
             return View();
         }

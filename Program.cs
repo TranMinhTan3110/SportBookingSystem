@@ -21,7 +21,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // 3. Đăng ký Dependency Injection cho LoginServices 
 builder.Services.AddScoped<ILoginServices, LoginServices>();
-
+builder.Services.AddScoped<IUserService, UserService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
@@ -45,11 +45,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-
-    pattern: "{controller=BookingAD}/{action=Index}/{id?}");
-//pattern: "{controller=Home}/{action=Index}/{id?}");
-
-    //pattern: "{controller=Dashboard}/{action=index}/{id?}");
-
+    pattern: "{controller=Login}/{action=SignIn}/{id?}");
 
 app.Run();

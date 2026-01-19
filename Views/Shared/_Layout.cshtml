@@ -97,7 +97,11 @@
                             <span class="dropdown-item-icon"><i class="bi bi-clock-history"></i></span>
                             <span>Lịch sử giao dịch</span>
                         </a>
-                        <a href="@Url.Action("Logout", "Account")" class="user-dropdown-item danger">
+                        <a href="@Url.Action("Index", "Settings")" class="user-dropdown-item">
+                            <span class="dropdown-item-icon"><i class="bi bi-gear-fill"></i></span>
+                            <span>Cài đặt</span>
+                        </a>
+                        <a href="@Url.Action("Signout", "Login")" class="user-dropdown-item danger">
                             <span class="dropdown-item-icon"><i class="bi bi-box-arrow-right"></i></span>
                             <span>Đăng xuất</span>
                         </a>
@@ -170,7 +174,7 @@
             <div class="mobile-nav-divider"></div>
 
             <!-- Logout -->
-            <a href="@Url.Action("Logout", "Account")" class="mobile-nav-link" style="color: var(--danger);">
+            <a href="@Url.Action("Signout", "Login")" class="mobile-nav-link" style="color: var(--danger);">
                 <span><i class="bi bi-box-arrow-right"></i></span>
                 <span>Đăng xuất</span>
             </a>

@@ -39,6 +39,8 @@ namespace SportBookingSystem.Models.Entities
         public int RoleId { get; set; }
         [ForeignKey("RoleId")]
         public Role Role { get; set; }
+        [Required]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Các quan hệ
         public ICollection<Bookings> Bookings { get; set; }
