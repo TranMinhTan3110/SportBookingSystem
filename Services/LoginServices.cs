@@ -141,5 +141,10 @@ namespace SportBookingSystem.Services
 
             return true;
         }
+
+        public async Task<Users?> GetUserByIdAsync(int userId)
+        {
+            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == userId);
+        }
     }
 }
