@@ -16,6 +16,7 @@ namespace SportBookingSystem.Controllers
             _loginServices = loginServices;
         }
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> SignIn(string phoneNumber, string password)
         {
             // 1. Gọi service kiểm tra thông tin đăng nhập

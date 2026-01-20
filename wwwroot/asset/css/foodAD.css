@@ -1,6 +1,10 @@
 ﻿/* ============================================
    FOOD & DRINK MANAGEMENT CSS - PROPER RESPONSIVE
    ============================================ */
+/* Hide rows by pagination */
+#productTableBody tr.pagination-hidden {
+    display: none !important;
+}
 
 /* Reset & Base */
 * {
@@ -1017,5 +1021,408 @@ textarea.form-control {
     /* Riêng table thì cho phép nó rộng nhưng scroll trong wrapper */
     .product-table {
         max-width: none;
+    }
+}
+/* ============================================
+   NÚT LÀM MỚI - IMPROVED VERSION
+   ============================================ */
+.btn-refresh {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    white-space: nowrap;
+    height: fit-content;
+}
+
+    .btn-refresh:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-refresh:active {
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-refresh i {
+        font-size: 16px;
+        transition: transform 0.3s ease;
+    }
+
+    .btn-refresh:hover i {
+        transform: rotate(180deg);
+    }
+
+/* ============================================
+   IMAGE UPLOAD - IMPROVED VERSION
+   ============================================ */
+.image-upload-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Custom File Input */
+.form-control-file {
+    position: relative;
+    padding: 16px;
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    background: var(--surface-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+    .form-control-file:hover {
+        border-color: var(--primary);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .form-control-file:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    /* File Input Label Style */
+    .form-control-file::file-selector-button {
+        background: var(--gradient-main);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        margin-right: 12px;
+        transition: all 0.3s ease;
+    }
+
+        .form-control-file::file-selector-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+/* Nút Làm Mới - Kế thừa style từ form-control */
+.btn-refresh {
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+}
+
+    .btn-refresh:hover {
+        border-color: var(--primary);
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--primary);
+    }
+
+    .btn-refresh:active {
+        transform: scale(0.98);
+    }
+
+    .btn-refresh i {
+        font-size: 16px;
+        transition: transform 0.5s ease;
+    }
+
+    .btn-refresh:hover i {
+        transform: rotate(180deg);
+    }
+
+/* Responsive cho nút làm mới */
+@media (max-width: 768px) {
+    .btn-refresh {
+        padding: 14px 16px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-refresh span {
+        display: none;
+    }
+
+    .btn-refresh i {
+        font-size: 18px;
+    }
+}
+/* Image Upload - Simple & Clean */
+.image-upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-control-file {
+    padding: 12px 16px;
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    background: var(--surface-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    color: var(--text-secondary);
+    width: 100%;
+}
+
+    .form-control-file:hover {
+        border-color: var(--primary);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .form-control-file::file-selector-button {
+        background: var(--gradient-main);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        margin-right: 12px;
+        transition: all 0.2s ease;
+    }
+
+        .form-control-file::file-selector-button:hover {
+            opacity: 0.9;
+        }
+
+.upload-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+    .upload-hint i {
+        color: var(--primary);
+    }
+
+.image-preview {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    height: 300px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--surface-light);
+}
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.btn-remove-image {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+    .btn-remove-image:hover {
+        background: #EF4444;
+        transform: scale(1.1);
+    }
+
+    .btn-remove-image i {
+        font-size: 16px;
+    }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .image-preview {
+        max-width: 100%;
+        height: 250px;
+    }
+}
+
+@media (max-width: 480px) {
+    .image-preview {
+        height: 200px;
+    }
+
+    .btn-remove-image {
+        width: 28px;
+        height: 28px;
+    }
+}
+/* ============================================
+   PAGINATION STYLES
+   ============================================ */
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.pagination-info {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+    .pagination-info strong {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pagination-btn {
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+    .pagination-btn:hover:not(:disabled) {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+.pagination-pages {
+    display: flex;
+    gap: 4px;
+}
+
+.page-number {
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    min-width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 0 12px;
+}
+
+    .page-number:hover {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .page-number.active {
+        background: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+.page-ellipsis {
+    color: var(--text-secondary);
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+    .pagination-container {
+        flex-direction: column;
+        padding: 16px;
+    }
+
+    .pagination-info {
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+    }
+
+    .pagination-controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .pagination-btn,
+    .page-number {
+        min-width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pagination-pages .page-number:not(.active) {
+        display: none;
+    }
+
+    .pagination-pages .page-number.active {
+        display: flex;
+    }
+
+    .page-ellipsis {
+        display: none;
     }
 }
