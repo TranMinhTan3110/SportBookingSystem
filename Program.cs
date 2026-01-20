@@ -25,6 +25,7 @@ builder.Services.AddScoped<IPitchService, PitchService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFoodADService, FoodADService>();
+builder.Services.AddScoped<IFoodService, FoodService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
@@ -49,6 +50,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=FoodAD}/{action=Index}/{id?}");
+    pattern: "{controller=Food}/{action=Index}/{id?}");
 
 app.Run();

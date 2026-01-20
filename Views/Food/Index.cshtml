@@ -1,4 +1,5 @@
-﻿@section Styles {
+﻿@model SportBookingSystem.Models.ViewModels.FoodIndexViewModel
+@section Styles {
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/asset/css/food.css" />
@@ -26,27 +27,18 @@
             <!-- Bộ Lọc - 3 cột -->
             <div class="col-lg-3 col-md-4 col-12">
                 <div class="filter-sidebar">
-                    <h4 class="filter-title">🔍 Bộ Lọc</h4>
-                    
-                    <!-- Danh mục -->
+                    <h4 class="filter-title">Bộ Lọc</h4>
+
                     <div class="filter-group">
                         <h5>Danh mục</h5>
-                        <div class="filter-option">
-                            <input type="checkbox" id="doannhanh" checked>
-                        <label for="doannhanh">Đồ ăn nhanh</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="nuocgiaikhat">
-                        <label for="nuocgiaikhat">Nước giải khát</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="dinhduong">
-                        <label for="dinhduong">Dinh dưỡng</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="commi">
-                            <label for="commi">Cơm mì</label>
-                        </div>
+                        @foreach (var cat in Model.Categories)
+                        {
+                            <div class="filter-option">
+                                <input type="checkbox" class="category-checkbox"
+                                       id="cat-@cat.CategoryId" value="@cat.CategoryId">
+                                <label for="cat-@cat.CategoryId">@cat.CategoryName (@cat.ProductCount)</label>
+                            </div>
+                        }
                     </div>
 
                     <!-- Khoảng giá -->
@@ -57,44 +49,6 @@
                             <span>-</span>
                             <input type="number" placeholder="Đến" min="0">
                         </div>
-                    </div>
-
-                    <!-- Loại món -->
-                    @* <div class="filter-group">
-                        <h5>Loại món</h5>
-                        <div class="filter-option">
-                            <input type="checkbox" id="burger">
-                        <label for="burger">Burger</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="pizza">
-                            <label for="pizza">Pizza</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="garan">
-                            <label for="garan">Gà rán</label>
-                        </div>
-                    </div> *@
-
-                    <!-- Nước uống -->
-                    <div class="filter-group">
-                        <h5>Nước uống</h5>
-                        <div class="filter-option">
-                            <input type="checkbox" id="nuocngot">
-                            <label for="nuocngot">Nước ngọt</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="nuocsuoi">
-                            <label for="nuocsuoi">Nước suối</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="nuoctangluc">
-                            <label for="nuoctangluc">Nước tăng lực</label>
-                        </div>
-                    <div class="filter-option">
-                        <input type="checkbox" id="cafe">
-                        <label for="cafe">Cà phê</label>
-                    </div>
                     </div>
 
                     <button class="btn-apply-filter">Áp dụng</button>
@@ -122,140 +76,32 @@
                     </div>
 
                     <!-- Product Grid -->
-                    <div class="products-grid">
+                <div class="products-grid" id="productsList">
+                    @foreach (var p in Model.Products)
+                    {
                         <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/burgerBoPhoMaiDacBiet.jpg" alt=""></div>
+                            <div class="product-image">
+                                <img src="@p.ImageUrl" alt="@p.ProductName">
+                            </div>
                             <div class="product-info">
-                                <div class="product-typeName">Đồ ăn nhanh</div>
-                                <div class="product-name">Burger Bò Phô Mai Đặc Biệt</div>
-                                <div class="product-price">89,000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
+                                <div class="product-typeName">@p.CategoryName</div>
+                                <div class="product-name">@p.ProductName</div>
+                                <div class="product-price">@p.FormattedPrice</div>
+                                <div class="btn-contain d-flex justify-content-end align-items-center">
+                                    <button class="btn border-0 bg-transparent" title="Mua ngay">
                                         <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
                                     </button>
-                                    <button class="btn border-0 bg-transparent">
+                                    <button class="btn border-0 bg-transparent" title="Thêm vào giỏ">
                                         <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/PizzaHaiSan.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Đồ ăn nhanh</div>
-                                <div class="product-name">Pizza Hải Sản Size M</div>
-                                <div class="product-price">159.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/pepsi6Lon.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Nước giải khát</div>
-                                <div class="product-name">Pepsi Lon 6-Pack</div>
-                                <div class="product-price">72.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/saladGaNuong.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Dinh dưỡng</div>
-                                <div class="product-name">Salad gà nướng</div>
-                                <div class="product-price">79.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/MiXaoComHaiSan.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Cơm/Mì</div>
-                                <div class="product-name">Mì Xào Hải Sản Đặc Biệt</div>
-                                <div class="product-price">95.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/redBull4Pack.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Nước tăng lực</div>
-                                <div class="product-name">Red Bull Energy 4-Pack</div>
-                                <div class="product-price">68.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/khoaiTayChien.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Đồ ăn nhanh</div>
-                                <div class="product-name">Khoai tây chiên size lớn</div>
-                                <div class="product-price">45.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                        <div class="product-image"><img src="~/asset/img/CaPheDenDa.jpeg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Cà phê</div>
-                                <div class="product-name">Cà phê đen đá truyền thống</div>
-                                <div class="product-price">25.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
     </div>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/asset/js/food.js"></script>
