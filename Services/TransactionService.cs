@@ -127,6 +127,112 @@ namespace SportBookingSystem.Services
                 _ => TransactionPrefixes.Recharge
             };
         }
+        public async Task<PaymentDashboardDTO> GetFilteredPaymentsAsync(
+           int page,
+           int pageSize,
+           string? searchTerm = null,
+           string? type = null,
+           string? status = null,
+           DateTime? date = null)
+        {
+            var query = _context.Transactions
+                .Include(t => t.Sender)
+                .AsQueryable();
+
+            // Apply search filter (by transaction code or user name)
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Trim().ToLower();
+                query = query.Where(t =>
+                    t.TransactionCode.ToLower().Contains(searchTerm) ||
+                    (t.Sender != null && (
+                        t.Sender.FullName.ToLower().Contains(searchTerm) ||
+                        t.Sender.Username.ToLower().Contains(searchTerm)
+                    ))
+                );
+            }
+
+            // Apply type filter
+            if (!string.IsNullOrWhiteSpace(type) && type != "all")
+            {
+                // Handle grouped types
+                if (type == "Thanh toán")
+                {
+                    query = query.Where(t =>
+                        t.TransactionType == TransactionTypes.Booking ||
+                        t.TransactionType == TransactionTypes.Order
+                    );
+                }
+                else
+                {
+                    query = query.Where(t => t.TransactionType == type);
+                }
+            }
+
+            // Apply status filter
+            if (!string.IsNullOrWhiteSpace(status) && status != "all")
+            {
+                // Map English status to Vietnamese
+                var mappedStatus = status switch
+                {
+                    "Completed" => TransactionStatus.Success,
+                    "Pending" => TransactionStatus.Pending,
+                    "Cancelled" => TransactionStatus.Canceled,
+                    _ => status
+                };
+                query = query.Where(t => t.Status == mappedStatus);
+            }
+
+            // Apply date filter
+            if (date.HasValue)
+            {
+                var filterDate = date.Value.Date;
+                query = query.Where(t => t.TransactionDate.Date == filterDate);
+            }
+
+            // Order by date descending
+            query = query.OrderByDescending(t => t.TransactionDate);
+
+            // Calculate totals from ALL transactions (not filtered)
+            var allTransactions = await _context.Transactions.ToListAsync();
+
+            // Calculate filtered count
+            var totalRecords = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            // Apply pagination
+            var transactions = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaymentDashboardDTO
+            {
+                Payments = transactions.Select(t => new TransactionItemDTO
+                {
+                    Code = t.TransactionCode,
+                    User = t.Sender?.FullName ?? t.Sender?.Username,
+                    Amount = t.Amount,
+                    Date = t.TransactionDate,
+                    Type = t.TransactionType,
+                    Status = t.Status,
+                    Source = t.Source
+                }).ToList(),
+                TotalDeposits = allTransactions
+                    .Where(t => t.TransactionType == TransactionTypes.Recharge
+                             && t.Status == TransactionStatus.Success)
+                    .Sum(t => t.Amount),
+                Revenue = allTransactions
+                    .Where(t => (t.TransactionType == TransactionTypes.Booking
+                              || t.TransactionType == TransactionTypes.Order)
+                             && t.Status == TransactionStatus.Success)
+                    .Sum(t => t.Amount),
+                TransactionCount = totalRecords, // Filtered count
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
+        }
 
         public async Task<List<ProductListDTO>> GetProductsAsync()
         {
@@ -141,5 +247,46 @@ namespace SportBookingSystem.Services
                 })
                 .ToListAsync();
         }
+        public async Task<RewardSettingDTO> GetCurrentRewardSettingsAsync()
+        {
+            var settings = await _context.SystemSetting.ToListAsync();
+            return new RewardSettingDTO
+            {
+                AmountStep = decimal.TryParse(settings.FirstOrDefault(s => s.SettingKey == "RewardAmountStep")?.SettingValue, out var a) ? a : 10000,
+                PointBonus = int.TryParse(settings.FirstOrDefault(s => s.SettingKey == "RewardPointBonus")?.SettingValue, out var p) ? p : 1,
+                IsActive = bool.TryParse(settings.FirstOrDefault(s => s.SettingKey == "IsRewardActive")?.SettingValue, out var i) ? i : true
+            };
+        }
+        public async Task SaveRewardSettingsAsync(RewardSettingDTO dto)
+        {
+            // Danh sách các key cần lưu
+            var settings = new Dictionary<string, string>
+  {
+    { "RewardAmountStep", dto.AmountStep.ToString() },
+    { "RewardPointBonus", dto.PointBonus.ToString() },
+    { "IsRewardActive", dto.IsActive.ToString().ToLower() }
+  };
+
+            foreach (var item in settings)
+            {
+                var setting = await _context.SystemSetting.FindAsync(item.Key);
+                if (setting != null)
+                {
+                    setting.SettingValue = item.Value;
+                }
+                else
+                {
+                    _context.SystemSetting.Add(new SystemSetting
+                    {
+                        SettingKey = item.Key,
+                        SettingValue = item.Value
+                    });
+                }
+            }
+            await _context.SaveChangesAsync();
+           
+        }
+
+        
     }
 }
