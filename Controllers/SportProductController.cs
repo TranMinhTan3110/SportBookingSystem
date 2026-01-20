@@ -99,6 +99,14 @@ namespace SportBookingSystem.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var result = await _productService.ToggleProductStatusAsync(id);
+            if (result) return Json(new { success = true, message = "Đã cập nhật trạng thái hiển thị!" });
+            return Json(new { success = false, message = "Cập nhật thất bại!" });
+        }
+
+        [HttpPost]
         public async Task<IActionResult> UpdateStock(int id, int quantity)
         {
             var result = await _productService.UpdateStockAsync(id, quantity);

@@ -55,7 +55,9 @@ namespace SportBookingSystem.Services
 
         public async Task<IEnumerable<Products>> GetProductsForUserAsync(string? search, string[]? categories, string[]? brands, decimal? minPrice, decimal? maxPrice, string? sortBy)
         {
-            var query = _context.Products.Include(p => p.Category).AsQueryable();
+            var query = _context.Products.Include(p => p.Category)
+                .Where(p => p.Status == true) // Chỉ lấy sản phẩm đang hoạt động
+                .AsQueryable();
 
             // Search
             if (!string.IsNullOrEmpty(search))
@@ -112,6 +114,7 @@ namespace SportBookingSystem.Services
                     product.ImageUrl = await SaveImageAsync(imageFile);
                 }
 
+                product.Status = true; // Mặc định khi tạo mới là hiện
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
                 return true;
@@ -138,6 +141,7 @@ namespace SportBookingSystem.Services
                 existing.Brand = product.Brand;
                 existing.ProductType = product.ProductType;
                 existing.CategoryId = product.CategoryId;
+                existing.Status = product.Status; // Cập nhật trạng thái
 
                 if (imageFile != null && imageFile.Length > 0)
                 {
@@ -168,6 +172,24 @@ namespace SportBookingSystem.Services
             catch (Exception ex)
             {
                 Console.WriteLine("Error in DeleteProductAsync: " + ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> ToggleProductStatusAsync(int id)
+        {
+            try
+            {
+                var product = await _context.Products.FindAsync(id);
+                if (product == null) return false;
+
+                product.Status = !product.Status; // Đảo ngược trạng thái
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error in ToggleProductStatusAsync: " + ex.Message);
                 return false;
             }
         }

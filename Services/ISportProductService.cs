@@ -11,6 +11,7 @@ namespace SportBookingSystem.Services
         Task<bool> CreateProductAsync(Products product, IFormFile? imageFile);
         Task<bool> UpdateProductAsync(Products product, IFormFile? imageFile);
         Task<bool> DeleteProductAsync(int id);
+        Task<bool> ToggleProductStatusAsync(int id);
         Task<bool> UpdateStockAsync(int id, int addedQuantity);
         Task<IEnumerable<Categories>> GetCategoriesByTypeAsync(string type);
     }

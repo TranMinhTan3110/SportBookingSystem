@@ -306,13 +306,23 @@ body {
     color: white;
 }
 
-.btn-delete {
-    background: rgba(239, 68, 68, 0.2);
-    color: #EF4444;
+.btn-status-active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22C55E;
 }
 
-.btn-delete:hover {
-    background: #EF4444;
+.btn-status-active:hover {
+    background: #22C55E;
+    color: white;
+}
+
+.btn-status-hidden {
+    background: rgba(100, 116, 139, 0.1);
+    color: #64748B;
+}
+
+.btn-status-hidden:hover {
+    background: #64748B;
     color: white;
 }
 

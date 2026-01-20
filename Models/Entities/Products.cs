@@ -35,5 +35,7 @@ namespace SportBookingSystem.Models.Entities
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
         public Categories? Category { get; set; }
+
+        public bool Status { get; set; } = true; // true: Hiển thị, false: Ẩn
     }
 }

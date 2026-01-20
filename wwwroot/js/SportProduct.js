@@ -162,6 +162,8 @@ function renderProductTable(products) {
 
     products.forEach(product => {
         const tr = document.createElement('tr');
+        if (!product.status) tr.style.opacity = '0.6';
+
         tr.innerHTML = `
             <td>#${product.productId}</td>
             <td><img src="${product.imageUrl || 'https://via.placeholder.com/200'}" alt="Product" class="product-img"></td>
@@ -177,7 +179,11 @@ function renderProductTable(products) {
                 <div class="action-buttons">
                     <button class="btn-action btn-view" onclick="updateStockPrompt(${product.productId}, '${product.productName}')" title="Nhập thêm hàng"><i class="fa-solid fa-plus"></i></button>
                     <button class="btn-action btn-edit" onclick="openModal('edit', ${product.productId})" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                    <button class="btn-action btn-delete" onclick="deleteProduct(${product.productId})" title="Xóa"><i class="fa-solid fa-trash"></i></button>
+                    <button class="btn-action ${product.status ? 'btn-status-active' : 'btn-status-hidden'}" 
+                            onclick="toggleProductStatus(${product.productId}, ${product.status})" 
+                            title="${product.status ? 'Ẩn sản phẩm' : 'Hiện sản phẩm'}">
+                        <i class="fa-solid ${product.status ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    </button>
                 </div>
             </td>
         `;
@@ -297,23 +303,22 @@ function updateStockPrompt(id, name) {
     });
 }
 
-function deleteProduct(id) {
+function toggleProductStatus(id, currentStatus) {
+    const actionText = currentStatus ? 'ẩn' : 'hiển thị';
     Swal.fire({
-        title: 'Xác nhận xóa?',
-        text: "Bạn có chắc chắn muốn xóa sản phẩm này không?",
-        icon: 'warning',
+        title: 'Xác nhận?',
+        text: `Bạn có muốn ${actionText} sản phẩm này không?`,
+        icon: 'question',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Có, xóa ngay!',
+        confirmButtonText: 'Đồng ý',
         cancelButtonText: 'Hủy'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch(`/SportProduct/Delete?id=${id}`, { method: 'POST' })
+            fetch(`/SportProduct/ToggleStatus?id=${id}`, { method: 'POST' })
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
-                        Swal.fire('Đã xóa', res.message, 'success');
+                        Swal.fire('Thành công', res.message, 'success');
                         loadProducts();
                     } else {
                         Swal.fire('Lỗi', res.message, 'error');
