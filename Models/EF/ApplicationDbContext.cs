@@ -1,16 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SportBookingSystem.Models;
 using SportBookingSystem.Models.Entities;
 
 namespace SportBookingSystem.Models.EF
 {
     public class ApplicationDbContext : DbContext
     {
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
-
 
         public DbSet<Role> Roles { get; set; }
         public DbSet<Users> Users { get; set; }
@@ -23,19 +20,17 @@ namespace SportBookingSystem.Models.EF
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<Transactions> Transactions { get; set; }
 
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            
             modelBuilder.Entity<Users>()
                 .HasIndex(u => u.Username)
                 .IsUnique();
 
             modelBuilder.Entity<Users>()
-        .Property(u => u.CreatedAt)
-        .HasDefaultValueSql("GETDATE()");
+                .Property(u => u.CreatedAt)
+                .HasDefaultValueSql("GETDATE()");
 
             modelBuilder.Entity<Users>()
                 .HasIndex(u => u.Phone)
@@ -49,44 +44,55 @@ namespace SportBookingSystem.Models.EF
                 .HasIndex(b => b.CheckInCode)
                 .IsUnique();
 
-           
             modelBuilder.Entity<Orders>()
                 .HasIndex(o => o.OrderCode)
                 .IsUnique();
 
-            
+            modelBuilder.Entity<Transactions>()
+                .HasIndex(t => t.TransactionCode)
+                .IsUnique();
+
             modelBuilder.Entity<Transactions>()
                 .HasOne(t => t.Sender)
                 .WithMany(u => u.SentTransactions)
-                .HasForeignKey(t => t.UserId)
+                .HasForeignKey(t => t.UserId) // Đã sửa từ SenderId về UserId
                 .OnDelete(DeleteBehavior.Restrict);
 
-           
             modelBuilder.Entity<Transactions>()
                 .HasOne(t => t.Receiver)
                 .WithMany(u => u.ReceivedTransactions)
                 .HasForeignKey(t => t.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-           
+            modelBuilder.Entity<Transactions>()
+                .HasOne(t => t.Booking)
+                .WithMany()
+                .HasForeignKey(t => t.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transactions>()
+                .HasOne(t => t.Order)
+                .WithMany()
+                .HasForeignKey(t => t.OrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<BookingServices>()
                 .HasOne(bs => bs.Product)
                 .WithMany()
                 .HasForeignKey(bs => bs.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);  
+                .OnDelete(DeleteBehavior.Restrict);
 
-        
             modelBuilder.Entity<BookingServices>()
                 .HasOne(bs => bs.Booking)
                 .WithMany(b => b.BookingServices)
                 .HasForeignKey(bs => bs.BookingId)
-                .OnDelete(DeleteBehavior.Restrict);  
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<OrderDetails>()
                 .HasOne(od => od.Product)
                 .WithMany()
                 .HasForeignKey(od => od.ProductId)
-                .OnDelete(DeleteBehavior.Restrict);  
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
-    }
+}
