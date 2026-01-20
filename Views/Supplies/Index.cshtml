@@ -7,8 +7,7 @@
     @* <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> *@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <link rel="stylesheet" href="Supplies.css">
-   <link href="~/css/Supplies.css" rel="stylesheet" />
+    <link href="~/css/Supplies.css" rel="stylesheet" />
 }
 <section class="banner">
     <div class="breadcrumb">
@@ -31,28 +30,17 @@
                 <div class="filter-sidebar">
                     <h4 class="filter-title">🔍 Bộ Lọc</h4>
 
-                    <!-- Danh mục -->
+                    <!-- Search Bar -->
+                    <div class="filter-group">
+                        <h5>Tìm kiếm</h5>
+                        <input type="text" id="userSearchInput" class="form-control" placeholder="Tên sản phẩm, thương hiệu...">
+                    </div>
+
+                    <!-- Danh mục (Dynamic) -->
                     <div class="filter-group">
                         <h5>Danh mục</h5>
-                        <div class="filter-option">
-                            <input type="checkbox" id="bongda" checked>
-                            <label for="bongda">Bóng đá</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="bongro">
-                            <label for="bongro">Bóng rổ</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="caulong">
-                            <label for="caulong">Cầu lông</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="tennis">
-                            <label for="tennis">Tennis</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="boi">
-                            <label for="boi">Bơi lội</label>
+                        <div id="categoryFilters">
+                           <p class="text-muted">Đang tải...</p>
                         </div>
                     </div>
 
@@ -60,52 +48,22 @@
                     <div class="filter-group">
                         <h5>Khoảng giá</h5>
                         <div class="price-range">
-                            <input type="number" placeholder="Từ" min="0">
+                            <input type="number" id="minPrice" placeholder="Từ" min="0">
                             <span>-</span>
-                            <input type="number" placeholder="Đến" min="0">
+                            <input type="number" id="maxPrice" placeholder="Đến" min="0">
                         </div>
                     </div>
 
-                    <!-- Thương hiệu -->
+                    <!-- Thương hiệu (Dynamic) -->
                     <div class="filter-group">
                         <h5>Thương hiệu</h5>
-                        <div class="filter-option">
-                            <input type="checkbox" id="nike">
-                            <label for="nike">Nike</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="adidas">
-                            <label for="adidas">Adidas</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="puma">
-                            <label for="puma">Puma</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="mizuno">
-                            <label for="mizuno">Mizuno</label>
+                        <div id="brandFilters">
+                            <p class="text-muted">Đang tải...</p>
                         </div>
                     </div>
 
-                    <!-- Đánh giá -->
-                    <div class="filter-group">
-                        <h5>Đánh giá</h5>
-                        <div class="filter-option">
-                            <input type="checkbox" id="star5">
-                            <label for="star5">⭐⭐⭐⭐⭐</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="star4">
-                            <label for="star4">⭐⭐⭐⭐ trở lên</label>
-                        </div>
-                        <div class="filter-option">
-                            <input type="checkbox" id="star3">
-                            <label for="star3">⭐⭐⭐ trở lên</label>
-                        </div>
-                    </div>
-
-                    <button class="btn-apply-filter">Áp dụng</button>
-                    <button class="btn-reset-filter">Xóa bộ lọc</button>
+                    <button class="btn-apply-filter" onclick="applyFilters()">Áp dụng</button>
+                    <button class="btn-reset-filter" onclick="resetFilters()">Xóa bộ lọc</button>
                 </div>
             </div>
 
@@ -114,178 +72,143 @@
                 <div class="products-section">
                     <!-- Header -->
                     <div class="products-header">
-                        <div class="products-count">
-                            Hiển thị <strong>12</strong> / 156 sản phẩm
+                        <div class="products-count" id="productsCount">
+                            Đang tải sản phẩm...
                         </div>
                         <div class="sort-dropdown">
-                            <select>
-                                <option>Sắp xếp: Mặc định</option>
-                                <option>Giá: Thấp đến cao</option>
-                                <option>Giá: Cao đến thấp</option>
-                                <option>Tên: A-Z</option>
-                                <option>Mới nhất</option>
+                            <select id="sortBy" onchange="applyFilters()">
+                                <option value="newest">Sắp xếp: Mới nhất</option>
+                                <option value="price_asc">Giá: Thấp đến cao</option>
+                                <option value="price_desc">Giá: Cao đến thấp</option>
+                                <option value="name_asc">Tên: A-Z</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Product Grid -->
-                    <div class="products-grid">
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/giay.jpeg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Giày</div>
-                                <div class="product-name">Giày bóng đá Nike Mercurial</div>
-                                <div class="product-price">450.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="bi bi-wallet-fill" style="font-size: 1.5rem; color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="bi bi-cart-plus-fill" style="font-size: 1.5rem; color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/bongda.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Vợt cầu lông</div>
-                                <div class="product-name">Vợt cầu lông Forza Power 976</div>
-                                <div class="product-price">1.710.000đ</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/votcaulong.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Vợt cầu lông</div>
-                                <div class="product-name">Vợt cầu lông Forza Power 976</div>
-                                <div class="product-price">1.710.000đ</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/giay.jpeg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Giày</div>
-                                <div class="product-name">Giày bóng đá Nike Mercurial</div>
-                                <div class="product-price">450.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/bongda.jpg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Bóng đá</div>
-                                <div class="product-name">
-                                    Bóng đá số 5 UCV 3.05 Terra xanh
-                                </div>
-                                <div class="product-price">450.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/giay.jpeg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Giày</div>
-                                <div class="product-name">Giày bóng đá Nike Mercurial</div>
-                                <div class="product-price">450.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/giay.jpeg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Giày</div>
-                                <div class="product-name">Giày bóng đá Nike Mercurial</div>
-                                <div class="product-price">450.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="product-card">
-                            <div class="product-image"><img src="/img/giay.jpeg" alt=""></div>
-                            <div class="product-info">
-                                <div class="product-typeName">Giày</div>
-                                <div class="product-name">Giày bóng đá Nike Mercurial</div>
-                                <div class="product-price">450.000₫</div>
-                                <div class=" btn-contain  d-flex justify-content-end align-items-center  ">
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
-                                    </button>
-                                    <button class="btn border-0 bg-transparent">
-                                        <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
-
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-
-
-
-
-
-
+                    <!-- Product Grid (Dynamic) -->
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Dynamic products will be rendered here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFilterData();
+            applyFilters();
+        });
+
+        function loadFilterData() {
+            fetch('/Supplies/GetFilterData')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
+                    return response.json();
+                })
+                .then(res => {
+                    if (res.success) {
+                        const catContainer = document.getElementById('categoryFilters');
+                        catContainer.innerHTML = res.categories.map(c => `
+                            <div class="filter-option">
+                                <input type="checkbox" class="cat-check" id="cat-${c.categoryId}" value="${c.categoryName}">
+                                <label for="cat-${c.categoryId}">${c.categoryName}</label>
+                            </div>
+                        `).join('');
+
+                        const brandContainer = document.getElementById('brandFilters');
+                        brandContainer.innerHTML = res.brands.map((b, i) => `
+                            <div class="filter-option">
+                                <input type="checkbox" class="brand-check" id="brand-${i}" value="${b}">
+                                <label for="brand-${i}">${b}</label>
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching filter data:', error);
+                    document.getElementById('categoryFilters').innerHTML = '<p class="text-danger small">Lỗi tải dữ liệu lọc</p>';
+                });
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('userSearchInput').value;
+            const sortBy = document.getElementById('sortBy').value;
+            const minPrice = document.getElementById('minPrice').value;
+            const maxPrice = document.getElementById('maxPrice').value;
+
+            const categories = Array.from(document.querySelectorAll('.cat-check:checked')).map(cb => cb.value).join(',');
+            const brands = Array.from(document.querySelectorAll('.brand-check:checked')).map(cb => cb.value).join(',');
+
+            const params = new URLSearchParams({
+                search,
+                categories,
+                brands,
+                minPrice,
+                maxPrice,
+                sortBy
+            });
+
+            const grid = document.getElementById('productsGrid');
+            const countLabel = document.getElementById('productsCount');
+            grid.innerHTML = '<div class="w-100 text-center py-5"><div class="spinner-border text-primary"></div></div>';
+
+            fetch(`/Supplies/GetFilteredProducts?${params.toString()}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok: ' + response.statusText);
+                    return response.json();
+                })
+                .then(res => {
+                    if (res.success) {
+                        renderProducts(res.data);
+                        countLabel.innerHTML = `Hiển thị <strong>${res.data.length}</strong> sản phẩm`;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                    grid.innerHTML = '<div class="w-100 text-center py-5"><p class="text-danger">Có lỗi xảy ra khi tải sản phẩm. Vui lòng thử lại sau.</p></div>';
+                });
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            if (products.length === 0) {
+                grid.innerHTML = '<div class="w-100 text-center py-5"><p class="text-muted">Không tìm thấy sản phẩm nào phù hợp.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${p.imageUrl || '/img/placeholder.jpg'}" alt="${p.productName}">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-typeName">${p.category ? p.category.categoryName : 'Khác'}</div>
+                        <div class="product-name">${p.productName}</div>
+                        <div class="product-price">${p.price.toLocaleString('vi-VN')}₫</div>
+                        <div class="btn-contain d-flex justify-content-end align-items-center">
+                            <button class="btn border-0 bg-transparent" title="Mua ngay">
+                                <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE;"></i>
+                            </button>
+                            <button class="btn border-0 bg-transparent" title="Thêm vào giỏ">
+                                <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function resetFilters() {
+            document.getElementById('userSearchInput').value = '';
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.getElementById('sortBy').value = 'newest';
+            document.querySelectorAll('.cat-check, .brand-check').forEach(cb => cb.checked = false);
+            applyFilters();
+        }
+    </script>
+}
