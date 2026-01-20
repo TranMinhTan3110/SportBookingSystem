@@ -1,313 +1,183 @@
-﻿/**
- * AdminPayment.js
- * Handles client-side filtering and interactivity for the Payment Dashboard
- */
+﻿document.addEventListener('DOMContentLoaded', function () {
+    const balanceSpan = document.getElementById('depositUserBalance');
+    const phoneInput = document.getElementById('depositUser');
 
-function initAdminPayment() {
-    // 1. Element References
-    const searchInput = document.getElementById('searchInput');
-    const typeFilter = document.getElementById('typeFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const dateFilter = document.getElementById('dateFilter');
-    const resetBtn = document.getElementById('resetFilters');
-
-    const tableBody = document.getElementById('paymentTableBody');
-    const tableRows = Array.from(tableBody.getElementsByTagName('tr'));
-    const visibleCountSpan = document.getElementById('visibleCount');
-
-    // 2. Event Listeners
-    searchInput.addEventListener('input', filterTable);
-    typeFilter.addEventListener('change', filterTable);
-    statusFilter.addEventListener('change', filterTable);
-    dateFilter.addEventListener('change', filterTable);
-
-    resetBtn.addEventListener('click', function () {
-        searchInput.value = '';
-        typeFilter.value = 'all';
-        statusFilter.value = 'all';
-        dateFilter.value = '';
-        filterTable(); // Re-run filter to show all
+    // Cấu hình mặc định cho SweetAlert2 để đồng bộ giao diện
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
     });
 
-    // 3. Filtering Logic
-    function filterTable() {
-        // Get current values
-        const searchText = searchInput.value.toLowerCase().trim();
-        const selectedType = typeFilter.value; // 'all' or specific value
-        const selectedStatus = statusFilter.value; // 'all' or specific value
-        const selectedDate = dateFilter.value; // YYYY-MM-DD string
-
-        let visibleRows = 0;
-
-        tableRows.forEach(row => {
-            // Data extraction from columns
-            // Col 0: Code, Col 1: User, Col 2: Type, Col 5: Date (dd/MM/yyyy), Col 6: Status
-
-            // Add null checks to prevent errors
-            if (!row.cells || row.cells.length < 7) {
-                row.style.display = 'none';
-                return;
-            }
-
-            const code = row.cells[0]?.textContent?.toLowerCase() || '';
-            const user = row.cells[1]?.textContent?.toLowerCase() || '';
-            const typeLower = row.cells[2]?.textContent?.trim() || ''; // Badge text
-            const dateCell = row.cells[5]?.querySelector('div.date-main');
-            const dateStr = dateCell?.textContent?.trim() || ''; // dd/MM/yyyy
-            const statusText = row.cells[6]?.textContent?.trim() || ''; // "Thành công", "Chờ xử lý"...
-
-            // -- Match Search (Code or User)
-            const matchesSearch = code.includes(searchText) || user.includes(searchText);
-
-            // -- Match Type
-            // Note: The dropdown values match the row content text logic we used in View (e.g., "Nạp tiền")
-            // We need to be careful with "Thanh toán" which matches "Thanh toán (Booking/Order)"
-            let matchesType = true;
-            if (selectedType !== 'all') {
-                if (selectedType === 'Thanh toán') {
-                    matchesType = typeLower.toLowerCase().includes('booking') || typeLower.toLowerCase().includes('order') || typeLower.toLowerCase().includes('thanh toán');
-                } else {
-                    matchesType = typeLower.includes(selectedType);
-                }
-            }
-
-            // -- Match Status
-            // Helper to map UI status text back to internal status keys if needed, 
-            // but we can also match based on class or text content.
-            // Let's deduce internal status from the text or badge class.
-            let rowStatusKey = '';
-            if (statusText.includes('Thành công')) rowStatusKey = 'Completed';
-            else if (statusText.includes('Chờ xử lý')) rowStatusKey = 'Pending';
-            else if (statusText.includes('Đã hủy')) rowStatusKey = 'Cancelled';
-
-            const matchesStatus = (selectedStatus === 'all') || (rowStatusKey === selectedStatus);
-
-            // -- Match Date
-            // Row date is dd/MM/yyyy, Input is yyyy-MM-dd
-            let matchesDate = true;
-            if (selectedDate && dateStr) {
-                // Convert row date to Comparable format
-                const [day, month, year] = dateStr.split('/');
-                // Format matches yyyy-MM-dd
-                const rowDateISO = `${year}-${month}-${day}`;
-                matchesDate = (rowDateISO === selectedDate);
-            }
-
-            // Final Decision
-            if (matchesSearch && matchesType && matchesStatus && matchesDate) {
-                row.style.display = '';
-                visibleRows++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        // Update counter
-        if (visibleCountSpan) {
-            visibleCountSpan.textContent = visibleRows;
-        }
-    }
-
-    // Initial Run
-    filterTable();
-
-    // ============================================
-    // TRANSACTION MANAGEMENT
-    // ============================================
-
-    // Tab Switching
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    console.log('Tab buttons found:', tabBtns.length);
-    console.log('Tab contents found:', tabContents.length);
-
-    tabBtns.forEach(btn => {
+    // 1. Chuyển Tab
+    document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function () {
-            const tabName = this.dataset.tab;
-            console.log('Tab clicked:', tabName);
-
-            // Remove active class from all tabs
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-
-            // Add active class to clicked tab
+            document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
             this.classList.add('active');
-            const targetTab = document.getElementById(`${tabName}-tab`);
-            console.log('Target tab element:', targetTab);
-            if (targetTab) {
-                targetTab.classList.add('active');
+            document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+
+            if (this.dataset.tab === 'purchase') {
+                loadProducts();
             }
         });
     });
 
-    // Load Users and Products on page load
-    // loadUsers(); // Disabled: Now using phone number input
-    loadProducts();
+    // 2. Tìm khách hàng bằng SĐT (Tab Nạp tiền)
+    phoneInput.addEventListener('change', async function () {
+        const phone = this.value.trim();
+        if (phone.length < 10) return;
 
-    /* 
-    // Load Users - Disabled
-    function loadUsers() {
-        fetch('/AdminPayment/GetUsers')
-            .then(response => response.json())
-            .then(users => {
-                const depositUserSelect = document.getElementById('depositUser');
-                const purchaseUserSelect = document.getElementById('purchaseUser');
+        try {
+            const res = await fetch(`/AdminPayment/GetUserByPhone?phone=${phone}`);
+            if (res.ok) {
+                const data = await res.json();
+                balanceSpan.textContent = new Intl.NumberFormat('vi-VN').format(data.walletBalance) + 'đ';
+                balanceSpan.dataset.userId = data.userId;
+                Toast.fire({ icon: 'success', title: 'Đã tìm thấy khách hàng' });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Số điện thoại này chưa đăng ký thành viên!' });
+                balanceSpan.textContent = '0đ';
+                balanceSpan.dataset.userId = "";
+            }
+        } catch (e) { console.error(e); }
+    });
 
-                users.forEach(user => {
-                    const option1 = new Option(`${user.fullName} (@${user.username})`, user.userID);
-                    const option2 = new Option(`${user.fullName} (@${user.username})`, user.userID);
-                    option1.dataset.balance = user.walletBalance;
-                    option2.dataset.balance = user.walletBalance;
-                    depositUserSelect.add(option1);
-                    purchaseUserSelect.add(option2);
+    // 3. Submit nạp tiền
+    document.getElementById('depositForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const userId = balanceSpan.dataset.userId;
+        if (!userId) {
+            Swal.fire({ icon: 'warning', title: 'Chú ý', text: 'Vui lòng nhập SĐT khách hàng hợp lệ trước!' });
+            return;
+        }
+
+        // Hiển thị xác nhận trước khi nạp
+        const confirm = await Swal.fire({
+            title: 'Xác nhận nạp tiền?',
+            text: `Bạn có chắc chắn muốn nạp tiền cho khách hàng này không?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Đồng ý nạp',
+            cancelButtonText: 'Hủy'
+        });
+
+        if (confirm.isConfirmed) {
+            Swal.showLoading(); // Hiển thị loading khi đang gọi API
+
+            const dto = {
+                UserID: parseInt(userId),
+                Amount: parseFloat(document.getElementById('depositAmount').value),
+                PaymentMethod: document.getElementById('depositMethod').value,
+                Message: document.getElementById('depositMessage').value
+            };
+
+            try {
+                const res = await fetch('/AdminPayment/CreateDeposit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dto)
                 });
-            })
-            .catch(error => console.error('Error loading users:', error));
-    }
-    */
+                const result = await res.json();
 
-    // Load Products
-    function loadProducts() {
-        fetch('/AdminPayment/GetProducts')
-            .then(response => response.json())
-            .then(products => {
-                const productSelect = document.getElementById('purchaseProduct');
-
-                products.forEach(product => {
-                    const option = new Option(product.productName, product.productID);
-                    option.dataset.price = product.price;
-                    option.dataset.stock = product.stockQuantity;
-                    productSelect.add(option);
-                });
-            })
-            .catch(error => console.error('Error loading products:', error));
-    }
-
-    /*
-    // Update balance when user is selected (Deposit)
-    document.getElementById('depositUser')?.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const balance = selectedOption?.dataset.balance || 0;
-        document.getElementById('depositUserBalance').textContent = formatCurrency(balance);
+                if (result.success) {
+                    await Swal.fire({
+                        icon: 'success',
+                        title: 'Thành công',
+                        text: 'Nạp tiền thành công!',
+                        confirmButtonText: 'OK'
+                    });
+                    location.reload();
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Thất bại', text: result.message });
+                }
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến máy chủ!' });
+            }
+        }
     });
 
-    // Update balance when user is selected (Purchase)
-    document.getElementById('purchaseUser')?.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const balance = selectedOption?.dataset.balance || 0;
-        document.getElementById('purchaseUserBalance').textContent = formatCurrency(balance);
-    });
-    */
-
-    // Update price and stock when product is selected
-    document.getElementById('purchaseProduct')?.addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        const price = selectedOption?.dataset.price || 0;
-        const stock = selectedOption?.dataset.stock || 0;
-
-        document.getElementById('purchasePrice').value = formatCurrency(price);
-        document.getElementById('productStock').textContent = stock;
-        calculateTotal();
+    // 4. Nút Đặt lại
+    document.querySelector('.btn-reset-form').addEventListener('click', function () {
+        balanceSpan.textContent = '0đ';
+        balanceSpan.dataset.userId = "";
     });
 
-    // Calculate total when quantity changes
-    document.getElementById('purchaseQuantity')?.addEventListener('input', calculateTotal);
-
-    function calculateTotal() {
+    // 5. Load danh sách sản phẩm
+    async function loadProducts() {
         const productSelect = document.getElementById('purchaseProduct');
-        const selectedOption = productSelect.options[productSelect.selectedIndex];
+        try {
+            const res = await fetch('/AdminPayment/GetProducts');
+            if (res.ok) {
+                const products = await res.json();
+                productSelect.innerHTML = '<option value="">-- Chọn sản phẩm --</option>';
+                products.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p.productId;
+                    option.textContent = `${p.productName} - ${p.price.toLocaleString('vi-VN')}đ`;
+                    option.dataset.price = p.price;
+                    option.dataset.stock = p.stock;
+                    productSelect.appendChild(option);
+                });
+            }
+        } catch (e) { console.error('Lỗi load sản phẩm:', e); }
+    }
+
+    // 6. Tìm khách hàng bằng SĐT (Tab Mua hàng)
+    document.getElementById('purchaseUser').addEventListener('change', async function () {
+        const phone = this.value.trim();
+        if (phone.length < 10) return;
+
+        try {
+            const res = await fetch(`/AdminPayment/GetUserByPhone?phone=${phone}`);
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('purchaseUserBalance').textContent = new Intl.NumberFormat('vi-VN').format(data.walletBalance) + 'đ';
+                document.getElementById('purchaseUserBalance').dataset.userId = data.userId;
+                Toast.fire({ icon: 'success', title: 'Đã nhận diện khách hàng' });
+            } else {
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không tìm thấy khách hàng!' });
+                document.getElementById('purchaseUserBalance').textContent = '0đ';
+                document.getElementById('purchaseUserBalance').dataset.userId = "";
+            }
+        } catch (e) { console.error(e); }
+    });
+
+    // 7. Cập nhật giá và tồn kho
+    document.getElementById('purchaseProduct').addEventListener('change', function () {
+        const selectedOption = this.options[this.selectedIndex];
+        if (!selectedOption.value) return;
+
+        const price = selectedOption.dataset.price || 0;
+        const stock = selectedOption.dataset.stock || 0;
+
+        document.getElementById('purchasePrice').value = parseFloat(price).toLocaleString('vi-VN') + 'đ';
+        document.getElementById('productStock').textContent = stock;
+        updatePurchaseTotal();
+    });
+
+    // 8. Tính tổng tiền
+    document.getElementById('purchaseQuantity').addEventListener('input', updatePurchaseTotal);
+
+    function updatePurchaseTotal() {
+        const selectedOption = document.getElementById('purchaseProduct').selectedOptions[0];
         const price = parseFloat(selectedOption?.dataset.price || 0);
-        const quantity = parseInt(document.getElementById('purchaseQuantity').value) || 0;
+        const quantity = parseInt(document.getElementById('purchaseQuantity').value || 0);
         const total = price * quantity;
-
-        document.getElementById('purchaseTotal').value = formatCurrency(total);
+        document.getElementById('purchaseTotal').value = total.toLocaleString('vi-VN') + 'đ';
     }
 
-    // Format currency
-    function formatCurrency(amount) {
-        return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
-    }
-
-    // Handle Deposit Form Submission
-    document.getElementById('depositForm')?.addEventListener('submit', function (e) {
+    // 9. Submit mua hàng
+    document.getElementById('purchaseForm').addEventListener('submit', function (e) {
         e.preventDefault();
-
-        const formData = {
-            UserID: parseInt(document.getElementById('depositUser').value),
-            Amount: parseFloat(document.getElementById('depositAmount').value),
-            PaymentMethod: document.getElementById('depositMethod').value,
-            Message: document.getElementById('depositMessage').value
-        };
-
-        if (!formData.UserID || !formData.Amount || !formData.PaymentMethod) {
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-            return;
-        }
-
-        fetch('/AdminPayment/CreateDeposit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message + '\nMã giao dịch: ' + data.transactionCode);
-                    document.getElementById('depositForm').reset();
-                    location.reload(); // Reload to update table
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi tạo giao dịch!');
-            });
+        Swal.fire({
+            icon: 'info',
+            title: 'Thông báo',
+            text: 'Chức năng mua hàng đang được xử lý ở phía Backend!',
+            confirmButtonColor: '#3085d6'
+        });
     });
-
-    // Handle Purchase Form Submission
-    document.getElementById('purchaseForm')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        const formData = {
-            UserID: parseInt(document.getElementById('purchaseUser').value),
-            ProductID: parseInt(document.getElementById('purchaseProduct').value),
-            Quantity: parseInt(document.getElementById('purchaseQuantity').value),
-            PaymentMethod: document.getElementById('purchaseMethod').value
-        };
-
-        if (!formData.UserID || !formData.ProductID || !formData.Quantity || !formData.PaymentMethod) {
-            alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-            return;
-        }
-
-        fetch('/AdminPayment/CreatePurchase', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message + '\nMã đơn hàng: ' + data.orderCode);
-                    document.getElementById('purchaseForm').reset();
-                    location.reload(); // Reload to update table
-                } else {
-                    alert('Lỗi: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi tạo đơn hàng!');
-            });
-    });
-}
-
-// Check if DOM is already loaded, if so run immediately, otherwise wait for DOMContentLoaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initAdminPayment);
-} else {
-    // DOM already loaded, run immediately
-    initAdminPayment();
-}
+});
