@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportBookingSystem.Models.EF;
 
@@ -11,9 +12,11 @@ using SportBookingSystem.Models.EF;
 namespace SportBookingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260120131541_AddSystemSettingsTable")]
+    partial class AddSystemSettingsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,9 +91,6 @@ namespace SportBookingSystem.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TimeSlotsSlotId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("TotalPrice")
                         .HasColumnType("decimal(18, 2)");
 
@@ -104,8 +104,6 @@ namespace SportBookingSystem.Migrations
                         .HasFilter("[CheckInCode] IS NOT NULL");
 
                     b.HasIndex("PitchId");
-
-                    b.HasIndex("TimeSlotsSlotId");
 
                     b.HasIndex("UserId");
 
@@ -196,40 +194,6 @@ namespace SportBookingSystem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Orders");
-                });
-
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.PitchSlots", b =>
-                {
-                    b.Property<int>("PitchSlotId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PitchSlotId"));
-
-                    b.Property<int?>("BookingId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PitchId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("PlayDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SlotId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.HasKey("PitchSlotId");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("PitchId");
-
-                    b.HasIndex("SlotId");
-
-                    b.ToTable("PitchSlots");
                 });
 
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Pitches", b =>
@@ -338,141 +302,36 @@ namespace SportBookingSystem.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.TimeSlots", b =>
-            {
-                b.Property<int>("SlotId")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SlotId"));
-
-                b.Property<TimeSpan>("EndTime")
-                    .HasColumnType("time");
-
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
-
-                b.Property<string>("SlotName")
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .HasColumnType("nvarchar(50)");
-
-                b.Property<TimeSpan>("StartTime")
-                    .HasColumnType("time");
-
-                b.HasKey("SlotId");
-
-                b.ToTable("TimeSlots");
-
-                b.HasData(
-                    new
-                    {
-                        SlotId = 1,
-                        EndTime = new TimeSpan(0, 7, 30, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 1",
-                        StartTime = new TimeSpan(0, 6, 0, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 2,
-                        EndTime = new TimeSpan(0, 9, 0, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 2",
-                        StartTime = new TimeSpan(0, 7, 30, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 3,
-                        EndTime = new TimeSpan(0, 17, 30, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 3",
-                        StartTime = new TimeSpan(0, 16, 0, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 4,
-                        EndTime = new TimeSpan(0, 19, 0, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 4 (Vàng)",
-                        StartTime = new TimeSpan(0, 17, 30, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 5,
-                        EndTime = new TimeSpan(0, 20, 30, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 5 (Vàng)",
-                        StartTime = new TimeSpan(0, 19, 0, 0, 0)
-                    });
-            });
             modelBuilder.Entity("SportBookingSystem.Models.Entities.SystemSetting", b =>
-            {
-                b.Property<string>("SettingKey")
-                    .HasMaxLength(100)
-                    .HasColumnType("nvarchar(100)");
-
-                b.Property<string>("SettingValue")
-                    .IsRequired()
-                    .HasColumnType("nvarchar(max)");
-
-                b.HasKey("SettingKey");
-
-                b.ToTable("SystemSetting");
-
-                b.HasData(
-                    new
-                    {
-                        SettingKey = "RewardAmountStep",
-                        SettingValue = "10000"
-                    },
-                    new
-                    {
-                        SettingKey = "RewardPointBonus",
-                        SettingValue = "1"
-                    },
-                    new
-                    {
-                        SettingKey = "IsRewardActive",
-                        SettingValue = "true"
-                    });
-            });
-
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.Transactions", b =>
                 {
-                    b.Property<int>("TransactionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<string>("SettingKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"));
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18, 2)");
+                    b.HasKey("SettingKey");
 
-                    b.Property<string>("Message")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.ToTable("SystemSetting");
 
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionType")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("TransactionId");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Transactions");
+                    b.HasData(
+                        new
+                        {
+                            SettingKey = "RewardAmountStep",
+                            SettingValue = "10000"
+                        },
+                        new
+                        {
+                            SettingKey = "RewardPointBonus",
+                            SettingValue = "1"
+                        },
+                        new
+                        {
+                            SettingKey = "IsRewardActive",
+                            SettingValue = "true"
+                        });
                 });
 
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Users", b =>
@@ -634,10 +493,6 @@ namespace SportBookingSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportBookingSystem.Models.Entities.TimeSlots", null)
-                        .WithMany("Bookings")
-                        .HasForeignKey("TimeSlotsSlotId");
-
                     b.HasOne("SportBookingSystem.Models.Entities.Users", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId");
@@ -673,31 +528,6 @@ namespace SportBookingSystem.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.PitchSlots", b =>
-                {
-                    b.HasOne("SportBookingSystem.Models.Entities.Bookings", "Booking")
-                        .WithMany()
-                        .HasForeignKey("BookingId");
-
-                    b.HasOne("SportBookingSystem.Models.Entities.Pitches", "Pitch")
-                        .WithMany()
-                        .HasForeignKey("PitchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("SportBookingSystem.Models.Entities.TimeSlots", "TimeSlot")
-                        .WithMany()
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("Pitch");
-
-                    b.Navigation("TimeSlot");
                 });
 
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Pitches", b =>
@@ -790,11 +620,6 @@ namespace SportBookingSystem.Migrations
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Role", b =>
                 {
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.TimeSlots", b =>
-                {
-                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Users", b =>
