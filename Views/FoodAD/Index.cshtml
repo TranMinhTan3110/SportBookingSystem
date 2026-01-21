@@ -28,10 +28,10 @@
                 <label class="form-label">LOẠI SẢN PHẨM</label>
                 <select class="form-select" id="filterType">
                     <option value="">Tất cả</option>
-                    <option value="Food">Đồ ăn</option>
-                    <option value="Drink">Thức uống</option>
-                    <option value="Snack">Đồ ăn vặt</option>
-                    <option value="Dessert">Tráng miệng</option>
+                    @foreach (var category in ViewBag.Categories)
+                    {
+                        <option value="@category.CategoryId">@category.CategoryName</option>
+                    }
                 </select>
             </div>
             <div class="form-group">
@@ -42,6 +42,13 @@
                     <option value="low">Sắp hết</option>
                     <option value="out">Hết hàng</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">HÀNH ĐỘNG</label>
+                <button class="btn-refresh" onclick="refreshFilters()">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>Làm mới</span>
+                </button>
             </div>
         </div>
     </div>
@@ -62,155 +69,68 @@
                     </tr>
                 </thead>
                 <tbody id="productTableBody">
-                    <tr>
-                        <td>#001</td>
-                        <td>
-                            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200&h=200&fit=crop" alt="Product" class="product-img">
-                        </td>
-                        <td>
-                            <div class="product-name">Hamburger Bò</div>
-                            <div class="product-category">Món chính</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-food">Đồ ăn</span>
-                        </td>
-                        <td>45,000₫</td>
-                        <td>
-                            <span class="stock-status stock-in">50 phần</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#002</td>
-                        <td>
-                            <img src="https://images.unsplash.com/photo-1554866585-cd94860890b7?w=200&h=200&fit=crop" alt="Product" class="product-img">
-                        </td>
-                        <td>
-                            <div class="product-name">Coca Cola</div>
-                            <div class="product-category">Nước ngọt có ga</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-drink">Thức uống</span>
-                        </td>
-                        <td>15,000₫</td>
-                        <td>
-                            <span class="stock-status stock-in">120 lon</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#003</td>
-                        <td>
-                            <img src="https://images.unsplash.com/photo-1608897013039-887f21d8c804?w=200&h=200&fit=crop" alt="Product" class="product-img">
-                        </td>
-                        <td>
-                            <div class="product-name">Redbull</div>
-                            <div class="product-category">Nước tăng lực</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-drink">Thức uống</span>
-                        </td>
-                        <td>20,000₫</td>
-                        <td>
-                            <span class="stock-status stock-in">8 lon</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#004</td>
-                        <td>
-                            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=200&h=200&fit=crop" alt="Product" class="product-img">
-                        </td>
-                        <td>
-                            <div class="product-name">Pizza Hải Sản</div>
-                            <div class="product-category">Món chính</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-food">Đồ ăn</span>
-                        </td>
-                        <td>85,000₫</td>
-                        <td>
-                            <span class="stock-status stock-in">30 phần</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#005</td>
-                        <td>
-                            <img src="https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=200&h=200&fit=crop" alt="Product" class="product-img">
-                        </td>
-                        <td>
-                            <div class="product-name">Khoai Tây Chiên</div>
-                            <div class="product-category">Món phụ</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-snack">Đồ ăn vặt</span>
-                        </td>
-                        <td>25,000₫</td>
-                        <td>
-                            <span class="stock-status stock-in">45 phần</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#006</td>
-                        <td>
-                            <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=200&h=200&fit=crop" alt="Product" class="product-img">
-                        </td>
-                        <td>
-                            <div class="product-name">Kem Vani</div>
-                            <div class="product-category">Tráng miệng</div>
-                        </td>
-                        <td>
-                            <span class="badge badge-dessert">Tráng miệng</span>
-                        </td>
-                        <td>30,000₫</td>
-                        <td>
-                            <span class="stock-status stock-out">0 phần</span>
-                        </td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn-action btn-view" title="Xem chi tiết"><i class="fa-solid fa-plus"></i></button>
-                                <button class="btn-action btn-edit" onclick="openModal('edit', 4)" title="Sửa"><i class="fa-solid fa-pen-to-square"></i></button>
-                                <button class="btn-action btn-delete" onclick="deleteProduct(4)" title="Xóa"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                    @foreach (var product in Model)
+                    {
+                        <tr data-category-id="@product.CategoryId">
+                            <td>#@product.ProductId.ToString("D3")</td>
+                            <td>
+                                <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "https://via.placeholder.com/200" : product.ImageUrl)"
+                                     alt="@product.ProductName" class="product-img">
+                            </td>
+                            <td>
+                                <div class="product-name">@product.ProductName</div>
+                                <div class="product-category">@product.CategoryName</div>
+                            </td>
+                            <td>
+                                <span class="badge @product.BadgeClass">@product.CategoryName</span>
+                            </td>
+                            <td>@product.Price.ToString("N0")₫</td>
+                            <td>
+                                <span class="stock-status @product.StockStatusClass">@product.StockStatusText</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view" onclick="addStockQuick(@product.ProductId)" title="Thêm số lượng">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                    <button class="btn-action btn-edit" onclick="openModal('edit', @product.ProductId)" title="Sửa">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button class="btn-action btn-delete" onclick="deleteProduct(@product.ProductId)" title="Xóa">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <div class="pagination-container">
+            <div class="pagination-info">
+                <span id="paginationInfo">Hiển thị <strong>1-10</strong> của <strong>0</strong> sản phẩm</span>
+            </div>
+            <div class="pagination-controls">
+                <button class="pagination-btn" id="firstPage" onclick="goToFirstPage()" title="Trang đầu">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="pagination-btn" id="prevPage" onclick="goToPrevPage()" title="Trang trước">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="pagination-pages" id="paginationPages">
+                    <!-- Dynamic page numbers will be inserted here -->
+                </div>
+                <button class="pagination-btn" id="nextPage" onclick="goToNextPage()" title="Trang sau">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button class="pagination-btn" id="lastPage" onclick="goToLastPage()" title="Trang cuối">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
     </div>
-</div>
 
 <!-- Add/Edit Product Modal -->
 <div class="modal-overlay" id="productModal">
@@ -228,12 +148,12 @@
 
                 <div class="form-group">
                     <label class="form-label">LOẠI SẢN PHẨM *</label>
-                    <select class="form-select" id="productType" required>
+                    <select class="form-select" id="productCategory" required>
                         <option value="">Chọn loại sản phẩm</option>
-                        <option value="Food">Đồ ăn</option>
-                        <option value="Drink">Thức uống</option>
-                        <option value="Snack">Đồ ăn vặt</option>
-                        <option value="Dessert">Tráng miệng</option>
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <option value="@category.CategoryId">@category.CategoryName</option>
+                        }
                     </select>
                 </div>
 
@@ -255,13 +175,25 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">URL HÌNH ẢNH</label>
-                    <input type="text" class="form-control" id="productImage" placeholder="Nhập link hình ảnh...">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">MÔ TẢ NGẮN</label>
-                    <textarea class="form-control" id="productDescription" placeholder="Nhập mô tả sản phẩm..."></textarea>
+                    <label class="form-label">HÌNH ẢNH SẢN PHẨM</label>
+                    <div class="image-upload-container">
+                        <input type="file"
+                               class="form-control-file"
+                               id="productImageFile"
+                               accept="image/*"
+                               onchange="previewImage(event)">
+                        <small class="upload-hint">
+                            <i class="fa-solid fa-circle-info"></i>
+                            JPG, PNG, GIF, WEBP - Tối đa 5MB
+                        </small>
+                        <div class="image-preview" id="imagePreview">
+                            <img id="previewImg" src="https://via.placeholder.com/300x300/374151/9CA3AF?text=Chọn+Hình" alt="Preview">
+                            <button type="button" class="btn-remove-image" onclick="removeImage()">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <input type="hidden" id="productImage">
+                    </div>
                 </div>
             </form>
         </div>
@@ -271,4 +203,5 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="~/asset/js/foodAD.js"></script>
