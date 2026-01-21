@@ -1,5 +1,4 @@
 ﻿@section Styles {
-    @* <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"> *@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/asset/css/booking.css" />
 }
@@ -8,6 +7,7 @@
     ViewData["Title"] = "Đặt sân";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <!-- Banner -->
 <section class="banner">
     <div class="breadcrumb">
@@ -20,18 +20,19 @@
         <p>Chọn sân yêu thích, đặt cọc hoặc thanh toán full - Nhanh chóng & Tiện lợi!</p>
     </div>
 </section>
+
 <!-- Main Container -->
 <div class="main-container">
     <!-- Filter Sidebar -->
     <aside class="filter-sidebar fade-in">
         <div class="filter-card">
             <div class="filter-header">
-                <h3 class="filter-title">🔍 Bộ Lọc</h3>
+                <h3 class="filter-title">Bộ Lọc</h3>
             </div>
 
             <!-- Date Filter -->
             <div class="filter-section">
-                <div class="filter-section-title">📅 Chọn Ngày</div>
+                <div class="filter-section-title">Chọn Ngày</div>
                 <div class="date-picker">
                     <input type="date" class="date-input" id="bookingDate">
                 </div>
@@ -39,12 +40,15 @@
 
             <!-- Time Filter -->
             <div class="filter-section">
-                <div class="filter-section-title">🕐 Khung Giờ</div>
+                <div class="filter-section-title">Khung Giờ</div>
                 <div class="time-slots">
-                    <div class="time-slot" data-time="morning">06:00 - 12:00</div>
-                    <div class="time-slot selected" data-time="afternoon">12:00 - 18:00</div>
-                    <div class="time-slot" data-time="evening">18:00 - 22:00</div>
-                    <div class="time-slot" data-time="night">22:00 - 24:00</div>
+                    @if (ViewBag.TimeSlots != null)
+                    {
+                        @foreach (var slot in ViewBag.TimeSlots)
+                        {
+                            <div class="time-slot" data-slot-id="@slot.SlotId">@slot.TimeRange</div>
+                        }
+                    }
                 </div>
             </div>
 
@@ -52,61 +56,18 @@
             <div class="filter-section">
                 <div class="filter-section-title">Loại Sân</div>
                 <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox" checked>
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Sân 5 người</span>
-                        <span class="filter-count">(12)</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Sân 7 người</span>
-                        <span class="filter-count">(8)</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Sân 11 người</span>
-                        <span class="filter-count">(5)</span>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Facilities Filter -->
-            <div class="filter-section">
-                <div class="filter-section-title">Tiện Nghi</div>
-                <div class="filter-options">
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Có mái che</span>
-                        <span class="filter-count">(15)</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Đèn LED</span>
-                        <span class="filter-count">(18)</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Bãi đỗ xe</span>
-                        <span class="filter-count">(20)</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Phòng thay đồ</span>
-                        <span class="filter-count">(16)</span>
-                    </label>
-                    <label class="filter-option">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Canteen</span>
-                        <span class="filter-count">(12)</span>
-                    </label>
+                    @if (ViewBag.Categories != null)
+                    {
+                        @foreach (var category in ViewBag.Categories)
+                        {
+                            <label class="filter-option" data-category-id="@category.CategoryId">
+                                <input type="checkbox">
+                                <div class="filter-checkbox"></div>
+                                <span class="filter-label">@category.CategoryName</span>
+                                <span class="filter-count"></span>
+                            </label>
+                        }
+                    }
                 </div>
             </div>
 
@@ -114,17 +75,17 @@
             <div class="filter-section">
                 <div class="filter-section-title">Tình Trạng</div>
                 <div class="filter-options">
-                    <label class="filter-option">
+                    <label class="filter-option" data-status="available">
                         <input type="checkbox" checked>
                         <div class="filter-checkbox"></div>
                         <span class="filter-label">Còn trống</span>
-                        <span class="filter-count">(18)</span>
+                        <span class="filter-count"></span>
                     </label>
-                    <label class="filter-option">
+                    <label class="filter-option" data-status="booked">
                         <input type="checkbox">
                         <div class="filter-checkbox"></div>
-                        <span class="filter-label">Sắp hết chỗ</span>
-                        <span class="filter-count">(5)</span>
+                        <span class="filter-label">Đã đặt</span>
+                        <span class="filter-count"></span>
                     </label>
                 </div>
             </div>
@@ -136,18 +97,16 @@
                     <div class="price-inputs">
                         <div class="price-input">
                             <label>Từ</label>
-                            <input type="text" placeholder="0₫" value="200,000₫">
+                            <input type="text" placeholder="0₫" value="0₫">
                         </div>
                         <div class="price-input">
                             <label>Đến</label>
-                            <input type="text" placeholder="2,000,000₫" value="1,000,000₫">
+                            <input type="text" placeholder="2,000,000₫" value="2,000,000₫">
                         </div>
-                    </div>
-                    <div class="price-slider">
-                        <div class="price-slider-fill"></div>
                     </div>
                 </div>
             </div>
+
             <div class="filter-actions">
                 <button type="button" class="filter-submit-btn">Lọc</button>
                 <button type="button" class="filter-clear-btn">Làm mới</button>
@@ -159,7 +118,7 @@
     <section class="fields-section fade-in stagger-1">
         <div class="fields-header">
             <div class="fields-count">
-                Hiển thị <strong>18</strong> trong tổng số <strong>25</strong> sân
+                Đang tải...
             </div>
             <div class="fields-sort">
                 <span class="sort-label">Sắp xếp:</span>
@@ -167,268 +126,16 @@
                     <option>Đề xuất</option>
                     <option>Giá thấp đến cao</option>
                     <option>Giá cao đến thấp</option>
-                    <option>Đánh giá cao nhất</option>
-                    <option>Gần nhất</option>
                 </select>
             </div>
         </div>
 
         <div class="fields-grid">
-            <!-- Field Card 1 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #10B981, #059669);">
-                    <span class="field-status-badge available">✓ Còn trống</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <h3 class="field-name">Sân A1 - Premium</h3>
-                        <span class="field-type">⚽ Sân 5 người</span>
-                    </div>
-
-                    <div class="field-pricing">
-                        <div class="pricing-header">
-                            <span class="pricing-label">Bảng giá hôm nay</span>
-                            <span class="pricing-time">14:00 - 16:00</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt cọc (30%)</span>
-                            <span class="pricing-value">90,000₫</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt sân full</span>
-                            <span class="pricing-value">300,000₫</span>
-                        </div>
-                        <div class="deposit-note">
-                            * Đặt cọc: Thanh toán 30% trước, còn lại trả khi đến sân
-                        </div>
-                    </div>
-
-                    <div class="field-actions">
-                        <button class="btn-deposit">
-                            <span class="btn-icon">💳</span>
-                            <span>Đặt cọc</span>
-                        </button>
-                        <button class="btn-book">
-                            <span class="btn-icon">✓</span>
-                            <span>Đặt sân</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 2 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #3B82F6, #2563EB);">
-                    <span class="field-status-badge limited">⚠️ Sắp hết</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <h3 class="field-name">Sân B3 - Standard</h3>
-                        <span class="field-type">⚽ Sân 7 người</span>
-                    </div>
-
-                    <div class="field-pricing">
-                        <div class="pricing-header">
-                            <span class="pricing-label">Bảng giá hôm nay</span>
-                            <span class="pricing-time">16:00 - 17:30</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt cọc (30%)</span>
-                            <span class="pricing-value">135,000₫</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt sân full</span>
-                            <span class="pricing-value">450,000₫</span>
-                        </div>
-                        <div class="deposit-note">
-                            * Đặt cọc: Thanh toán 30% trước, còn lại trả khi đến sân
-                        </div>
-                    </div>
-
-                    <div class="field-actions">
-                        <button class="btn-deposit">
-                            <span class="btn-icon">💳</span>
-                            <span>Đặt cọc</span>
-                        </button>
-                        <button class="btn-book">
-                            <span class="btn-icon">✓</span>
-                            <span>Đặt sân</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 3 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
-                    <span class="field-status-badge available">✓ Còn trống</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <h3 class="field-name">Sân C2 - Deluxe</h3>
-                        <span class="field-type">⚽ Sân 11 người</span>
-                    </div>
-
-                    <div class="field-pricing">
-                        <div class="pricing-header">
-                            <span class="pricing-label">Bảng giá hôm nay</span>
-                            <span class="pricing-time">18:00 - 19:30</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt cọc (30%)</span>
-                            <span class="pricing-value">240,000₫</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt sân full</span>
-                            <span class="pricing-value">800,000₫</span>
-                        </div>
-                        <div class="deposit-note">
-                            * Đặt cọc: Thanh toán 30% trước, còn lại trả khi đến sân
-                        </div>
-                    </div>
-
-                    <div class="field-actions">
-                        <button class="btn-deposit">
-                            <span class="btn-icon">💳</span>
-                            <span>Đặt cọc</span>
-                        </button>
-                        <button class="btn-book">
-                            <span class="btn-icon">✓</span>
-                            <span>Đặt sân</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 4 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">
-                    <span class="field-status-badge available">✓ Còn trống</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <h3 class="field-name">Sân A3 - Economy</h3>
-                        <span class="field-type">⚽ Sân 5 người</span>
-                    </div>
-
-                    <div class="field-pricing">
-                        <div class="pricing-header">
-                            <span class="pricing-label">Bảng giá hôm nay</span>
-                            <span class="pricing-time">15:00 - 16:00</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt cọc (30%)</span>
-                            <span class="pricing-value">75,000₫</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt sân full</span>
-                            <span class="pricing-value">250,000₫</span>
-                        </div>
-                        <div class="deposit-note">
-                            * Đặt cọc: Thanh toán 30% trước, còn lại trả khi đến sân
-                        </div>
-                    </div>
-
-                    <div class="field-actions">
-                        <button class="btn-deposit">
-                            <span class="btn-icon">💳</span>
-                            <span>Đặt cọc</span>
-                        </button>
-                        <button class="btn-book">
-                            <span class="btn-icon">✓</span>
-                            <span>Đặt sân</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 5 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #14B8A6, #0D9488);">
-                    <span class="field-status-badge available">✓ Còn trống</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <h3 class="field-name">Sân D1 - New</h3>
-                        <span class="field-type">⚽ Sân 7 người</span>
-                    </div>
-
-                    <div class="field-pricing">
-                        <div class="pricing-header">
-                            <span class="pricing-label">Bảng giá hôm nay</span>
-                            <span class="pricing-time">19:00 - 20:30</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt cọc (30%)</span>
-                            <span class="pricing-value">120,000₫</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt sân full</span>
-                            <span class="pricing-value">400,000₫</span>
-                        </div>
-                        <div class="deposit-note">
-                            * Đặt cọc: Thanh toán 30% trước, còn lại trả khi đến sân
-                        </div>
-                    </div>
-
-                    <div class="field-actions">
-                        <button class="btn-deposit">
-                            <span class="btn-icon">💳</span>
-                            <span>Đặt cọc</span>
-                        </button>
-                        <button class="btn-book">
-                            <span class="btn-icon">✓</span>
-                            <span>Đặt sân</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 6 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #EF4444, #991B1B);">
-                    <span class="field-status-badge booked">✕ Đã hết sân</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <h3 class="field-name">Sân B1 - Premium Plus</h3>
-                        <span class="field-type">⚽ Sân 5 người</span>
-                    </div>
-
-                    <div class="field-pricing">
-                        <div class="pricing-header">
-                            <span class="pricing-label">Bảng giá hôm nay</span>
-                            <span class="pricing-time">20:00 - 21:30</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt cọc (30%)</span>
-                            <span class="pricing-value">105,000₫</span>
-                        </div>
-                        <div class="pricing-row">
-                            <span class="pricing-type">Giá đặt sân full</span>
-                            <span class="pricing-value">350,000₫</span>
-                        </div>
-                        <div class="deposit-note" style="color: #ef4444; font-weight: bold;">
-                            * Hiện tại khung giờ này đã được đặt kín.
-                        </div>
-                    </div>
-
-                    <div class="field-actions">
-                        <button class="btn-deposit" style="opacity: 0.5; cursor: not-allowed;" disabled>
-                            <span class="btn-icon">💳</span>
-                            <span>Đặt cọc</span>
-                        </button>
-                        <button class="btn-book" style="background: #94a3b8; cursor: not-allowed;" disabled>
-                            <span class="btn-icon">✕</span>
-                            <span>Hết chỗ</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            <!-- Dữ liệu sẽ được load bằng JavaScript -->
         </div>
     </section>
 </div>
+
 @section Scripts {
-    @* <script src="~/js/site.js"></script> *@
     <script src="/asset/js/booking.js"></script>
 }

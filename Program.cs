@@ -1,6 +1,6 @@
-﻿using SportBookingSystem.Models.EF;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using SportBookingSystem.Models.EF;
 using SportBookingSystem.Services; 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,12 +21,17 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 // 3. Đăng ký Dependency Injection cho LoginServices 
 builder.Services.AddScoped<ILoginServices, LoginServices>();
+builder.Services.AddScoped<IPitchService, PitchService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFoodADService, FoodADService>();
+builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionUserService, TransactionUserService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

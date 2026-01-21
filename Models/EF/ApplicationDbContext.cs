@@ -19,7 +19,12 @@ namespace SportBookingSystem.Models.EF
         public DbSet<Orders> Orders { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<Transactions> Transactions { get; set; }
+
+        public DbSet<TimeSlots> TimeSlots { get; set; }
+        public DbSet<PitchSlots> PitchSlots { get; set; }
+
         public DbSet<SystemSetting> SystemSetting { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -94,6 +99,15 @@ namespace SportBookingSystem.Models.EF
                 .WithMany()
                 .HasForeignKey(od => od.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Cấu hình Seed Data cho TimeSlots
+            modelBuilder.Entity<TimeSlots>().HasData(
+                new TimeSlots { SlotId = 1, SlotName = "Ca 1", StartTime = new TimeSpan(6, 0, 0), EndTime = new TimeSpan(7, 30, 0) },
+                new TimeSlots { SlotId = 2, SlotName = "Ca 2", StartTime = new TimeSpan(7, 30, 0), EndTime = new TimeSpan(9, 0, 0) },
+                new TimeSlots { SlotId = 3, SlotName = "Ca 3", StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(17, 30, 0) },
+                new TimeSlots { SlotId = 4, SlotName = "Ca 4 (Vàng)", StartTime = new TimeSpan(17, 30, 0), EndTime = new TimeSpan(19, 0, 0) },
+                new TimeSlots { SlotId = 5, SlotName = "Ca 5 (Vàng)", StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 30, 0) }
+            );
             //dữ liệu bảng SystemSetting
             modelBuilder.Entity<SystemSetting>().HasData(
     new SystemSetting { SettingKey = "RewardAmountStep", SettingValue = "10000" },
