@@ -24,6 +24,8 @@ builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISportProductService, SportProductService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IQrService, QrService>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews()

@@ -1,10 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.DTOs;
+using SportBookingSystem.Models.EF;
 
 namespace SportBookingSystem.Controllers
 {
     public class AdminPaymentController : Controller
     {
+        private readonly ApplicationDbContext _context;
+
+        public AdminPaymentController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
         public IActionResult Index()
         {
             // Mock Data: Transactions (Deposits, Bookings, Orders)
@@ -43,6 +51,22 @@ namespace SportBookingSystem.Controllers
             };
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return Json(new { success = false });
+
+            return Json(new { 
+                success = true, 
+                userId = user.UserId,
+                username = user.Username,
+                fullName = user.FullName,
+                phone = user.Phone,
+                balance = user.WalletBalance
+            });
         }
 
         // API: Get Users for dropdown

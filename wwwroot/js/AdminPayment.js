@@ -301,7 +301,75 @@ function initAdminPayment() {
                 console.error('Error:', error);
                 alert('Có lỗi xảy ra khi tạo đơn hàng!');
             });
+        // ... (rest of the file remains same)
     });
+
+    // ============================================
+    // GLOBAL QR HANDLER
+    // ============================================
+    window.handleQrDetails = function (orderId, userId, productId, quantity) {
+        console.log('Handling QR details:', { orderId, userId, productId, quantity });
+
+        // 1. Switch to Purchase Tab
+        const purchaseBtn = document.querySelector('.tab-btn[data-tab="purchase"]');
+        if (purchaseBtn) purchaseBtn.click();
+
+        // 2. Fetch User Info (Phone) and Fill
+        fetch(`/AdminPayment/GetUserById/${userId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const userField = document.getElementById('purchaseUser');
+                    const balanceField = document.getElementById('purchaseUserBalance');
+
+                    if (userField) userField.value = data.phone || data.username;
+                    if (balanceField) balanceField.textContent = formatCurrency(data.balance);
+
+                    // 3. Select Product
+                    const productSelect = document.getElementById('purchaseProduct');
+                    if (productSelect) {
+                        productSelect.value = productId;
+                        // Trigger change event to update price/stock
+                        productSelect.dispatchEvent(new Event('change'));
+                    }
+
+                    // 4. Set Quantity
+                    const qtyField = document.getElementById('purchaseQuantity');
+                    if (qtyField) {
+                        qtyField.value = quantity;
+                        qtyField.dispatchEvent(new Event('input'));
+                    }
+
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Tự động điền hoàn tất',
+                        text: `Đã điền thông tin cho khách hàng ${data.fullName}`,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire('Lỗi', 'Không tìm thấy thông tin người dùng từ mã QR.', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching user for QR:', err);
+                Swal.fire('Lỗi', 'Có lỗi xảy ra khi lấy thông tin người dùng.', 'error');
+            });
+    };
+
+    // 4. Handle URL Parameters (if redirected from global scanner)
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrOrder = urlParams.get('qrOrder');
+    const qrUser = urlParams.get('qrUser');
+    const qrProduct = urlParams.get('qrProduct');
+    const qrQty = urlParams.get('qrQty');
+
+    if (qrOrder && qrUser && qrProduct && qrQty) {
+        // Wait a bit to ensure selects are populated (loadProducts is async)
+        setTimeout(() => {
+            window.handleQrDetails(qrOrder, qrUser, qrProduct, qrQty);
+        }, 800);
+    }
 }
 
 // Check if DOM is already loaded, if so run immediately, otherwise wait for DOMContentLoaded

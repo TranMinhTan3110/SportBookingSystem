@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="~/css/AdminLayout.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @await RenderSectionAsync("Styles", required: false)
@@ -112,6 +114,10 @@
                     <p class="header-subtitle">21 /12/2024 14:30</p>
                 </div>
                 <div class="header-right">
+                    <button class="btn btn-primary d-flex align-items-center gap-2 me-3" id="startScannerBtn" style="border-radius: 10px; padding: 8px 16px;">
+                        <i class="bi bi-qr-code-scan"></i>
+                        <span class="d-none d-md-inline">Quét QR</span>
+                    </button>
                     <a asp-controller="AdminProfile" asp-action="Index" class="nav-link header-user-link"><i class="bi bi-person-circle"></i></a>
                 </div>
             </header>
@@ -125,6 +131,30 @@
 
     <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- QR Scanner Modal -->
+    <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+                <div class="modal-header bg-primary text-white py-3">
+                    <h5 class="modal-title fw-bold"><i class="bi bi-qr-code-scan me-2"></i>Quét mã QR sản phẩm</h5>
+                    <button type="button" class="btn-close btn-close-white" id="stopScannerBtn" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="reader" style="width: 100%; border-radius: 15px; overflow: hidden; border: none;"></div>
+                    <div class="text-center mt-3">
+                        <p class="text-muted small mb-3">Vui lòng đưa mã QR vào khung hình để quét hoặc tải ảnh lên</p>
+                        <div class="d-grid">
+                            <label class="btn btn-outline-primary" style="border-radius: 10px; cursor: pointer;">
+                                <i class="bi bi-image me-2"></i>Chọn ảnh từ thiết bị
+                                <input type="file" id="qr-input-file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         const menuToggle = document.getElementById('menuToggle');
@@ -146,21 +176,107 @@
         }
 
         // Active nav link
-        // Active nav link
         const navLinks = document.querySelectorAll('.nav-link');
-        
-        // Normalize path (remove trailing slash for consistency)
         const normalizePath = (path) => path.replace(/\/+$/, "").toLowerCase();
         const currentPath = normalizePath(window.location.pathname);
 
         navLinks.forEach(link => {
             const linkPath = normalizePath(new URL(link.href).pathname);
-            
-            // Match if paths are identical OR if current path starts with link path (for sub-pages)
-             // Exception: Dashboard (/) should only match exact root or dashboard
             if (linkPath === currentPath || (currentPath.startsWith(linkPath) && linkPath !== '/' && linkPath.length > 1)) {
                 navLinks.forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
+            }
+        });
+
+        // QR Scanner Logic - Wrapped in event listener
+        document.addEventListener('DOMContentLoaded', function() {
+            let html5QrCode = null;
+            const qrScannerModalEl = document.getElementById('qrScannerModal');
+            if (!qrScannerModalEl) return;
+            
+            const qrModal = new bootstrap.Modal(qrScannerModalEl);
+
+            const startBtn = document.getElementById('startScannerBtn');
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    qrModal.show();
+                    setTimeout(() => {
+                        html5QrCode = new Html5Qrcode("reader");
+                        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                        
+                        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
+                        .catch(err => {
+                            console.error("Lỗi khởi động camera:", err);
+                            Swal.fire('Lỗi', 'Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.', 'error');
+                        });
+                    }, 500);
+                });
+            }
+
+            document.getElementById('stopScannerBtn')?.addEventListener('click', stopScanner);
+            qrScannerModalEl.addEventListener('hidden.bs.modal', stopScanner);
+
+            // File input handling
+            const fileInput = document.getElementById('qr-input-file');
+            fileInput.addEventListener('change', e => {
+                if (e.target.files.length == 0) return;
+                
+                const imageFile = e.target.files[0];
+                const tmpQrCode = new Html5Qrcode("reader"); // Use a separate instance or the main one
+                
+                // Show loading
+                Swal.fire({ title: 'Đang đọc mã...', didOpen: () => Swal.showLoading() });
+
+                tmpQrCode.scanFile(imageFile, true)
+                .then(decodedText => {
+                    Swal.close();
+                    onScanSuccess(decodedText);
+                })
+                .catch(err => {
+                    Swal.close();
+                    console.error("Lỗi đọc file QR:", err);
+                    Swal.fire('Thất bại', 'Không tìm thấy mã QR trong ảnh này.', 'error');
+                });
+            });
+
+            function stopScanner() {
+                if (html5QrCode && html5QrCode.isScanning) {
+                    html5QrCode.stop().then(() => {
+                        html5QrCode.clear();
+                    }).catch(err => console.error("Lỗi dừng scanner:", err));
+                }
+            }
+
+            function onScanSuccess(decodedText, decodedResult) {
+                stopScanner();
+                qrModal.hide();
+                
+                if (decodedText.startsWith("PURCHASE:")) {
+                    const parts = decodedText.split(":");
+                    const orderId = parts[1];
+                    const userId = parts[2];
+                    const productId = parts[3];
+                    const quantity = parts[4];
+
+                    Swal.fire({
+                        title: 'Đã tìm thấy đơn hàng!',
+                        html: `Mã đơn: <b>${orderId}</b><br>Người dùng ID: ${userId}<br>Sản phẩm ID: ${productId}<br>Số lượng: ${quantity}`,
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: 'Xử lý ngay',
+                        cancelButtonText: 'Đóng'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            if (typeof window.handleQrDetails === 'function') {
+                                window.handleQrDetails(orderId, userId, productId, quantity);
+                            } else {
+                                window.location.href = `/AdminPayment/Index?qrOrder=${orderId}&qrUser=${userId}&qrProduct=${productId}&qrQty=${quantity}`;
+                            }
+                        }
+                    });
+                } else {
+                    Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
+                }
             }
         });
     </script>

@@ -141,7 +141,6 @@ namespace SportBookingSystem.Services
                 existing.Brand = product.Brand;
                 existing.ProductType = product.ProductType;
                 existing.CategoryId = product.CategoryId;
-                existing.Status = product.Status; // Cập nhật trạng thái
 
                 if (imageFile != null && imageFile.Length > 0)
                 {
