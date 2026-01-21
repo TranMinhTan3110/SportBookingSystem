@@ -19,6 +19,7 @@ namespace SportBookingSystem.Models.EF
         public DbSet<Orders> Orders { get; set; }
         public DbSet<OrderDetails> OrderDetails { get; set; }
         public DbSet<Transactions> Transactions { get; set; }
+        public DbSet<SystemSetting> SystemSetting { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,6 +94,12 @@ namespace SportBookingSystem.Models.EF
                 .WithMany()
                 .HasForeignKey(od => od.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+            //dữ liệu bảng SystemSetting
+            modelBuilder.Entity<SystemSetting>().HasData(
+    new SystemSetting { SettingKey = "RewardAmountStep", SettingValue = "10000" },
+    new SystemSetting { SettingKey = "RewardPointBonus", SettingValue = "1" },
+    new SystemSetting { SettingKey = "IsRewardActive", SettingValue = "true" }
+);
         }
     }
 }

@@ -19,3 +19,4 @@ namespace SportBookingSystem.Models.Entities
         public ICollection<Products> Products { get; set; }
     }
 }
+    
