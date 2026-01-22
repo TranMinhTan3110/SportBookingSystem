@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
+using SportBookingSystem.Constants;
 using System;
 using System.Threading.Tasks;
 
@@ -49,7 +50,7 @@ namespace SportBookingSystem.Services
                         UserId = userId,
                         OrderDate = DateTime.Now,
                         TotalAmount = totalAmount,
-                        Status = 1, // Đã thanh toán
+                        Status = 0, // 0: Chờ xử lý (Pending)
                         OrderCode = $"ORD-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}"
                     };
                     _context.Orders.Add(order);
@@ -71,9 +72,9 @@ namespace SportBookingSystem.Services
                         UserId = userId,
                         Amount = totalAmount,
                         TransactionDate = DateTime.Now,
-                        TransactionType = "Thanh toán mua đồ",
+                        TransactionType = TransactionTypes.Order,
                         TransactionCode = order.OrderCode,
-                        Status = "Completed",
+                        Status = TransactionStatus.Pending,
                         Source = "Ví nội bộ",
                         BalanceAfter = user.WalletBalance,
                         Message = $"Mua {quantity} x {product.ProductName}",

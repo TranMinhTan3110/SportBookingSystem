@@ -374,14 +374,21 @@
     });
 
     // ========================================
-    // QR AUTOMATION LOGIC
+    // QR AUTOMATION & FULFILLMENT LOGIC
     // ========================================
-    window.handleQrDetails = function (orderId, userId, productId, quantity) {
-        // Switch to Purchase Tab
+    const fulfillmentModal = new bootstrap.Modal(document.getElementById('qrFulfillmentModal'));
+
+    window.handleQrDetails = async function (orderId, userId, productId, quantity) {
+        // Check if this is a fulfillment request (has orderId)
+        if (orderId && orderId !== '0') {
+            showFulfillmentModal(orderId);
+            return;
+        }
+
+        // Otherwise, it's a manual purchase pre-fill
         const purchaseBtn = document.querySelector('.tab-btn[data-tab="purchase"]');
         if (purchaseBtn) purchaseBtn.click();
 
-        // Fetch User Info
         fetch(`/AdminPayment/GetUserById/${userId}`)
             .then(res => res.json())
             .then(data => {
@@ -406,16 +413,80 @@
             });
     };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const qrData = {
-        order: urlParams.get('qrOrder'),
-        user: urlParams.get('qrUser'),
-        product: urlParams.get('qrProduct'),
-        qty: urlParams.get('qrQty')
-    };
+    async function showFulfillmentModal(orderId) {
+        const loading = document.getElementById('fulfillmentLoading');
+        const content = document.getElementById('fulfillmentContent');
 
-    if (qrData.order && qrData.user && qrData.product && qrData.qty) {
-        setTimeout(() => window.handleQrDetails(qrData.order, qrData.user, qrData.product, qrData.qty), 1000);
+        loading.classList.remove('d-none');
+        content.classList.add('d-none');
+        fulfillmentModal.show();
+
+        try {
+            const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('fOrderId').value = data.orderId;
+                document.getElementById('fOrderCode').textContent = data.orderCode;
+                document.getElementById('fCustomerName').textContent = data.customerName;
+                document.getElementById('fProductName').textContent = data.productName;
+                document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
+                document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
+
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+            } else {
+                fulfillmentModal.hide();
+                Toast.fire({ icon: 'error', title: 'Không tìm thấy thông tin đơn hàng' });
+            }
+        } catch (e) {
+            fulfillmentModal.hide();
+            Toast.fire({ icon: 'error', title: 'Lỗi tải đơn hàng' });
+        }
+    }
+
+    async function processFulfillment(status) {
+        const orderId = document.getElementById('fOrderId').value;
+        const confirm = await Swal.fire({
+            title: status === 'Thành công' ? 'Xác nhận đơn hàng?' : 'Hủy đơn hàng?',
+            text: status === 'Thành công' ? 'Xác nhận khách đã nhận đồ?' : 'Hủy đơn và hoàn tiền cho khách?',
+            icon: status === 'Thành công' ? 'question' : 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Không',
+            confirmButtonColor: status === 'Thành công' ? '#198754' : '#dc3545'
+        });
+
+        if (confirm.isConfirmed) {
+            try {
+                const res = await fetch('/AdminPayment/UpdateOrderStatus', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: parseInt(orderId), newStatus: status })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    fulfillmentModal.hide();
+                    Swal.fire('Thành công', result.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Lỗi', result.message, 'error');
+                }
+            } catch (e) {
+                Swal.fire('Lỗi', 'Lỗi kết nối máy chủ', 'error');
+            }
+        }
+    }
+
+    document.getElementById('btnFulfillSuccess')?.addEventListener('click', () => processFulfillment('Thành công'));
+    document.getElementById('btnFulfillCancel')?.addEventListener('click', () => processFulfillment('Đã hủy'));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrOrder = urlParams.get('qrOrder');
+    const qrUser = urlParams.get('qrUser');
+    const qrProduct = urlParams.get('qrProduct');
+    const qrQty = urlParams.get('qrQty');
+
+    if (qrOrder || (qrUser && qrProduct && qrQty)) {
+        setTimeout(() => window.handleQrDetails(qrOrder || 0, qrUser, qrProduct, qrQty), 1000);
     }
 
     // ========================================
