@@ -28,6 +28,7 @@ builder.Services.AddScoped<IFoodADService, FoodADService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionUserService, TransactionUserService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache();
