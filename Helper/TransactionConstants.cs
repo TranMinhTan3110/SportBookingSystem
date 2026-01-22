@@ -1,4 +1,4 @@
-﻿namespace SportBookingSystem.Constants
+﻿        namespace SportBookingSystem.Constants
 {
     public static class TransactionStatus
     {

@@ -28,6 +28,7 @@ builder.Services.AddScoped<IFoodADService, FoodADService>();
 builder.Services.AddScoped<IFoodService, FoodService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 builder.Services.AddScoped<ITransactionUserService, TransactionUserService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<ISportProductService, SportProductService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IQrService, QrService>();

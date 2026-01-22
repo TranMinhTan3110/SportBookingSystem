@@ -1,11 +1,10 @@
-﻿@{
+﻿@model SportBookingSystem.Models.ViewModels.ReportDataViewModel
+@{
     ViewData["Title"] = "Báo cáo - Thống kê";
     Layout = "~/Views/Shared/LayoutAdmin.cshtml";
 }
 @section Styles {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     <link rel="stylesheet" href="~/asset/css/reportAD.css" />
 }
@@ -28,10 +27,10 @@
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="stat-label">Tổng Doanh Thu</div>
-                <div class="stat-value" id="totalRevenue">285,500,000₫</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>+15.2% so với kỳ trước</span>
+                <div class="stat-value" id="totalRevenue">@Model.TotalRevenue.ToString("N0")₫</div>
+                <div class="stat-change @(Model.GrowthRate >= 0 ? "positive" : "negative")">
+                    <i class="fas fa-arrow-@(Model.GrowthRate >= 0 ? "up" : "down")"></i>
+                    <span>@(Model.GrowthRate >= 0 ? "+" : "")@Model.GrowthRate.ToString("F1")% so với kỳ trước</span>
                 </div>
             </div>
 
@@ -40,10 +39,10 @@
                     <i class="fas fa-calendar-check"></i>
                 </div>
                 <div class="stat-label">Đặt Sân</div>
-                <div class="stat-value" id="bookingRevenue">198,850,000₫</div>
+                <div class="stat-value" id="bookingRevenue">@Model.BookingRevenue.ToString("N0")₫</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
-                    <span>+18.3% so với kỳ trước</span>
+                    <span>Từ đặt sân</span>
                 </div>
             </div>
 
@@ -52,10 +51,10 @@
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-label">Dịch Vụ</div>
-                <div class="stat-value" id="serviceRevenue">86,650,000₫</div>
+                <div class="stat-value" id="serviceRevenue">@Model.ServiceRevenue.ToString("N0")₫</div>
                 <div class="stat-change positive">
                     <i class="fas fa-arrow-up"></i>
-                    <span>+9.7% so với kỳ trước</span>
+                    <span>Từ dịch vụ</span>
                 </div>
             </div>
         </div>
@@ -67,24 +66,28 @@
                     <label class="form-label small text-muted mb-2">
                         <i class="fas fa-calendar me-1"></i>Từ Ngày
                     </label>
-                    <input type="date" class="form-control" id="fromDate" value="2025-01-01">
+                    <input type="date" class="form-control" id="fromDate" value="@ViewBag.FromDate">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label small text-muted mb-2">
                         <i class="fas fa-calendar me-1"></i>Đến Ngày
                     </label>
-                    <input type="date" class="form-control" id="toDate" value="2025-01-17">
+                    <input type="date" class="form-control" id="toDate" value="@ViewBag.ToDate">
                 </div>
                 <div class="col-md-3">
                     <label class="form-label small text-muted mb-2">
                         <i class="fas fa-filter me-1"></i>Kỳ Báo Cáo
                     </label>
-                    <select class="form-select" id="reportPeriod">
-                        <option selected>Tháng này</option>
+                    <select class="form-select" id="reportPeriod" onchange="handlePeriodChange()">
+                        <option value="custom" selected>Tùy chỉnh</option>
+                        <option value="today">Hôm nay</option>
+                        <option value="yesterday">Hôm qua</option>
+                        <option value="thisweek">Tuần này</option>
+                        <option value="lastweek">Tuần trước</option>
+                        <option value="thismonth">Tháng này</option>
                         <option value="lastmonth">Tháng trước</option>
                         <option value="quarter">Quý này</option>
                         <option value="year">Năm nay</option>
-                        <option value="custom">Tùy chỉnh</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -123,95 +126,104 @@
         </div>
 
         <!-- Top Performing Sports -->
+        @if (Model.TopSports != null && Model.TopSports.Any())
+        {
+            <div class="glass-card summary-section">
+                <div class="section-title">
+                    <i class="fas fa-trophy text-warning"></i>
+                    Môn Thể Thao Hoạt Động Tốt Nhất
+                </div>
+                <div class="sports-grid" id="topSportsContainer">
+                    @foreach (var sport in Model.TopSports)
+                    {
+                        <div class="glass-card sport-card @sport.ColorClass">
+                            <div class="sport-header">
+                                <div class="sport-icon">
+                                    <i class="@sport.IconClass"></i>
+                                </div>
+                                <div class="sport-name">@sport.SportName</div>
+                            </div>
+                            <div class="sport-stats">
+                                <div class="sport-stat-row">
+                                    <span class="sport-stat-label">Doanh thu</span>
+                                    <span class="sport-stat-value">@sport.Revenue.ToString("N0")₫</span>
+                                </div>
+                                <div class="sport-stat-row">
+                                    <span class="sport-stat-label">Số lượt đặt</span>
+                                    <span class="sport-stat-value">@sport.BookingCount</span>
+                                </div>
+                                <div class="sport-stat-row">
+                                    <span class="sport-stat-label">Tăng trưởng</span>
+                                    <span class="growth-badge @(sport.Growth >= 0 ? "growth-positive" : "growth-negative")">
+                                        <i class="fas fa-arrow-@(sport.Growth >= 0 ? "up" : "down")"></i>@sport.Growth.ToString("F1")%
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Monthly Summary Table with Filter -->
         <div class="glass-card summary-section">
-            <div class="section-title">
-                <i class="fas fa-trophy text-warning"></i>
-                Môn Thể Thao Hoạt Động Tốt Nhất
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="section-title mb-0">
+                    <i class="fas fa-calendar-alt text-info"></i>
+                    Tổng Kết Theo Tháng
+                </div>
+                <button class="btn btn-sm btn-outline-primary" onclick="toggleMonthFilter()">
+                    <i class="fas fa-filter me-1"></i>Lọc theo tháng
+                </button>
             </div>
-            <div class="sports-grid">
-                <div class="glass-card sport-card football">
-                    <div class="sport-header">
-                        <div class="sport-icon">
-                            <i class="fas fa-futbol"></i>
-                        </div>
-                        <div class="sport-name">Bóng Đá</div>
-                    </div>
-                    <div class="sport-stats">
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Doanh thu</span>
-                            <span class="sport-stat-value">128,500,000₫</span>
-                        </div>
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Số lượt đặt</span>
-                            <span class="sport-stat-value">342</span>
-                        </div>
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Tăng trưởng</span>
-                            <span class="growth-badge growth-positive">
-                                <i class="fas fa-arrow-up"></i>18.5%
-                            </span>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="glass-card sport-card tennis">
-                    <div class="sport-header">
-                        <div class="sport-icon">
-                            <i class="fas fa-table-tennis"></i>
-                        </div>
-                        <div class="sport-name">Tennis</div>
+            <!-- Month Filter (Hidden by default) -->
+            <div id="monthFilterSection" style="display: none;" class="mb-3 p-3 bg-dark rounded">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted mb-2">Từ tháng</label>
+                        <select class="form-select form-select-sm" id="fromMonth">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i" selected="@(i == DateTime.Now.AddMonths(-2).Month)">Tháng @i</option>
+                            }
+                        </select>
                     </div>
-                    <div class="sport-stats">
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Doanh thu</span>
-                            <span class="sport-stat-value">89,200,000₫</span>
-                        </div>
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Số lượt đặt</span>
-                            <span class="sport-stat-value">256</span>
-                        </div>
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Tăng trưởng</span>
-                            <span class="growth-badge growth-positive">
-                                <i class="fas fa-arrow-up"></i>12.3%
-                            </span>
-                        </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted mb-2">Năm</label>
+                        <select class="form-select form-select-sm" id="fromYear">
+                            @for (int year = DateTime.Now.Year; year >= 2020; year--)
+                            {
+                                <option value="@year" selected="@(year == DateTime.Now.AddMonths(-2).Year)">@year</option>
+                            }
+                        </select>
                     </div>
-                </div>
-
-                <div class="glass-card sport-card badminton">
-                    <div class="sport-header">
-                        <div class="sport-icon">
-                            <i class="fas fa-volleyball-ball"></i>
-                        </div>
-                        <div class="sport-name">Cầu Lông</div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted mb-2">Đến tháng</label>
+                        <select class="form-select form-select-sm" id="toMonth">
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i" selected="@(i == DateTime.Now.Month)">Tháng @i</option>
+                            }
+                        </select>
                     </div>
-                    <div class="sport-stats">
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Doanh thu</span>
-                            <span class="sport-stat-value">67,800,000₫</span>
-                        </div>
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Số lượt đặt</span>
-                            <span class="sport-stat-value">189</span>
-                        </div>
-                        <div class="sport-stat-row">
-                            <span class="sport-stat-label">Tăng trưởng</span>
-                            <span class="growth-badge growth-negative">
-                                <i class="fas fa-arrow-down"></i>3.2%
-                            </span>
-                        </div>
+                    <div class="col-md-2">
+                        <label class="form-label small text-muted mb-2">Năm</label>
+                        <select class="form-select form-select-sm" id="toYear">
+                            @for (int year = DateTime.Now.Year; year >= 2020; year--)
+                            {
+                                <option value="@year" selected="@(year == DateTime.Now.Year)">@year</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-sm btn-primary w-100" onclick="applyMonthFilter()">
+                            <i class="fas fa-sync-alt me-1"></i>Áp dụng
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Monthly Summary Table -->
-        <div class="glass-card summary-section">
-            <div class="section-title">
-                <i class="fas fa-calendar-alt text-info"></i>
-                Tổng Kết Theo Tháng
-            </div>
             <div class="table-responsive">
                 <table class="table">
                     <thead>
@@ -223,77 +235,27 @@
                             <th>Tăng Trưởng</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">Tháng 1/2025</div>
-                                <div class="text-muted small">01/01 - 17/01</div>
-                            </td>
-                            <td class="amount-cell">285,500,000₫</td>
-                            <td>787</td>
-                            <td>362,900₫</td>
-                            <td>
-                                <span class="growth-badge growth-positive">
-                                    <i class="fas fa-arrow-up"></i>15.2%
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">Tháng 12/2024</div>
-                                <div class="text-muted small">Toàn tháng</div>
-                            </td>
-                            <td class="amount-cell">512,800,000₫</td>
-                            <td>1,456</td>
-                            <td>352,200₫</td>
-                            <td>
-                                <span class="growth-badge growth-positive">
-                                    <i class="fas fa-arrow-up"></i>8.7%
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">Tháng 11/2024</div>
-                                <div class="text-muted small">Toàn tháng</div>
-                            </td>
-                            <td class="amount-cell">471,600,000₫</td>
-                            <td>1,324</td>
-                            <td>356,200₫</td>
-                            <td>
-                                <span class="growth-badge growth-negative">
-                                    <i class="fas fa-arrow-down"></i>2.4%
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">Tháng 10/2024</div>
-                                <div class="text-muted small">Toàn tháng</div>
-                            </td>
-                            <td class="amount-cell">483,200,000₫</td>
-                            <td>1,389</td>
-                            <td>347,900₫</td>
-                            <td>
-                                <span class="growth-badge growth-positive">
-                                    <i class="fas fa-arrow-up"></i>11.5%
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="fw-semibold">Tháng 9/2024</div>
-                                <div class="text-muted small">Toàn tháng</div>
-                            </td>
-                            <td class="amount-cell">433,500,000₫</td>
-                            <td>1,267</td>
-                            <td>342,100₫</td>
-                            <td>
-                                <span class="growth-badge growth-positive">
-                                    <i class="fas fa-arrow-up"></i>6.8%
-                                </span>
-                            </td>
-                        </tr>
+                    <tbody id="monthlySummaryBody">
+                        @if (Model.MonthlySummaries != null && Model.MonthlySummaries.Any())
+                        {
+                            @foreach (var summary in Model.MonthlySummaries)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">@summary.MonthLabel</div>
+                                        <div class="text-muted small">@summary.DateRange</div>
+                                    </td>
+                                    <td class="amount-cell">@summary.TotalRevenue.ToString("N0")₫</td>
+                                    <td>@summary.TransactionCount</td>
+                                    <td>@summary.AveragePerTransaction.ToString("N0")₫</td>
+                                    <td>
+                                        <span class="growth-badge @(summary.GrowthRate >= 0 ? "growth-positive" : "growth-negative")">
+                                            <i class="fas fa-arrow-@(summary.GrowthRate >= 0 ? "up" : "down")"></i>@summary.GrowthRate.ToString("F1")%
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
                     </tbody>
                 </table>
             </div>
@@ -301,3 +263,10 @@
     </div>
 </body>
 <script src="~/asset/js/reportAD.js"></script>
+<script>
+    // Khởi tạo biểu đồ khi trang load
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeCharts();
+        initializeMonthFilters();
+    });
+</script>
