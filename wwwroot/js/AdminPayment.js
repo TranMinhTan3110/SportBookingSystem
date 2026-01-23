@@ -27,17 +27,17 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             applyFilters();
-        }, 500); // Wait 500ms after user stops typing
+        }, 500);
     }
 
     // Apply all filters
     async function applyFilters() {
         const params = new URLSearchParams({
-            search: searchInput.value.trim(),
-            type: typeFilter.value,
-            status: statusFilter.value,
-            date: dateFilter.value,
-            page: 1, // Reset to first page when filtering
+            search: searchInput?.value.trim() || '',
+            type: typeFilter?.value || 'all',
+            status: statusFilter?.value || 'all',
+            date: dateFilter?.value || '',
+            page: 1,
             pageSize: 10
         });
 
@@ -47,7 +47,7 @@
                 const data = await response.json();
                 updateTable(data);
                 updatePagination(data);
-                updateVisibleCount(data.payments.length, data.transactionCount);
+                updateVisibleCount(data.payments ? data.payments.length : 0, data.transactionCount || 0);
             } else {
                 Toast.fire({ icon: 'error', title: 'Lỗi khi lọc dữ liệu' });
             }
@@ -57,9 +57,10 @@
         }
     }
 
-    // Update table with filtered data
+    // Update table with data
     function updateTable(data) {
         const tbody = document.getElementById('paymentTableBody');
+        if (!tbody) return;
 
         if (!data.payments || data.payments.length === 0) {
             tbody.innerHTML = `
@@ -76,8 +77,9 @@
         tbody.innerHTML = data.payments.map(item => {
             const avatar = item.user?.substring(0, 1).toUpperCase() || '?';
             const badgeClass = getBadgeClass(item.type);
-            const amountClass = isPositiveTransaction(item.type) ? 'amount-positive' : 'amount-negative';
-            const amountPrefix = isPositiveTransaction(item.type) ? '+' : '-';
+            const isPositive = item.type === 'Nạp tiền' || item.type === 'Chuyền tiền';
+            const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
+            const amountPrefix = isPositive ? '+' : '-';
             const statusHTML = getStatusHTML(item.status);
 
             return `
@@ -115,67 +117,47 @@
         }).join('');
     }
 
-    // Update pagination
+    // Update pagination UI
     function updatePagination(data) {
-        const paginationNav = document.querySelector('.pagination');
-        if (!paginationNav) return;
+        const paginationWrapper = document.querySelector('.pagination');
+        if (!paginationWrapper) return;
 
         let html = '';
         const currentPage = data.currentPage;
         const totalPages = data.totalPages;
 
-        // Previous button
         if (currentPage > 1) {
-            html += `<li class="page-item">
-                <a href="#" class="page-link" data-page="${currentPage - 1}">Trước</a>
-            </li>`;
+            html += `<li class="page-item"><a href="#" class="page-link" data-page="${currentPage - 1}">Trước</a></li>`;
         } else {
-            html += `<li class="page-item disabled">
-                <span class="page-link">Trước</span>
-            </li>`;
+            html += `<li class="page-item disabled"><span class="page-link">Trước</span></li>`;
         }
 
-        // Page numbers
         for (let i = 1; i <= totalPages; i++) {
             if (i === currentPage) {
-                html += `<li class="page-item active">
-                    <span class="page-link">${i}</span>
-                </li>`;
+                html += `<li class="page-item active"><span class="page-link">${i}</span></li>`;
             } else if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
-                html += `<li class="page-item">
-                    <a href="#" class="page-link" data-page="${i}">${i}</a>
-                </li>`;
+                html += `<li class="page-item"><a href="#" class="page-link" data-page="${i}">${i}</a></li>`;
             } else if (i === currentPage - 3 || i === currentPage + 3) {
-                html += `<li class="page-item disabled">
-                    <span class="page-link">...</span>
-                </li>`;
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
             }
         }
 
-        // Next button
         if (currentPage < totalPages) {
-            html += `<li class="page-item">
-                <a href="#" class="page-link" data-page="${currentPage + 1}">Sau</a>
-            </li>`;
+            html += `<li class="page-item"><a href="#" class="page-link" data-page="${currentPage + 1}">Sau</a></li>`;
         } else {
-            html += `<li class="page-item disabled">
-                <span class="page-link">Sau</span>
-            </li>`;
+            html += `<li class="page-item disabled"><span class="page-link">Sau</span></li>`;
         }
 
-        paginationNav.innerHTML = html;
+        paginationWrapper.innerHTML = html;
 
-        // Attach click events to pagination links
-        paginationNav.querySelectorAll('a.page-link').forEach(link => {
-            link.addEventListener('click', async (e) => {
+        paginationWrapper.querySelectorAll('a.page-link').forEach(link => {
+            link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const page = parseInt(link.dataset.page);
-                await loadPage(page);
+                loadPage(parseInt(link.dataset.page));
             });
         });
     }
 
-    // Load specific page
     async function loadPage(page) {
         const params = new URLSearchParams({
             search: searchInput.value.trim(),
@@ -186,20 +168,15 @@
             pageSize: 10
         });
 
-        try {
-            const response = await fetch(`/AdminPayment/FilterPayments?${params}`);
-            if (response.ok) {
-                const data = await response.json();
-                updateTable(data);
-                updatePagination(data);
-                updateVisibleCount(data.payments.length, data.transactionCount);
-            }
-        } catch (error) {
-            console.error('Pagination error:', error);
+        const response = await fetch(`/AdminPayment/FilterPayments?${params}`);
+        if (response.ok) {
+            const data = await response.json();
+            updateTable(data);
+            updatePagination(data);
+            updateVisibleCount(data.payments.length, data.transactionCount);
         }
     }
 
-    // Update visible count
     function updateVisibleCount(visible, total) {
         const visibleCountSpan = document.getElementById('visibleCount');
         if (visibleCountSpan) {
@@ -207,7 +184,7 @@
         }
     }
 
-    // Helper: Get badge class for transaction type
+    // Helpers
     function getBadgeClass(type) {
         if (type === 'Nạp tiền') return 'badge-success';
         if (type === 'Thanh toán sân' || type === 'Thanh toán đồ') return 'badge-default';
@@ -215,59 +192,37 @@
         return 'badge-secondary';
     }
 
-    // Helper: Check if transaction is positive
-    function isPositiveTransaction(type) {
-        return type === 'Nạp tiền' || type === 'Chuyển tiền';
-    }
-
-    // Helper: Get status HTML
     function getStatusHTML(status) {
         switch (status) {
             case 'Thành công':
-                return `<span class="status-indicator">
-                    <span class="status-dot status-success"></span>
-                    <span class="status-text status-success-text">Thành công</span>
-                </span>`;
+                return `<span class="status-indicator"><span class="status-dot status-success"></span><span class="status-text status-success-text">Thành công</span></span>`;
             case 'Chờ xử lý':
-                return `<span class="status-indicator">
-                    <span class="status-dot status-warning"></span>
-                    <span class="status-text status-warning-text">Chờ xử lý</span>
-                </span>`;
+                return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xử lý</span></span>`;
             case 'Đã hủy':
-                return `<span class="status-indicator">
-                    <span class="status-dot status-danger"></span>
-                    <span class="status-text status-danger-text">Đã hủy</span>
-                </span>`;
+                return `<span class="status-indicator"><span class="status-dot status-danger"></span><span class="status-text status-danger-text">Đã hủy</span></span>`;
             default:
                 return `<span>${status}</span>`;
         }
     }
 
-    // Helper: Format currency
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
     }
 
-    // Helper: Format date
     function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('vi-VN');
+        return new Date(dateString).toLocaleDateString('vi-VN');
     }
 
-    // Helper: Format time
     function formatTime(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+        return new Date(dateString).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Event listeners for filters
-    searchInput.addEventListener('input', debounceSearch);
-    typeFilter.addEventListener('change', applyFilters);
-    statusFilter.addEventListener('change', applyFilters);
-    dateFilter.addEventListener('change', applyFilters);
-
-    // Reset filters button
-    resetButton.addEventListener('click', function () {
+    // Event listeners
+    searchInput?.addEventListener('input', debounceSearch);
+    typeFilter?.addEventListener('change', applyFilters);
+    statusFilter?.addEventListener('change', applyFilters);
+    dateFilter?.addEventListener('change', applyFilters);
+    resetButton?.addEventListener('click', () => {
         searchInput.value = '';
         typeFilter.value = 'all';
         statusFilter.value = 'all';
@@ -282,7 +237,8 @@
         btn.addEventListener('click', function () {
             document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
             this.classList.add('active');
-            document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+            const targetId = `${this.dataset.tab}-tab`;
+            document.getElementById(targetId)?.classList.add('active');
 
             if (this.dataset.tab === 'purchase') {
                 loadProducts();
@@ -291,9 +247,9 @@
     });
 
     // ========================================
-    // DEPOSIT FUNCTIONALITY
+    // DEPOSIT FORM LOGIC
     // ========================================
-    phoneInput.addEventListener('change', async function () {
+    phoneInput?.addEventListener('change', async function () {
         const phone = this.value.trim();
         if (phone.length < 10) return;
 
@@ -301,7 +257,7 @@
             const res = await fetch(`/AdminPayment/GetUserByPhone?phone=${phone}`);
             if (res.ok) {
                 const data = await res.json();
-                balanceSpan.textContent = new Intl.NumberFormat('vi-VN').format(data.walletBalance) + 'đ';
+                balanceSpan.textContent = formatCurrency(data.walletBalance);
                 balanceSpan.dataset.userId = data.userId;
                 Toast.fire({ icon: 'success', title: 'Đã tìm thấy khách hàng' });
             } else {
@@ -314,8 +270,7 @@
         }
     });
 
-    // Submit deposit
-    document.getElementById('depositForm').addEventListener('submit', async function (e) {
+    document.getElementById('depositForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
         const userId = balanceSpan.dataset.userId;
         if (!userId) {
@@ -325,18 +280,14 @@
 
         const confirm = await Swal.fire({
             title: 'Xác nhận nạp tiền?',
-            text: `Bạn có chắc chắn muốn nạp tiền cho khách hàng này không?`,
+            text: `Xác nhận nạp tiền cho khách hàng?`,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Đồng ý nạp',
+            confirmButtonText: 'Đồng ý',
             cancelButtonText: 'Hủy'
         });
 
         if (confirm.isConfirmed) {
-            Swal.showLoading();
-
             const dto = {
                 UserID: parseInt(userId),
                 Amount: parseFloat(document.getElementById('depositAmount').value),
@@ -351,35 +302,24 @@
                     body: JSON.stringify(dto)
                 });
                 const result = await res.json();
-
                 if (result.success) {
-                    await Swal.fire({
-                        icon: 'success',
-                        title: 'Thành công',
-                        text: 'Nạp tiền thành công!',
-                        confirmButtonText: 'OK'
-                    });
-                    location.reload();
+                    Swal.fire('Thành công', 'Nạp tiền thành công!', 'success').then(() => location.reload());
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Thất bại', text: result.message });
+                    Swal.fire('Thất bại', result.message, 'error');
                 }
             } catch (e) {
-                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể kết nối đến máy chủ!' });
+                Swal.fire('Lỗi', 'Không thể kết nối đến máy chủ!', 'error');
             }
         }
     });
 
-    // Reset deposit form
-    document.querySelector('.btn-reset-form').addEventListener('click', function () {
-        balanceSpan.textContent = '0đ';
-        balanceSpan.dataset.userId = "";
-    });
-
     // ========================================
-    // PRODUCT PURCHASE FUNCTIONALITY
+    // PURCHASE FORM LOGIC
     // ========================================
     async function loadProducts() {
         const productSelect = document.getElementById('purchaseProduct');
+        if (!productSelect || productSelect.options.length > 1) return;
+
         try {
             const res = await fetch('/AdminPayment/GetProducts');
             if (res.ok) {
@@ -388,19 +328,16 @@
                 products.forEach(p => {
                     const option = document.createElement('option');
                     option.value = p.productId;
-                    option.textContent = `${p.productName} - ${p.price.toLocaleString('vi-VN')}đ`;
+                    option.textContent = `${p.productName} - ${formatCurrency(p.price)}`;
                     option.dataset.price = p.price;
                     option.dataset.stock = p.stock;
                     productSelect.appendChild(option);
                 });
             }
-        } catch (e) {
-            console.error('Lỗi load sản phẩm:', e);
-        }
+        } catch (e) { console.error('Lỗi load sản phẩm:', e); }
     }
 
-    // Find customer by phone (purchase tab)
-    document.getElementById('purchaseUser').addEventListener('change', async function () {
+    document.getElementById('purchaseUser')?.addEventListener('change', async function () {
         const phone = this.value.trim();
         if (phone.length < 10) return;
 
@@ -408,118 +345,186 @@
             const res = await fetch(`/AdminPayment/GetUserByPhone?phone=${phone}`);
             if (res.ok) {
                 const data = await res.json();
-                document.getElementById('purchaseUserBalance').textContent =
-                    new Intl.NumberFormat('vi-VN').format(data.walletBalance) + 'đ';
+                document.getElementById('purchaseUserBalance').textContent = formatCurrency(data.walletBalance);
                 document.getElementById('purchaseUserBalance').dataset.userId = data.userId;
-                Toast.fire({ icon: 'success', title: 'Đã nhận diện khách hàng' });
-            } else {
-                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không tìm thấy khách hàng!' });
-                document.getElementById('purchaseUserBalance').textContent = '0đ';
-                document.getElementById('purchaseUserBalance').dataset.userId = "";
             }
-        } catch (e) {
-            console.error(e);
-        }
+        } catch (e) { console.error(e); }
     });
 
-    // Update price and stock
-    document.getElementById('purchaseProduct').addEventListener('change', function () {
-        const selectedOption = this.options[this.selectedIndex];
-        if (!selectedOption.value) return;
-
-        const price = selectedOption.dataset.price || 0;
-        const stock = selectedOption.dataset.stock || 0;
-
-        document.getElementById('purchasePrice').value =
-            parseFloat(price).toLocaleString('vi-VN') + 'đ';
-        document.getElementById('productStock').textContent = stock;
+    document.getElementById('purchaseProduct')?.addEventListener('change', function () {
+        const option = this.selectedOptions[0];
+        if (!option.value) return;
+        document.getElementById('purchasePrice').value = formatCurrency(option.dataset.price);
+        document.getElementById('productStock').textContent = option.dataset.stock;
         updatePurchaseTotal();
     });
 
-    // Calculate total
-    document.getElementById('purchaseQuantity').addEventListener('input', updatePurchaseTotal);
+    document.getElementById('purchaseQuantity')?.addEventListener('input', updatePurchaseTotal);
 
     function updatePurchaseTotal() {
-        const selectedOption = document.getElementById('purchaseProduct').selectedOptions[0];
-        const price = parseFloat(selectedOption?.dataset.price || 0);
-        const quantity = parseInt(document.getElementById('purchaseQuantity').value || 0);
-        const total = price * quantity;
-        document.getElementById('purchaseTotal').value = total.toLocaleString('vi-VN') + 'đ';
+        const option = document.getElementById('purchaseProduct')?.selectedOptions[0];
+        const price = parseFloat(option?.dataset.price || 0);
+        const qty = parseInt(document.getElementById('purchaseQuantity')?.value || 0);
+        document.getElementById('purchaseTotal').value = formatCurrency(price * qty);
     }
 
-    // Submit purchase
-    document.getElementById('purchaseForm').addEventListener('submit', function (e) {
+    document.getElementById('purchaseForm')?.addEventListener('submit', function (e) {
         e.preventDefault();
-        Swal.fire({
-            icon: 'info',
-            title: 'Thông báo',
-            text: 'Chức năng mua hàng đang được xử lý ở phía Backend!',
-            confirmButtonColor: '#3085d6'
-        });
+        Swal.fire('Thông báo', 'Chức năng mua hàng đang được xử lý ở phía Backend!', 'info');
     });
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Khai báo biến đại diện cho Modal để dùng chung cho cả 2 sự kiện
-    const modalElement = document.getElementById('rewardSettingsModal');
+    // ========================================
+    // QR AUTOMATION & FULFILLMENT LOGIC
+    // ========================================
+    const fulfillmentModal = new bootstrap.Modal(document.getElementById('qrFulfillmentModal'));
 
-    // 1. Load quy định điểm thưởng khi Modal mở lên
-    if (modalElement) {
-        modalElement.addEventListener('show.bs.modal', async function () {
-            try {
-                const res = await fetch(`/AdminPayment/GetRewardSetting`);
-                if (res.ok) {
-                    const data = await res.json();
+    window.handleQrDetails = async function (orderId, userId, productId, quantity) {
+        // Check if this is a fulfillment request (has orderId)
+        if (orderId && orderId !== '0') {
+            showFulfillmentModal(orderId);
+            return;
+        }
 
-                    
-                    document.getElementById('spendingRatio').value = data.amountStep;
-                    document.getElementById('depositRatio').value = data.pointBonus;
-                    document.getElementById('isRewardActive').checked = data.isActive;
-                }
-            } catch (e) {
-                console.error("Lỗi khi load dữ liệu:", e);
-            }
-        });
-    }
+        // Otherwise, it's a manual purchase pre-fill
+        const purchaseBtn = document.querySelector('.tab-btn[data-tab="purchase"]');
+        if (purchaseBtn) purchaseBtn.click();
 
-    // 2. Sự kiện lưu quy định điểm thưởng
-    const saveBtn = document.getElementById('saveRewardSettings');
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async function () {
-            const dto = {
-                AmountStep: parseFloat(document.getElementById('spendingRatio').value),
-                PointBonus: parseFloat(document.getElementById('depositRatio').value),
-                IsActive: document.getElementById('isRewardActive').checked
-            };
+        fetch(`/AdminPayment/GetUserById/${userId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('purchaseUser').value = data.phone || data.username;
+                    document.getElementById('purchaseUserBalance').textContent = formatCurrency(data.balance);
+                    document.getElementById('purchaseUserBalance').dataset.userId = data.userId;
 
-            try {
-                const res = await fetch(`/AdminPayment/SaveRewardSettings`, {
-                    method: 'POST',
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(dto)
-                });
-
-                const result = await res.json();
-
-                // Kiểm tra result.success 
-                if (result.success) {
-                    Swal.fire('Thành công', result.message, 'success');
-
-                  
-                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                    if (modalInstance) {
-                        modalInstance.hide();
+                    const productSelect = document.getElementById('purchaseProduct');
+                    if (productSelect) {
+                        productSelect.value = productId;
+                        productSelect.dispatchEvent(new Event('change'));
                     }
-                } else {
-                    throw new Error(result.message);
-                }
 
-            } catch (e) {
-                console.error("Lỗi khi lưu:", e);
-                Swal.fire('Lỗi', e.message || 'Không thể kết nối đến server', 'error');
+                    const qtyField = document.getElementById('purchaseQuantity');
+                    if (qtyField) {
+                        qtyField.value = quantity;
+                        qtyField.dispatchEvent(new Event('input'));
+                    }
+                    Toast.fire({ icon: 'success', title: 'Tự động điền hoàn tất', text: `Khách hàng: ${data.fullName}` });
+                }
+            });
+    };
+
+    async function showFulfillmentModal(orderId) {
+        const loading = document.getElementById('fulfillmentLoading');
+        const content = document.getElementById('fulfillmentContent');
+
+        loading.classList.remove('d-none');
+        content.classList.add('d-none');
+        fulfillmentModal.show();
+
+        try {
+            const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('fOrderId').value = data.orderId;
+                document.getElementById('fOrderCode').textContent = data.orderCode;
+                document.getElementById('fCustomerName').textContent = data.customerName;
+                document.getElementById('fProductName').textContent = data.productName;
+                document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
+                document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
+
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+            } else {
+                fulfillmentModal.hide();
+                Toast.fire({ icon: 'error', title: 'Không tìm thấy thông tin đơn hàng' });
             }
-        });
+        } catch (e) {
+            fulfillmentModal.hide();
+            Toast.fire({ icon: 'error', title: 'Lỗi tải đơn hàng' });
+        }
     }
+
+    async function processFulfillment(status) {
+        const orderId = document.getElementById('fOrderId').value;
+        const confirm = await Swal.fire({
+            title: status === 'Thành công' ? 'Xác nhận đơn hàng?' : 'Hủy đơn hàng?',
+            text: status === 'Thành công' ? 'Xác nhận khách đã nhận đồ?' : 'Hủy đơn và hoàn tiền cho khách?',
+            icon: status === 'Thành công' ? 'question' : 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Không',
+            confirmButtonColor: status === 'Thành công' ? '#198754' : '#dc3545'
+        });
+
+        if (confirm.isConfirmed) {
+            try {
+                const res = await fetch('/AdminPayment/UpdateOrderStatus', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ orderId: parseInt(orderId), newStatus: status })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    fulfillmentModal.hide();
+                    Swal.fire('Thành công', result.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Lỗi', result.message, 'error');
+                }
+            } catch (e) {
+                Swal.fire('Lỗi', 'Lỗi kết nối máy chủ', 'error');
+            }
+        }
+    }
+
+    document.getElementById('btnFulfillSuccess')?.addEventListener('click', () => processFulfillment('Thành công'));
+    document.getElementById('btnFulfillCancel')?.addEventListener('click', () => processFulfillment('Đã hủy'));
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const qrOrder = urlParams.get('qrOrder');
+    const qrUser = urlParams.get('qrUser');
+    const qrProduct = urlParams.get('qrProduct');
+    const qrQty = urlParams.get('qrQty');
+
+    if (qrOrder || (qrUser && qrProduct && qrQty)) {
+        setTimeout(() => window.handleQrDetails(qrOrder || 0, qrUser, qrProduct, qrQty), 1000);
+    }
+
+    // ========================================
+    // REWARD SETTINGS LOGIC
+    // ========================================
+    const modalElement = document.getElementById('rewardSettingsModal');
+    modalElement?.addEventListener('show.bs.modal', async function () {
+        try {
+            const res = await fetch(`/AdminPayment/GetRewardSetting`);
+            if (res.ok) {
+                const data = await res.json();
+                document.getElementById('spendingRatio').value = data.amountStep;
+                document.getElementById('depositRatio').value = data.pointBonus;
+                document.getElementById('isRewardActive').checked = data.isActive;
+            }
+        } catch (e) { console.error("Lỗi khi load dữ liệu:", e); }
+    });
+
+    document.getElementById('saveRewardSettings')?.addEventListener('click', async function () {
+        const dto = {
+            AmountStep: parseFloat(document.getElementById('spendingRatio').value),
+            PointBonus: parseFloat(document.getElementById('depositRatio').value),
+            IsActive: document.getElementById('isRewardActive').checked
+        };
+
+        try {
+            const res = await fetch(`/AdminPayment/SaveRewardSettings`, {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dto)
+            });
+            const result = await res.json();
+            if (result.success) {
+                Swal.fire('Thành công', result.message, 'success');
+                bootstrap.Modal.getInstance(modalElement)?.hide();
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (e) { Swal.fire('Lỗi', e.message || 'Lỗi kết nối server', 'error'); }
+    });
 });
