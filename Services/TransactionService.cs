@@ -68,6 +68,21 @@ namespace SportBookingSystem.Services
                 {
                     UserId = u.UserId,
                     FullName = u.FullName ?? u.Username,
+                    Phone = u.Phone,
+                    WalletBalance = u.WalletBalance
+                })
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<UserDepositInfoDTO?> GetUserByIdAsync(int id)
+        {
+            return await _context.Users
+                .Where(u => u.UserId == id)
+                .Select(u => new UserDepositInfoDTO
+                {
+                    UserId = u.UserId,
+                    FullName = u.FullName ?? u.Username,
+                    Phone = u.Phone,
                     WalletBalance = u.WalletBalance
                 })
                 .FirstOrDefaultAsync();
@@ -261,11 +276,11 @@ namespace SportBookingSystem.Services
         {
             // Danh sách các key cần lưu
             var settings = new Dictionary<string, string>
-  {
-    { "RewardAmountStep", dto.AmountStep.ToString() },
-    { "RewardPointBonus", dto.PointBonus.ToString() },
-    { "IsRewardActive", dto.IsActive.ToString().ToLower() }
-  };
+            {
+                { "RewardAmountStep", dto.AmountStep.ToString() },
+                { "RewardPointBonus", dto.PointBonus.ToString() },
+                { "IsRewardActive", dto.IsActive.ToString().ToLower() }
+            };
 
             foreach (var item in settings)
             {
@@ -284,9 +299,90 @@ namespace SportBookingSystem.Services
                 }
             }
             await _context.SaveChangesAsync();
-           
         }
 
-        
+        public async Task<OrderFulfillmentDTO?> GetOrderDetailsByIdAsync(int orderId)
+        {
+            var order = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+            if (order == null) return null;
+
+            var firstDetail = order.OrderDetails.FirstOrDefault();
+
+            return new OrderFulfillmentDTO
+            {
+                OrderId = order.OrderId,
+                OrderCode = order.OrderCode,
+                CustomerName = order.User?.FullName ?? order.User?.Username,
+                ProductName = firstDetail?.Product?.ProductName,
+                Quantity = firstDetail?.Quantity ?? 0,
+                TotalAmount = order.TotalAmount ?? 0,
+                Status = order.Status.ToString()
+            };
+        }
+
+        public async Task<(bool Success, string Message)> UpdateOrderStatusAsync(int orderId, string newStatus)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.Product)
+                    .FirstOrDefaultAsync(o => o.OrderId == orderId);
+
+                if (order == null) return (false, "Không tìm thấy đơn hàng");
+
+                var dbTransaction = await _context.Transactions.FirstOrDefaultAsync(t => t.OrderId == orderId);
+                if (dbTransaction == null) return (false, "Không tìm thấy giao dịch liên quan");
+
+                if (newStatus == TransactionStatus.Success)
+                {
+                    order.Status = 1;
+                    dbTransaction.Status = TransactionStatus.Success;
+                }
+                else if (newStatus == TransactionStatus.Canceled)
+                {
+                    if (dbTransaction.Status == TransactionStatus.Success || dbTransaction.Status == TransactionStatus.Canceled)
+                    {
+                        return (false, "Đơn hàng đã được xử lý trước đó");
+                    }
+
+                    order.Status = -1; // Đã hủy
+                    dbTransaction.Status = TransactionStatus.Canceled;
+
+                    // Hoàn tiền
+                    var user = await _context.Users.FindAsync(order.UserId);
+                    if (user != null)
+                    {
+                        user.WalletBalance += order.TotalAmount ?? 0;
+                        dbTransaction.BalanceAfter = user.WalletBalance;
+                    }
+
+                    // Trả lại kho
+                    foreach (var detail in order.OrderDetails)
+                    {
+                        var product = await _context.Products.FindAsync(detail.ProductId);
+                        if (product != null)
+                        {
+                            product.StockQuantity += detail.Quantity;
+                        }
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return (true, "Cập nhật thành công");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return (false, ex.Message);
+            }
+        }
     }
 }

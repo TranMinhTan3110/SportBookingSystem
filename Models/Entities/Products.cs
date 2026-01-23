@@ -29,11 +29,13 @@ namespace SportBookingSystem.Models.Entities
         public string? Brand { get; set; } // Nike, Adidas...
 
         [StringLength(50)]
-        public string? ProductType { get; set; } // Food, Drink, Shoe, Shirt
+        public string? ProductType { get; set; }
 
         // Khóa ngoại Category
         public int CategoryId { get; set; }
         [ForeignKey("CategoryId")]
-        public Categories Category { get; set; }
+        public Categories? Category { get; set; }
+
+        public bool Status { get; set; } = true; // true: Hiển thị, false: Ẩn
     }
 }

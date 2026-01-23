@@ -306,6 +306,9 @@ namespace SportBookingSystem.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<bool>("Status")
+                        .HasColumnType("bit");
+
                     b.Property<int>("StockQuantity")
                         .HasColumnType("int");
 
