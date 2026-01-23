@@ -45,5 +45,36 @@ namespace SportBookingSystem.Controllers.API
             var bookings = await _transactionUserService.LoadUserBookingsAsync(userId);
             return Ok(bookings);
         }
+        // API kiểm tra người nhận
+        [HttpGet("check-receiver")]
+        public async Task<IActionResult> CheckReceiver(string phone)
+        {
+            var user = await _transactionUserService.GetUserByPhoneAsync(phone);
+
+            if (user != null)
+                return Ok(new { success = true, name = user.FullName });
+            else
+                return NotFound(new { success = false, message = "Không tìm thấy người dùng" });
+        }
+
+        // API chuyển tiền
+        [HttpPost("transfer")]
+        public async Task<IActionResult> Transfer([FromBody] TransferDTO dto)
+        {
+            // Lấy userId từ Claims
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { success = false, message = "Vui lòng đăng nhập" });
+            }
+
+            // Gọi service
+            string result = await _transactionUserService.TransferMoneyAsync(userId, dto);
+
+            if (result == "success")
+                return Ok(new { success = true, message = "Chuyển tiền thành công" });
+            else
+                return BadRequest(new { success = false, message = result });
+        }
     }
 }

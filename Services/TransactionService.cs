@@ -27,7 +27,7 @@ namespace SportBookingSystem.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Tính toán statistics từ TẤT CẢ giao dịch (không phân trang)
+            
             var allTransactions = await _context.Transactions.ToListAsync();
 
             return new PaymentDashboardDTO
@@ -154,7 +154,7 @@ namespace SportBookingSystem.Services
                 .Include(t => t.Sender)
                 .AsQueryable();
 
-            // Apply search filter (by transaction code or user name)
+            
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 searchTerm = searchTerm.Trim().ToLower();
@@ -167,10 +167,10 @@ namespace SportBookingSystem.Services
                 );
             }
 
-            // Apply type filter
+            
             if (!string.IsNullOrWhiteSpace(type) && type != "all")
             {
-                // Handle grouped types
+             
                 if (type == "Thanh toán")
                 {
                     query = query.Where(t =>
@@ -184,10 +184,10 @@ namespace SportBookingSystem.Services
                 }
             }
 
-            // Apply status filter
+          
             if (!string.IsNullOrWhiteSpace(status) && status != "all")
             {
-                // Map English status to Vietnamese
+              
                 var mappedStatus = status switch
                 {
                     "Completed" => TransactionStatus.Success,
@@ -198,24 +198,24 @@ namespace SportBookingSystem.Services
                 query = query.Where(t => t.Status == mappedStatus);
             }
 
-            // Apply date filter
+         
             if (date.HasValue)
             {
                 var filterDate = date.Value.Date;
                 query = query.Where(t => t.TransactionDate.Date == filterDate);
             }
 
-            // Order by date descending
+            
             query = query.OrderByDescending(t => t.TransactionDate);
 
-            // Calculate totals from ALL transactions (not filtered)
+            
             var allTransactions = await _context.Transactions.ToListAsync();
 
-            // Calculate filtered count
+          
             var totalRecords = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
-            // Apply pagination
+           
             var transactions = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -242,7 +242,7 @@ namespace SportBookingSystem.Services
                               || t.TransactionType == TransactionTypes.Order)
                              && t.Status == TransactionStatus.Success)
                     .Sum(t => t.Amount),
-                TransactionCount = totalRecords, // Filtered count
+                TransactionCount = totalRecords, 
                 CurrentPage = page,
                 PageSize = pageSize,
                 TotalPages = totalPages
@@ -274,7 +274,7 @@ namespace SportBookingSystem.Services
         }
         public async Task SaveRewardSettingsAsync(RewardSettingDTO dto)
         {
-            // Danh sách các key cần lưu
+            
             var settings = new Dictionary<string, string>
             {
                 { "RewardAmountStep", dto.AmountStep.ToString() },

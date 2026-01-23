@@ -200,10 +200,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // ============================================
     // CONSOLE LOG (Development)
     // ============================================
-    console.log('🏟️ SportHub Layout loaded successfully!');
-    console.log('📱 Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
-    console.log('🛍️ Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
-    console.log('👤 User dropdown: ' + (userDropdown ? 'Ready' : 'Not found'));
+    console.log(' SportHub Layout loaded successfully!');
+    console.log(' Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
+    console.log(' Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
+    console.log(' User dropdown: ' + (userDropdown ? 'Ready' : 'Not found'));
 });
 
 // ============================================
@@ -223,13 +223,13 @@ function formatCurrency(amount) {
 }
 
 /**
- * Show toast notification (placeholder)
- * @param {string} message - Message to display
- * @param {string} type - Type of toast (success, error, info, warning)
+ * 
+ * @param {string} message 
+ * @param {string} type 
  */
 function showToast(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
-    // TODO: Implement actual toast notification UI
+    
     alert(message);
 }
 
