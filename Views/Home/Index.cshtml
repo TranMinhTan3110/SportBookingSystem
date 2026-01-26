@@ -41,10 +41,11 @@
             </div>
 
             <div class="wallet-actions">
-                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-plus-circle-fill"></i> Nạp tiền</button>
-                <button class="wallet-btn "  data-bs-toggle="modal" data-bs-target="#transferMoneyModal">
-                    <i class="bi bi-cash-coin"></i> Chuyển khoản
-                </button>                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-graph-up-arrow"></i> Chi tiết</button>
+                <button class="wallet-btn" data-bs-toggle="modal" data-bs-target="#topupModal">
+                    <i class="bi bi-plus-circle-fill"></i> Nạp tiền
+                </button>
+                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-cash-coin"></i> Chuyển khoản</button>
+                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-graph-up-arrow"></i> Chi tiết</button>
             </div>
         </div>
 
@@ -497,43 +498,60 @@
         </div>
     </section>
 </div>
-
-@* //modal chuyển khoản *@
-
-<div class="modal fade" id="transferMoneyModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="topupModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-white text-dark">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold"><i class="bi bi-send-fill me-2"></i>Chuyển tiền nội bộ</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold" id="topupModalLabel">
+                    <i class="bi bi-plus-circle-fill text-primary me-2"></i>Nạp Tiền Vào Ví
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Số điện thoại người nhận</label>
-                    <input type="text" id="trf_phone" class="form-control" placeholder="Nhập SĐT người nhận...">
-                    <div id="trf_receiver_name" class="mt-1 small text-primary fw-bold" style="display:none"></div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Số tiền muốn chuyển</label>
-                    <input type="number" id="trf_amount" class="form-control" placeholder="0">
-                    <div class="mt-1 small text-muted">Số dư hiện tại: <span class="fw-bold">@Model.User.WalletBalance.ToString("N0")₫</span></div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Lời nhắn</label>
-                    <textarea id="trf_message" class="form-control" rows="2" placeholder="Nhập nội dung..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer border-0">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" id="btn_confirm_transfer" class="btn btn-success px-4">Xác nhận chuyển</button>
+            <div class="modal-body p-4">
+                <form id="topupForm">
+                    <label class="form-label small text-muted mb-3">Chọn số tiền muốn nạp</label>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4"><button type="button" class="btn btn-outline-primary w-100 py-2 btn-amount" data-amount="50000">50K</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-primary w-100 py-2 btn-amount" data-amount="100000">100K</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-primary w-100 py-2 btn-amount" data-amount="200000">200K</button></div>
+                    </div>
+
+                    <input type="number" class="form-control form-control-lg mb-4" id="topupAmount"
+                           placeholder="Hoặc nhập số tiền khác" min="10000" style="border-radius: 12px; background: #f8f9fa;">
+
+                    <label class="form-label small text-muted mb-2">Phương thức thanh toán</label>
+                    <div class="payment-option p-3 mb-4 d-flex align-items-center border rounded-3 active" style="cursor: pointer;">
+                        <input class="form-check-input me-3" type="radio" name="paymentMethod" checked>
+                        <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" width="30" class="me-2">
+                        <span class="small fw-bold">Cổng thanh toán VNPay</span>
+                    </div>
+
+                    <button type="button" class="btn btn-success w-100 py-3 fw-bold shadow-sm"
+                            onclick="processTopup()" style="border-radius: 12px;">
+                        <i class="bi bi-shield-check me-2"></i>Tiến hành nạp tiền
+                    </button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script src="~/js/Home.js"></script>
+}
+@if (TempData["PaymentMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@(TempData["PaymentStatus"]?.ToString() == "success" ? "Thành công!" : "Thất bại!")',
+            html: '@Html.Raw(TempData["PaymentMessage"])',
+            icon: '@TempData["PaymentStatus"]',
+            confirmButtonText: 'Đồng ý',
+            confirmButtonColor: '#28a745'
+        });
+    </script>
 }

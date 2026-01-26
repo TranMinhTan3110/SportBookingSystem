@@ -1,4 +1,4 @@
-﻿// Global variables
+// Global variables
 let selectedProduct = null;
 let purchaseModal = null;
 let qrModal = null;
