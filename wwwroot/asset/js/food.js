@@ -63,7 +63,6 @@ $(document).ready(function () {
 function renderProducts(products) {
     var html = '';
     products.forEach(p => {
-        // Escape quotes just in case
         const safeName = p.productName.replace(/'/g, "\\'");
 
         html += `
@@ -74,12 +73,12 @@ function renderProducts(products) {
                     <div class="product-name">${p.productName}</div>
                     <div class="product-price">${p.formattedPrice}</div>
                     <div class="btn-contain d-flex justify-content-end align-items-center gap-2">
-                        <button class="btn border-0 bg-transparent p-0" title="Mua ngay" onclick="openPurchaseModal(${p.productId}, '${safeName}', ${p.price}, '${p.imageUrl}')">
-                            <i class="fa-solid fa-wallet fa-xl" style="color: #63E6BE; cursor: pointer;"></i>
-                        </button>
-                        <button class="btn border-0 bg-transparent p-0" title="Thêm vào giỏ" onclick="addToCart(${p.productId}, '${safeName}', ${p.price})">
-                            <i class="fa-solid fa-cart-arrow-down fa-xl" style="color: #0e86e1; cursor: pointer;"></i>
-                        </button>
+                    <button class="btn btn-primary py-2 fw-semibold flex-fill"  onclick="openPurchaseModal(${p.productId}, '${safeName}', ${p.price}, '${p.imageUrl}')">
+                        <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
+                    </button>
+                    <button class="btn btn-outline-primary py-2 fw-semibold flex-fill"onclick="addToCart(${p.productId}, '${safeName}', ${p.price})">
+                        <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
+                    </button>
                     </div>
                 </div>
             </div>`;

@@ -73,12 +73,13 @@
         tbody.innerHTML = data.payments.map(item => {
             const avatar = item.user?.substring(0, 1).toUpperCase() || '?';
             const badgeClass = getBadgeClass(item.type);
+
             const type = (item.type || '').trim();
             if (type.includes('Hoàn tiền') && type !== 'Hoàn tiền') {
                 console.log(`Mismatch found: '${type}' (Length: ${type.length}) vs 'Hoàn tiền'`);
             }
 
-            const isPositive = type === 'Nạp tiền' || type === 'Hoàn tiền';
+            const isPositive = type !== 'Hoàn tiền';
             const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
             const amountPrefix = isPositive ? '+' : '-';
             const statusHTML = getStatusHTML(item.status);
