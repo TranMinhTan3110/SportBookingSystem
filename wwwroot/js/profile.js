@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const fieldName = card.querySelector('.booking-field-info span').textContent;
 
             if (confirm(`Xác nhận thanh toán cho ${fieldName}?`)) {
-                // TODO: Process payment
                 alert('Đang xử lý thanh toán...');
             }
         });
@@ -93,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const avatar = document.querySelector('.profile-avatar');
     if (avatar) {
         avatar.addEventListener('click', function () {
-            // TODO: Open file upload dialog
             console.log('Avatar clicked - open upload dialog');
         });
     }
