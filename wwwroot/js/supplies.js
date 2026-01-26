@@ -159,7 +159,6 @@ function confirmPayment() {
                 purchaseModal.hide();
                 document.getElementById('purchaseQrCode').src = 'data:image/png;base64,' + res.qrCode;
 
-                // Countdown logic
                 const timerSpan = document.getElementById('suppliesTimer');
                 const countdownDiv = document.getElementById('suppliesQrCountdown');
                 if (timerSpan && countdownDiv) {
@@ -210,8 +209,7 @@ function startSuppliesCountdown(duration, display, container) {
 }
 
 function addToCart(id, name, price) {
-    // Simple placeholder for now as full cart logic wasn't specified but button was requested.
-    // Can be expanded to use LocalStorage or Backend Cart API.
+
     Swal.fire({
         icon: 'success',
         title: 'Đã thêm vào giỏ',

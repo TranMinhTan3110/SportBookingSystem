@@ -15,7 +15,7 @@ $(document).ready(function () {
             selectedCats.push(parseInt($(this).val()));
         });
 
-        // 2. Thu thập Khoảng giá - Quan trọng: Phải lấy đúng Selector
+        // 2. Thu thập Khoảng giá
         var minVal = $(".price-range input[placeholder='Từ']").val();
         var maxVal = $(".price-range input[placeholder='Đến']").val();
 
@@ -134,8 +134,6 @@ window.confirmPayment = function () {
             if (res.success) {
                 purchaseModal.hide();
                 document.getElementById('purchaseQrCode').src = 'data:image/png;base64,' + res.qrCode;
-
-                // Countdown
                 const timerSpan = document.getElementById('foodTimer');
                 const countdownDiv = document.getElementById('foodQrCountdown');
                 if (timerSpan && countdownDiv) {

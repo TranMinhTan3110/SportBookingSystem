@@ -96,12 +96,11 @@ namespace SportBookingSystem.Services
 
         public async Task<Orders?> GetLatestPendingOrderAsync(int userId)
         {
-            // Status 0: Pending, 1: Success, -1: Canceled (based on PurchaseService)
-            // We want the most recent pending order.
+
             return await _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
-                .Where(o => o.UserId == userId && o.Status == 0) // Pending
+                .Where(o => o.UserId == userId && o.Status == 0) 
                 .OrderByDescending(o => o.OrderDate)
                 .FirstOrDefaultAsync();
         }

@@ -20,7 +20,6 @@ namespace SportBookingSystem.Controllers
         public IActionResult GenerateBookingQr(string checkInCode)
         {
             if (string.IsNullOrEmpty(checkInCode)) return BadRequest("Mã check-in không hợp lệ");
-            // Format: BOOKING:[CheckInCode]
             string qrContent = $"BOOKING:{checkInCode}";
             string qrBase64 = _qrService.GenerateQrCode(qrContent);
             return Json(new { success = true, qrCode = qrBase64 });

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 let productCategories = [];
 
-// Modal Functions
+
 function openModal(mode, productId = null) {
     const modal = document.getElementById('productModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -207,8 +207,8 @@ function saveProduct() {
     const formData = new FormData();
     if (isEdit) formData.append('ProductId', id);
     formData.append('ProductName', document.getElementById('productName').value);
-    formData.append('CategoryId', typeSelect.value); // Send ID
-    formData.append('ProductType', selectedOption.getAttribute('data-name') || ''); // Send Name if needed for ProductType field
+    formData.append('CategoryId', typeSelect.value);
+    formData.append('ProductType', selectedOption.getAttribute('data-name') || '');
     formData.append('Brand', document.getElementById('productBrand').value);
     formData.append('Size', document.getElementById('productSize').value);
     formData.append('Price', document.getElementById('productPrice').value);
@@ -220,7 +220,6 @@ function saveProduct() {
         formData.append('imageFile', fileInput.files[0]);
     }
 
-    // DEBUG LOGS
     console.log("--- DEBUG: SENDING PRODUCT DATA ---");
     const debugObj = {};
     formData.forEach((value, key) => {

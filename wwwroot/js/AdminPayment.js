@@ -2,7 +2,6 @@
     const balanceSpan = document.getElementById('depositUserBalance');
     const phoneInput = document.getElementById('depositUser');
 
-    // SweetAlert2 configuration
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -53,7 +52,6 @@
         }
     }
 
-    // Update table with data
     function updateTable(data) {
         const tbody = document.getElementById('paymentTableBody');
         if (!tbody) return;
@@ -119,7 +117,6 @@
         }).join('');
     }
 
-    // Update pagination UI
     function updatePagination(data) {
         const paginationWrapper = document.querySelector('.pagination');
         if (!paginationWrapper) return;
@@ -219,7 +216,6 @@
         return new Date(dateString).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Event listeners
     searchInput?.addEventListener('input', debounceSearch);
     typeFilter?.addEventListener('change', applyFilters);
     statusFilter?.addEventListener('change', applyFilters);

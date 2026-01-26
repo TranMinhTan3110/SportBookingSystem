@@ -57,7 +57,7 @@ namespace SportBookingSystem.Controllers
                     success = result.Success, 
                     message = result.Message, 
                     qrCode = result.QrCode,
-                    remainingSeconds = 900 // 15 minutes for new order
+                    remainingSeconds = 900 
                 });
             }
             catch (Exception ex)

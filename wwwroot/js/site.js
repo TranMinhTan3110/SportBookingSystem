@@ -1,18 +1,11 @@
-﻿// ============================================
-// SPORTHUB - USER LAYOUT JAVASCRIPT
-// Dropdown + Mobile Menu + Smooth Scroll
-// ============================================
+﻿
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ============================================
-    // ELEMENTS
-    // ============================================
     const servicesDropdown = document.getElementById('servicesDropdown');
     const userDropdown = document.getElementById('userDropdown');
     const dropdownOverlay = document.getElementById('dropdownOverlay');
 
-    // Mobile Menu Elements
     const mobileMenuToggle = document.getElementById('mobileMenuToggle');
     const mobileNav = document.getElementById('mobileNav');
     const mobileNavOverlay = document.getElementById('mobileNavOverlay');
@@ -21,9 +14,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const header = document.querySelector('.header');
 
-    // ============================================
-    // SERVICES DROPDOWN
-    // ============================================
     if (servicesDropdown) {
         const toggle = servicesDropdown.querySelector('.dropdown-toggle');
 
@@ -32,10 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             const isOpen = servicesDropdown.classList.contains('open');
 
-            // Close all dropdowns first
+
             closeAllDropdowns();
 
-            // Toggle this dropdown
             if (!isOpen) {
                 servicesDropdown.classList.add('open');
                 dropdownOverlay.classList.add('active');
@@ -43,9 +32,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ============================================
-    // USER DROPDOWN
-    // ============================================
     if (userDropdown) {
         const avatar = userDropdown.querySelector('.user-avatar');
 
@@ -53,10 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
             const isOpen = userDropdown.classList.contains('open');
 
-            // Close all dropdowns first
             closeAllDropdowns();
 
-            // Toggle this dropdown
             if (!isOpen) {
                 userDropdown.classList.add('open');
                 dropdownOverlay.classList.add('active');
@@ -64,23 +48,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close dropdowns when clicking overlay
+
     if (dropdownOverlay) {
         dropdownOverlay.addEventListener('click', closeAllDropdowns);
     }
 
-    // Close dropdowns when clicking outside
+
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.dropdown') && !e.target.closest('.user-dropdown')) {
             closeAllDropdowns();
         }
     });
 
-    // ============================================
-    // MOBILE MENU
-    // ============================================
 
-    // Open Mobile Menu
+
+
     if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -88,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close Mobile Menu
+
     if (mobileNavClose) {
         mobileNavClose.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -96,23 +78,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Close Mobile Menu when clicking overlay
     if (mobileNavOverlay) {
         mobileNavOverlay.addEventListener('click', function () {
             closeMobileMenu();
         });
     }
 
-    // Close Mobile Menu when clicking a link
     mobileNavLinks.forEach(link => {
         link.addEventListener('click', function () {
             closeMobileMenu();
         });
     });
 
-    // ============================================
-    // SMOOTH SCROLL FOR ANCHOR LINKS
-    // ============================================
     const anchorLinks = document.querySelectorAll('a[href^="#"]');
 
     anchorLinks.forEach(anchor => {
@@ -132,9 +109,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ============================================
-    // HEADER SHADOW ON SCROLL
-    // ============================================
     window.addEventListener('scroll', function () {
         if (window.pageYOffset > 50) {
             header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
@@ -143,22 +117,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============================================
-    // CLOSE MOBILE MENU ON WINDOW RESIZE
-    // ============================================
     window.addEventListener('resize', function () {
         if (window.innerWidth > 768) {
             closeMobileMenu();
         }
     });
 
-    // ============================================
-    // FUNCTIONS
-    // ============================================
-
-    /**
-     * Close all dropdown menus
-     */
     function closeAllDropdowns() {
         if (servicesDropdown) {
             servicesDropdown.classList.remove('open');
@@ -169,27 +133,18 @@ document.addEventListener('DOMContentLoaded', function () {
         dropdownOverlay.classList.remove('active');
     }
 
-    /**
-     * Open mobile navigation menu
-     */
     function openMobileMenu() {
         mobileNav.classList.add('active');
         mobileNavOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
     }
 
-    /**
-     * Close mobile navigation menu
-     */
     function closeMobileMenu() {
         mobileNav.classList.remove('active');
         mobileNavOverlay.classList.remove('active');
         document.body.style.overflow = '';
     }
 
-    // ============================================
-    // KEYBOARD NAVIGATION (ESC to close)
-    // ============================================
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeAllDropdowns();
@@ -197,23 +152,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============================================
-    // CONSOLE LOG (Development)
-    // ============================================
     console.log('🏟️ SportHub Layout loaded successfully!');
     console.log('📱 Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
     console.log('🛍️ Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
     console.log('👤 User dropdown: ' + (userDropdown ? 'Ready' : 'Not found'));
 });
 
-// ============================================
-// UTILITY FUNCTIONS (Global)
-// ============================================
-
 /**
- * Format currency to Vietnamese Dong
- * @param {number} amount - Amount to format
- * @returns {string} Formatted currency string
+
+ @param {number} amount 
+  @returns {string} F
  */
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
@@ -223,21 +171,21 @@ function formatCurrency(amount) {
 }
 
 /**
- * Show toast notification (placeholder)
- * @param {string} message - Message to display
- * @param {string} type - Type of toast (success, error, info, warning)
+
+ * @param {string} message 
+ * @param {string} type 
  */
 function showToast(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
-    // TODO: Implement actual toast notification UI
+
     alert(message);
 }
 
 /**
- * Debounce function
- * @param {Function} func - Function to debounce
- * @param {number} wait - Wait time in milliseconds
- * @returns {Function} Debounced function
+
+ * @param {Function} func 
+ * @param {number} wait 
+ * @returns {Function} 
  */
 function debounce(func, wait) {
     let timeout;
@@ -252,10 +200,10 @@ function debounce(func, wait) {
 }
 
 /**
- * Throttle function
- * @param {Function} func - Function to throttle
- * @param {number} limit - Limit time in milliseconds
- * @returns {Function} Throttled function
+
+ * @param {Function} func -
+ * @param {number} limit 
+ * @returns {Function} 
  */
 function throttle(func, limit) {
     let inThrottle;

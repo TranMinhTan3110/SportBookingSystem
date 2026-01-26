@@ -15,6 +15,6 @@ namespace SportBookingSystem.DTO
     public class FulfillmentRequestDTO
     {
         public int OrderId { get; set; }
-        public string NewStatus { get; set; } = string.Empty; // "Thành công" or "Đã hủy"
+        public string NewStatus { get; set; } = string.Empty; 
     }
 }

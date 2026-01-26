@@ -1,23 +1,14 @@
-﻿// ============================================
-// PROFILE PAGE - INTERACTIVE
-// ============================================
+﻿
 
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ============================================
-    // RECHARGE BUTTON
-    // ============================================
     const rechargeBtn = document.querySelector('.btn-recharge');
     if (rechargeBtn) {
         rechargeBtn.addEventListener('click', function () {
-            // TODO: Open recharge modal
+
             alert('Chức năng nạp tiền đang được phát triển');
         });
     }
-
-    // ============================================
-    // CHECK-IN BUTTON
-    // ============================================
     const checkinBtn = document.querySelector('.btn-checkin');
     const checkInQrModal = document.getElementById('checkInQrModal');
 
@@ -48,12 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // ============================================
 
-
-    // ============================================
-    // PAY NOW BUTTONS
-    // ============================================
     const payButtons = document.querySelectorAll('.btn-pay-now');
     payButtons.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -67,22 +53,18 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ============================================
-    // VIEW ALL BUTTONS
-    // ============================================
+
     const viewAllButtons = document.querySelectorAll('.btn-view-all');
     viewAllButtons.forEach(btn => {
         btn.addEventListener('click', function () {
             const section = this.closest('section');
             const sectionTitle = section.querySelector('.section-title').textContent.trim();
             console.log('View all:', sectionTitle);
-            // TODO: Navigate to detail page
+
         });
     });
 
-    // ============================================
-    // BOOKING CARD ANIMATION
-    // ============================================
+
     const bookingCards = document.querySelectorAll('.booking-card');
     const observerOptions = {
         threshold: 0.1,
@@ -108,9 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(card);
     });
 
-    // ============================================
-    // PROFILE AVATAR UPLOAD (Optional)
-    // ============================================
     const avatar = document.querySelector('.profile-avatar');
     if (avatar) {
         avatar.addEventListener('click', function () {
@@ -120,9 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // ============================================
-    // PERSONAL INFO BUTTONS & MODAL LOGIC
-    // ============================================
     const emailModal = document.getElementById('emailModal');
     const phoneModal = document.getElementById('phoneModal');
     const passwordModal = document.getElementById('passwordModal');
@@ -131,7 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (modal) {
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            // Reset fields
             const inputs = modal.querySelectorAll('input');
             inputs.forEach(input => input.value = '');
         }
@@ -144,7 +119,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Close on click close button or cancel button or outside modal
     document.querySelectorAll('.close-modal, .btn-cancel').forEach(btn => {
         btn.addEventListener('click', function () {
             const modal = this.closest('.modal');
@@ -170,7 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.addEventListener('click', () => openModal(passwordModal));
     });
 
-    // Handle AJAX submissions
     document.getElementById('saveEmail')?.addEventListener('click', function () {
         const newEmail = document.getElementById('newEmail').value;
         if (!newEmail) return showNotification('Vui lòng nhập email', 'error');
@@ -270,18 +243,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 
-    // ============================================
-    // COPY BOOKING CODE
-    // ============================================
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(() => {
             showNotification('Đã sao chép!', 'success');
         });
     }
 
-    // ============================================
-    // NOTIFICATION SYSTEM
-    // ============================================
     function showNotification(message, type = 'info') {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
@@ -307,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 3000);
     }
 
-    // Add animations
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideInRight {
@@ -351,7 +317,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
                             document.getElementById('checkInCodeDisplay').textContent = 'Order #' + orderId;
 
-                            // Handle countdown
                             const countdownDiv = document.getElementById('qrCountdown');
                             const timerSpan = document.getElementById('countdownTimer');
 
@@ -405,7 +370,6 @@ document.addEventListener('DOMContentLoaded', function () {
         countdownInterval = setInterval(updateDisplay, 1000);
     }
 
-    // Clear interval on modal close
     document.querySelectorAll('.close-modal, .btn-cancel').forEach(btn => {
         btn.addEventListener('click', () => {
             if (countdownInterval) clearInterval(countdownInterval);

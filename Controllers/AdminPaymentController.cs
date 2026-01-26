@@ -139,7 +139,7 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Số lượng phải lớn hơn 0" });
                 }
 
-                // Temporary Mock response for purchase
+
                 var orderCode = $"ORD-{DateTime.Now:yyyyMMddHHmmss}";
                 
                 return Json(new { 
@@ -160,7 +160,6 @@ namespace SportBookingSystem.Controllers
             var order = await _transactionService.GetOrderDetailsByIdAsync(orderId);
             if (order == null) return NotFound();
 
-            // Check expiration (15 minutes) for Pending orders
             if (order.Status == "0" && DateTime.Now > order.OrderDate.AddMinutes(15))
             {
                  return Json(new { 
