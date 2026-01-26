@@ -1,5 +1,4 @@
-﻿/* Hero Section */
-.hero {
+﻿.hero {
     padding: 80px 24px;
     text-align: center;
     position: relative;
@@ -14,11 +13,11 @@
     bottom: 0;
 }
 
-    .hero-background img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+.hero-background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 
 .hero-content {
@@ -70,10 +69,10 @@
     box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
 }
 
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
-    }
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
+}
 
 .btn-secondary {
     background: var(--surface-light);
@@ -81,10 +80,10 @@
     border: 1px solid var(--border);
 }
 
-    .btn-secondary:hover {
-        background: var(--surface);
-        transform: translateY(-2px);
-    }
+.btn-secondary:hover {
+    background: var(--surface);
+    transform: translateY(-2px);
+}
 
 /* Container */
 .container {
@@ -132,11 +131,11 @@
     cursor: pointer;
 }
 
-    .field-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);
-        border-color: var(--primary);
-    }
+.field-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(16, 185, 129, 0.2);
+    border-color: var(--primary);
+}
 
 .field-image {
     width: 100%;
@@ -146,15 +145,15 @@
     overflow: hidden;
 }
 
-    .field-image::before {
-        content: '🏟️';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 80px;
-        opacity: 0.3;
-    }
+.field-image::before {
+    content: '🏟️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    opacity: 0.3;
+}
 
 .field-badge {
     position: absolute;
@@ -261,12 +260,12 @@
     transition: all 0.3s ease;
 }
 
-    .btn-book:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-    }
+.btn-book:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
 
-/* Features Section */
+
 .features-section {
     background: var(--surface);
     border-radius: 24px;
@@ -330,16 +329,16 @@
     overflow: hidden;
 }
 
-    .wallet-card::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        right: -20%;
-        width: 300px;
-        height: 300px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-    }
+.wallet-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
 
 .wallet-header {
     display: flex;
@@ -407,10 +406,10 @@
     transition: all 0.3s ease;
 }
 
-    .wallet-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-2px);
-    }
+.wallet-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
 
 .quick-actions {
     background: var(--surface);
@@ -445,11 +444,11 @@
     color: var(--text-primary);
 }
 
-    .action-item:hover {
-        background: rgba(16, 185, 129, 0.1);
-        border-color: var(--primary);
-        transform: translateX(6px);
-    }
+.action-item:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--primary);
+    transform: translateX(6px);
+}
 
 .action-icon {
     width: 48px;
@@ -477,17 +476,12 @@
     color: var(--text-secondary);
 }
 
-/* ============================================
-   PRODUCTS SECTION - ĐỒ ĂN & ĐỒ DÙNG
-   Responsive cho Desktop, Tablet, Mobile
-   ============================================ */
 
-/* Products Section Container */
+
 .products-section {
     margin-bottom: 60px;
 }
 
-/* Section Header */
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -500,7 +494,6 @@
     flex: 1;
 }
 
-/* View All Button */
 .view-all-btn {
     padding: 12px 24px;
     background: var(--surface-light);
@@ -517,21 +510,19 @@
     gap: 8px;
 }
 
-    .view-all-btn:hover {
-        background: var(--primary);
-        color: white;
-        border-color: var(--primary);
-        transform: translateX(4px);
-    }
+.view-all-btn:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    transform: translateX(4px);
+}
 
-/* Products Grid */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 28px;
 }
 
-/* Product Card */
 .product-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -541,13 +532,12 @@
     cursor: pointer;
 }
 
-    .product-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 20px 60px rgba(34, 197, 94, 0.2);
-        border-color: var(--primary);
-    }
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(34, 197, 94, 0.2);
+    border-color: var(--primary);
+}
 
-/* Product Image */
 .product-image {
     width: 100%;
     height: 200px;
@@ -584,7 +574,6 @@
     background: linear-gradient(135deg, #F59E0B, #10B981);
 }
 
-/* Product Emoji Icon */
 .product-emoji {
     font-size: 80px;
     opacity: 0.3;
@@ -611,21 +600,21 @@
     z-index: 1;
 }
 
-    .product-badge.hot {
-        background: rgba(239, 68, 68, 0.9);
-    }
+.product-badge.hot {
+    background: rgba(239, 68, 68, 0.9);
+}
 
-    .product-badge.new {
-        background: rgba(34, 197, 94, 0.9);
-    }
+.product-badge.new {
+    background: rgba(34, 197, 94, 0.9);
+}
 
-    .product-badge.discount {
-        background: rgba(245, 158, 11, 0.9);
-    }
+.product-badge.discount {
+    background: rgba(245, 158, 11, 0.9);
+}
 
-    .product-badge.popular {
-        background: rgba(59, 130, 246, 0.9);
-    }
+.product-badge.popular {
+    background: rgba(59, 130, 246, 0.9);
+}
 
 /* Product Content */
 .product-content {
@@ -724,14 +713,15 @@
     white-space: nowrap;
 }
 
-    .btn-add-cart:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-    }
+.btn-add-cart:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+}
 
-    .btn-add-cart:active {
-        transform: scale(0.98);
-    }
+.btn-add-cart:active {
+    transform: scale(0.98);
+}
+
 .product-footer {
     display: flex;
     flex-direction: row;
@@ -761,12 +751,12 @@
     white-space: nowrap;
 }
 
-    .btn-add-cart:hover {
-        background: var(--primary);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-    }
+.btn-add-cart:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+}
 
 
 /* Mua ngay Button */
@@ -785,14 +775,14 @@
     white-space: nowrap;
 }
 
-    .btn-buy-now:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
-    }
+.btn-buy-now:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+}
 
-    .btn-buy-now:active {
-        transform: scale(0.95);
-    }
+.btn-buy-now:active {
+    transform: scale(0.95);
+}
 
 /* Thuê ngay Button */
 .btn-rent-now {
@@ -810,19 +800,17 @@
     white-space: nowrap;
 }
 
-    .btn-rent-now:hover {
-        transform: scale(1.05);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
-    }
+.btn-rent-now:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+}
 
-    .btn-rent-now:active {
-        transform: scale(0.98);
-    }
+.btn-rent-now:active {
+    transform: scale(0.98);
+}
 
 
-/* ============================================
-   RESPONSIVE - MOBILE
-   ============================================ */
+
 @media (max-width: 768px) {
     .product-footer {
         gap: 12px;
@@ -848,6 +836,7 @@
 }
 
 @media (max-width: 480px) {
+
     .btn-add-cart,
     .btn-buy-now {
         padding: 10px 14px;
@@ -860,10 +849,9 @@
     }
 }
 
-/* ============================================
-   TOUCH OPTIMIZATION
-   ============================================ */
+
 @media (hover: none) and (pointer: coarse) {
+
     .btn-add-cart,
     .btn-buy-now,
     .btn-rent-now {
@@ -871,9 +859,7 @@
     }
 }
 
-/* ============================================
-   ANIMATION CLASSES
-   ============================================ */
+
 .btn-add-cart.adding {
     background: var(--primary);
     color: white;
@@ -881,7 +867,9 @@
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
     }
 
@@ -895,7 +883,9 @@
 }
 
 @keyframes shake {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateX(0);
     }
 
@@ -913,7 +903,9 @@
 }
 
 @keyframes bounce {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
     }
 
@@ -921,9 +913,8 @@
         transform: translateY(-10px);
     }
 }
-/* ============================================
-   RESPONSIVE - TABLET (768px - 1024px)
-   ============================================ */
+
+
 @media (max-width: 1024px) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -955,15 +946,12 @@
     }
 }
 
-/* ============================================
-   RESPONSIVE - MOBILE (max-width: 768px)
-   ============================================ */
+
 @media (max-width: 768px) {
     .products-section {
         margin-bottom: 40px;
     }
 
-    /* Section Header - Stack on Mobile */
     .section-header {
         flex-direction: column;
         align-items: flex-start;
@@ -977,13 +965,13 @@
         padding: 12px 20px;
     }
 
-    /* Products Grid - 1 Column */
+
     .products-grid {
         grid-template-columns: 1fr;
         gap: 20px;
     }
 
-    /* Product Card */
+
     .product-card {
         border-radius: 16px;
     }
@@ -1048,9 +1036,7 @@
     }
 }
 
-/* ============================================
-   RESPONSIVE - SMALL MOBILE (max-width: 480px)
-   ============================================ */
+
 @media (max-width: 480px) {
     .section-header-content {
         width: 100%;
@@ -1100,9 +1086,7 @@
     }
 }
 
-/* ============================================
-   LANDSCAPE MODE (Mobile Landscape)
-   ============================================ */
+
 @media (max-width: 768px) and (orientation: landscape) {
     .products-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1123,9 +1107,7 @@
     }
 }
 
-/* ============================================
-   TOUCH OPTIMIZATION
-   ============================================ */
+
 @media (hover: none) and (pointer: coarse) {
     .product-card:hover {
         transform: none;
@@ -1144,9 +1126,7 @@
     }
 }
 
-/* ============================================
-   ANIMATIONS
-   ============================================ */
+
 @keyframes slideInUp {
     from {
         opacity: 0;
@@ -1163,7 +1143,7 @@
     animation: slideInUp 0.6s ease backwards;
 }
 
-/* Add to cart animation */
+
 @keyframes addToCart {
     0% {
         transform: scale(1);
@@ -1219,10 +1199,10 @@
     transition: all 0.3s ease;
 }
 
-    .history-item:hover {
-        background: rgba(16, 185, 129, 0.05);
-        border-color: var(--primary);
-    }
+.history-item:hover {
+    background: rgba(16, 185, 129, 0.05);
+    border-color: var(--primary);
+}
 
 .history-icon {
     width: 56px;
@@ -1258,13 +1238,13 @@
     font-family: 'JetBrains Mono', monospace;
 }
 
-    .history-amount.positive {
-        color: var(--success);
-    }
+.history-amount.positive {
+    color: var(--success);
+}
 
-    .history-amount.negative {
-        color: var(--danger);
-    }
+.history-amount.negative {
+    color: var(--danger);
+}
 
 .history-status {
     padding: 6px 14px;
@@ -1274,16 +1254,17 @@
     text-transform: uppercase;
 }
 
-    .history-status.success {
-        background: rgba(16, 185, 129, 0.2);
-        color: var(--success);
-    }
+.history-status.success {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--success);
+}
 
-    .history-status.pending {
-        background: rgba(245, 158, 11, 0.2);
-        color: var(--secondary);
-    }
-/* Responsive */
+.history-status.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--secondary);
+}
+
+
 @media (max-width: 1024px) {
     .wallet-section {
         grid-template-columns: 1fr;
@@ -1329,7 +1310,6 @@
     }
 }
 
-/* Animations */
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1362,17 +1342,14 @@
     animation-delay: 0.4s;
 }
 
-* ============================================
-HISTORY SECTION - RESPONSIVE FIX
-Không bị lòi ra + Số tiền rút gọn
-============================================ */
-/* History Section - Desktop */
+
 .history-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 24px;
     padding: 32px;
-    overflow: hidden; /* ← QUAN TRỌNG: Ngăn nội dung lòi ra */
+    overflow: hidden;
+    /* ← QUAN TRỌNG: Ngăn nội dung lòi ra */
 }
 
 .history-header {
@@ -1380,13 +1357,15 @@ Không bị lòi ra + Số tiền rút gọn
     justify-content: space-between;
     align-items: center;
     margin-bottom: 28px;
-    gap: 16px; /* ← Thêm gap */
+    gap: 16px;
+    /* ← Thêm gap */
 }
 
 .history-title {
     font-size: 24px;
     font-weight: 700;
-    flex-shrink: 0; /* ← Không cho title bị co lại */
+    flex-shrink: 0;
+    /* ← Không cho title bị co lại */
 }
 
 .history-list {
@@ -1398,19 +1377,21 @@ Không bị lòi ra + Số tiền rút gọn
 .history-item {
     display: flex;
     align-items: center;
-    gap: 16px; /* ← Giảm gap từ 20px xuống 16px */
+    gap: 16px;
+    /* ← Giảm gap từ 20px xuống 16px */
     padding: 20px;
     background: var(--surface-light);
     border: 1px solid var(--border);
     border-radius: 16px;
     transition: all 0.3s ease;
-    min-width: 0; /* ← QUAN TRỌNG: Cho phép flex items co lại */
+    min-width: 0;
+    /* ← QUAN TRỌNG: Cho phép flex items co lại */
 }
 
-    .history-item:hover {
-        background: rgba(34, 197, 94, 0.05);
-        border-color: var(--primary);
-    }
+.history-item:hover {
+    background: rgba(34, 197, 94, 0.05);
+    border-color: var(--primary);
+}
 
 .history-icon {
     width: 56px;
@@ -1421,13 +1402,16 @@ Không bị lòi ra + Số tiền rút gọn
     align-items: center;
     justify-content: center;
     font-size: 26px;
-    flex-shrink: 0; /* ← Không cho icon bị co */
+    flex-shrink: 0;
+    /* ← Không cho icon bị co */
 }
 
 .history-details {
     flex: 1;
-    min-width: 0; /* ← QUAN TRỌNG: Cho phép text truncate */
-    overflow: hidden; /* ← Ngăn text lòi ra */
+    min-width: 0;
+    /* ← QUAN TRỌNG: Cho phép text truncate */
+    overflow: hidden;
+    /* ← Ngăn text lòi ra */
 }
 
 .history-item-title {
@@ -1435,8 +1419,10 @@ Không bị lòi ra + Số tiền rút gọn
     font-size: 16px;
     margin-bottom: 6px;
     overflow: hidden;
-    text-overflow: ellipsis; /* ← Thêm ... khi text dài */
-    white-space: nowrap; /* ← Không wrap xuống dòng */
+    text-overflow: ellipsis;
+    /* ← Thêm ... khi text dài */
+    white-space: nowrap;
+    /* ← Không wrap xuống dòng */
 }
 
 .history-item-date {
@@ -1449,17 +1435,19 @@ Không bị lòi ra + Số tiền rút gọn
     font-size: 20px;
     font-weight: 800;
     font-family: 'JetBrains Mono', monospace;
-    flex-shrink: 0; /* ← Không cho amount bị co */
-    white-space: nowrap; /* ← Không wrap */
+    flex-shrink: 0;
+    /* ← Không cho amount bị co */
+    white-space: nowrap;
+    /* ← Không wrap */
 }
 
-    .history-amount.positive {
-        color: var(--success);
-    }
+.history-amount.positive {
+    color: var(--success);
+}
 
-    .history-amount.negative {
-        color: var(--danger);
-    }
+.history-amount.negative {
+    color: var(--danger);
+}
 
 .history-status {
     padding: 6px 14px;
@@ -1467,23 +1455,23 @@ Không bị lòi ra + Số tiền rút gọn
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
-    flex-shrink: 0; /* ← Không cho status bị co */
-    white-space: nowrap; /* ← Không wrap */
+    flex-shrink: 0;
+    /* ← Không cho status bị co */
+    white-space: nowrap;
+    /* ← Không wrap */
 }
 
-    .history-status.success {
-        background: rgba(34, 197, 94, 0.2);
-        color: var(--success);
-    }
+.history-status.success {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--success);
+}
 
-    .history-status.pending {
-        background: rgba(245, 158, 11, 0.2);
-        color: var(--warning);
-    }
+.history-status.pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning);
+}
 
-/* ============================================
-   RESPONSIVE - TABLET (768px - 1024px)
-   ============================================ */
+
 @media (max-width: 1024px) {
     .history-item {
         gap: 14px;
@@ -1506,9 +1494,7 @@ Không bị lòi ra + Số tiền rút gọn
     }
 }
 
-/* ============================================
-   RESPONSIVE - MOBILE (max-width: 768px)
-   ============================================ */
+
 @media (max-width: 768px) {
     .history-card {
         padding: 24px 16px;
@@ -1548,7 +1534,8 @@ Không bị lòi ra + Số tiền rút gọn
 
     /* Icon + Details (hàng 1) */
     .history-icon {
-        grid-row: 1 / 3; /* Icon chiếm 2 hàng */
+        grid-row: 1 / 3;
+        /* Icon chiếm 2 hàng */
         width: 48px;
         height: 48px;
         font-size: 24px;
@@ -1573,8 +1560,10 @@ Không bị lòi ra + Số tiền rút gọn
     .history-amount {
         grid-column: 2;
         grid-row: 2;
-        font-size: 16px; /* ← Giảm size cho mobile */
-        text-align: left; /* ← Căn trái */
+        font-size: 16px;
+        /* ← Giảm size cho mobile */
+        text-align: left;
+        /* ← Căn trái */
     }
 
     .history-status {
@@ -1582,14 +1571,13 @@ Không bị lòi ra + Số tiền rút gọn
         grid-row: 2;
         padding: 4px 10px;
         font-size: 10px;
-        justify-self: end; /* ← Căn phải */
+        justify-self: end;
+        /* ← Căn phải */
         align-self: center;
     }
 }
 
-/* ============================================
-   RESPONSIVE - SMALL MOBILE (max-width: 480px)
-   ============================================ */
+
 @media (max-width: 480px) {
     .history-card {
         padding: 20px 12px;
@@ -1628,9 +1616,7 @@ Không bị lòi ra + Số tiền rút gọn
     }
 }
 
-/* ============================================
-   VERY SMALL MOBILE (max-width: 360px)
-   ============================================ */
+
 @media (max-width: 360px) {
     .history-card {
         padding: 16px 10px;

@@ -9,11 +9,12 @@ namespace SportBookingSystem.DTO
         public int Quantity { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Status { get; set; }
+        public DateTime OrderDate { get; set; }
     }
 
     public class FulfillmentRequestDTO
     {
         public int OrderId { get; set; }
-        public string NewStatus { get; set; } = string.Empty; // "Thành công" or "Đã hủy"
+        public string NewStatus { get; set; } = string.Empty; 
     }
 }

@@ -154,7 +154,6 @@ namespace SportBookingSystem.Services
                 .Include(t => t.Sender)
                 .AsQueryable();
 
-            // Apply search filter (by transaction code or user name)
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 searchTerm = searchTerm.Trim().ToLower();
@@ -167,10 +166,8 @@ namespace SportBookingSystem.Services
                 );
             }
 
-            // Apply type filter
             if (!string.IsNullOrWhiteSpace(type) && type != "all")
             {
-                // Handle grouped types
                 if (type == "Thanh toán")
                 {
                     query = query.Where(t =>
@@ -184,10 +181,8 @@ namespace SportBookingSystem.Services
                 }
             }
 
-            // Apply status filter
             if (!string.IsNullOrWhiteSpace(status) && status != "all")
             {
-                // Map English status to Vietnamese
                 var mappedStatus = status switch
                 {
                     "Completed" => TransactionStatus.Success,
@@ -198,24 +193,24 @@ namespace SportBookingSystem.Services
                 query = query.Where(t => t.Status == mappedStatus);
             }
 
-            // Apply date filter
+            //Bộ lọc ngày
             if (date.HasValue)
             {
                 var filterDate = date.Value.Date;
                 query = query.Where(t => t.TransactionDate.Date == filterDate);
             }
 
-            // Order by date descending
+            //Sắp xếp theo ngày giảm dần
             query = query.OrderByDescending(t => t.TransactionDate);
 
-            // Calculate totals from ALL transactions (not filtered)
+            //Tổng tiền nạp
             var allTransactions = await _context.Transactions.ToListAsync();
 
-            // Calculate filtered count
+            //Tổng số giao dịch
             var totalRecords = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
-            // Apply pagination
+            //Áp dụng phân trang
             var transactions = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -242,7 +237,7 @@ namespace SportBookingSystem.Services
                               || t.TransactionType == TransactionTypes.Order)
                              && t.Status == TransactionStatus.Success)
                     .Sum(t => t.Amount),
-                TransactionCount = totalRecords, // Filtered count
+                TransactionCount = totalRecords,
                 CurrentPage = page,
                 PageSize = pageSize,
                 TotalPages = totalPages
@@ -321,7 +316,8 @@ namespace SportBookingSystem.Services
                 ProductName = firstDetail?.Product?.ProductName,
                 Quantity = firstDetail?.Quantity ?? 0,
                 TotalAmount = order.TotalAmount ?? 0,
-                Status = order.Status.ToString()
+                Status = order.Status.ToString(),
+                OrderDate = order.OrderDate
             };
         }
 
@@ -360,7 +356,24 @@ namespace SportBookingSystem.Services
                     if (user != null)
                     {
                         user.WalletBalance += order.TotalAmount ?? 0;
-                        dbTransaction.BalanceAfter = user.WalletBalance;
+                        
+                        // Tạo giao dịch hoàn tiền mới
+                        var refundTrans = new Transactions
+                        {
+                            UserId = user.UserId,
+                            Amount = order.TotalAmount ?? 0,
+                            TransactionType = TransactionTypes.Refund,
+                            Source = "System",
+                            Status = TransactionStatus.Success,
+                            TransactionDate = DateTime.Now,
+                            BalanceAfter = user.WalletBalance,
+                            Message = $"Hoàn tiền đơn hàng {order.OrderCode}",
+                            OrderId = order.OrderId
+                        };
+                        _context.Transactions.Add(refundTrans);
+                        await _context.SaveChangesAsync(); 
+
+                        refundTrans.TransactionCode = $"{TransactionPrefixes.Refund}-{refundTrans.TransactionId:D4}";
                     }
 
                     // Trả lại kho
@@ -382,6 +395,28 @@ namespace SportBookingSystem.Services
             {
                 await transaction.RollbackAsync();
                 return (false, ex.Message);
+            }
+        }
+        public async Task CancelExpiredOrdersAsync()
+        {
+            try
+            {
+                var expirationTime = DateTime.Now.AddMinutes(-15);
+                var expiredOrderIds = await _context.Orders
+                    .Where(o => o.Status == 0 && o.OrderDate < expirationTime)
+                    .Select(o => o.OrderId)
+                    .ToListAsync();
+
+                if (!expiredOrderIds.Any()) return;
+
+                foreach (var orderId in expiredOrderIds)
+                {
+                    await UpdateOrderStatusAsync(orderId, TransactionStatus.Canceled);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error canceling expired orders: {ex.Message}");
             }
         }
     }

@@ -1,14 +1,5 @@
-﻿// ============================================
-// FOOD & DRINKS ADMIN MANAGEMENT JAVASCRIPT
-// ============================================
-
-// Global variables
-let currentEditId = null;
+﻿let currentEditId = null;
 let selectedImageFile = null;
-
-// ============================================
-// MODAL FUNCTIONS
-// ============================================
 function openModal(mode, productId = null) {
     const modal = document.getElementById('productModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -37,11 +28,7 @@ function closeModal() {
     currentEditId = null;
 }
 
-// ============================================
-// LOAD PRODUCT DATA FOR EDIT
-// ============================================
 function loadProductData(productId) {
-    // Show loading
     Swal.fire({
         title: 'Đang tải...',
         text: 'Vui lòng đợi',
@@ -64,7 +51,6 @@ function loadProductData(productId) {
                 document.getElementById('productStock').value = data.stockQuantity;
                 document.getElementById('productUnit').value = data.unit;
 
-                // Load existing image
                 if (data.imageUrl) {
                     document.getElementById('previewImg').src = data.imageUrl;
                     document.querySelector('.btn-remove-image').style.display = 'flex';
@@ -93,9 +79,6 @@ function loadProductData(productId) {
         });
 }
 
-// ============================================
-// SAVE PRODUCT (CREATE/UPDATE)
-// ============================================
 async function saveProduct() {
     const form = document.getElementById('productForm');
     if (!form.checkValidity()) {
@@ -108,7 +91,6 @@ async function saveProduct() {
         return;
     }
 
-    // Show loading
     Swal.fire({
         title: selectedImageFile ? 'Đang upload hình ảnh...' : 'Đang lưu...',
         text: 'Vui lòng đợi',
@@ -120,7 +102,6 @@ async function saveProduct() {
 
     let imageUrl = document.getElementById('productImage').value;
 
-    // Upload image if new file is selected
     if (selectedImageFile) {
         const uploadResult = await uploadImage(selectedImageFile);
         if (uploadResult.success) {
@@ -188,9 +169,6 @@ async function saveProduct() {
         });
 }
 
-// ============================================
-// DELETE PRODUCT
-// ============================================
 function deleteProduct(id) {
     Swal.fire({
         title: 'Xác nhận xóa?',
@@ -203,7 +181,6 @@ function deleteProduct(id) {
         cancelButtonText: 'Hủy'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Show loading
             Swal.fire({
                 title: 'Đang xóa...',
                 text: 'Vui lòng đợi',
@@ -250,9 +227,7 @@ function deleteProduct(id) {
     });
 }
 
-// ============================================
-// ADD STOCK QUICK
-// ============================================
+
 function addStockQuick(productId) {
     Swal.fire({
         title: 'Thêm số lượng vào kho',
@@ -273,7 +248,6 @@ function addStockQuick(productId) {
         if (result.isConfirmed) {
             const qty = parseInt(result.value);
 
-            // Show loading
             Swal.fire({
                 title: 'Đang cập nhật...',
                 text: 'Vui lòng đợi',
@@ -327,14 +301,10 @@ function addStockQuick(productId) {
     });
 }
 
-// ============================================
-// IMAGE UPLOAD FUNCTIONS
-// ============================================
 function previewImage(event) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
         Swal.fire({
             icon: 'error',
@@ -346,7 +316,6 @@ function previewImage(event) {
         return;
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
         Swal.fire({
             icon: 'error',
@@ -360,7 +329,6 @@ function previewImage(event) {
 
     selectedImageFile = file;
 
-    // Preview image
     const reader = new FileReader();
     reader.onload = function (e) {
         const previewImg = document.getElementById('previewImg');
@@ -369,7 +337,6 @@ function previewImage(event) {
         previewImg.src = e.target.result;
         btnRemove.style.display = 'flex';
 
-        // Show success toast
         const Toast = Swal.mixin({
             toast: true,
             position: 'top-end',
@@ -417,11 +384,7 @@ async function uploadImage(file) {
     }
 }
 
-// ============================================
-// REFRESH FILTERS
-// ============================================
 function refreshFilters() {
-    // Show loading toast
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -445,9 +408,6 @@ function refreshFilters() {
         window.location.href = '/FoodAD/Index';
     }, 500);
 }
-// ============================================
-// COMBINED FILTER FUNCTION
-// ============================================
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const categoryFilter = document.getElementById('filterType').value;
@@ -459,7 +419,6 @@ function applyFilters() {
     rows.forEach(row => {
         let showRow = true;
 
-        // Filter by search term
         if (searchTerm) {
             const productName = row.querySelector('.product-name');
             if (productName) {
@@ -470,7 +429,7 @@ function applyFilters() {
             }
         }
 
-        // Filter by category
+        // Lọc theo loại
         if (categoryFilter && showRow) {
             const rowCategoryId = row.getAttribute('data-category-id');
             if (rowCategoryId !== categoryFilter) {
@@ -478,7 +437,7 @@ function applyFilters() {
             }
         }
 
-        // Filter by stock
+        // Lọc theo số lượng
         if (stockFilter && showRow) {
             const stockStatus = row.querySelector('.stock-status');
             if (stockStatus) {
@@ -496,7 +455,7 @@ function applyFilters() {
             }
         }
 
-        // Apply visibility
+        // Hiển thị
         row.style.display = showRow ? '' : 'none';
         if (showRow) visibleCount++;
     });
@@ -504,7 +463,7 @@ function applyFilters() {
     return visibleCount;
 }
 // ============================================
-// SEARCH FUNCTIONALITY
+// TÌM KIẾM
 // ============================================
 function initializeSearch() {
     const searchInput = document.getElementById('searchInput');
@@ -516,7 +475,7 @@ function initializeSearch() {
 }
 
 // ============================================
-// FILTER BY TYPE - USING DATA ATTRIBUTE
+// LỌC THEO LOẠI - DÙNG DATA ATTRIBUTE
 // ============================================
 function initializeTypeFilter() {
     const filterType = document.getElementById('filterType');
@@ -549,7 +508,7 @@ function initializeTypeFilter() {
 }
 
 // ============================================
-// FILTER BY STOCK STATUS
+// LỌC THEO TÌNH TRẠNG KHO
 // ============================================
 function initializeStockFilter() {
     const filterStock = document.getElementById('filterStock');
@@ -586,9 +545,6 @@ function initializeStockFilter() {
     });
 }
 
-// ============================================
-// MODAL CLOSE ON OUTSIDE CLICK
-// ============================================
 function initializeModalClick() {
     const modal = document.getElementById('productModal');
     if (!modal) return;
@@ -601,11 +557,11 @@ function initializeModalClick() {
 }
 
 // ============================================
-// KEYBOARD SHORTCUTS
+// TỔ HỢP PHÍM
 // ============================================
 function initializeKeyboardShortcuts() {
     document.addEventListener('keydown', function (e) {
-        // ESC to close modal
+        // ESC để đóng modal
         if (e.key === 'Escape') {
             const modal = document.getElementById('productModal');
             if (modal && modal.classList.contains('active')) {
@@ -613,7 +569,7 @@ function initializeKeyboardShortcuts() {
             }
         }
 
-        // Ctrl/Cmd + K to focus search
+        // Ctrl/Cmd + K để focus vào ô tìm kiếm
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
             const searchInput = document.getElementById('searchInput');
@@ -625,22 +581,21 @@ function initializeKeyboardShortcuts() {
 }
 
 // ============================================
-// INITIALIZE ALL FUNCTIONS ON PAGE LOAD
+// KHOI TẠO TẤT CẢ CÁC HÀM TRONG TRANG
 // ============================================
 document.addEventListener('DOMContentLoaded', function () {
     console.log('Food & Drinks Admin Page Loaded');
 
-    // Initialize all features
+    // Khoi tao tat ca cac ham trong trang
     initializeSearch();
     initializeTypeFilter();
     initializeStockFilter();
     initializeModalClick();
     initializeKeyboardShortcuts();
-    initializePagination(); 
+    initializePagination();
 
     console.log('All features initialized successfully');
 
-    // Show welcome toast
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -655,9 +610,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// ============================================
-// UTILITY FUNCTIONS
-// ============================================
+
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
         style: 'currency',
@@ -668,9 +621,7 @@ function formatCurrency(amount) {
 function formatNumber(num) {
     return new Intl.NumberFormat('vi-VN').format(num);
 }
-// ============================================
-// PAGINATION FUNCTIONALITY
-// ============================================
+
 let currentPage = 1;
 let itemsPerPage = 10;
 let totalItems = 0;
@@ -687,7 +638,7 @@ function updatePagination() {
     totalItems = visibleRows.length;
     totalPages = Math.ceil(totalItems / itemsPerPage);
 
-    // Ensure current page is valid
+    // Kiem tra trang hien tai
     if (currentPage > totalPages && totalPages > 0) {
         currentPage = totalPages;
     }
@@ -695,10 +646,10 @@ function updatePagination() {
         currentPage = 1;
     }
 
-    // Hide all rows first
+    // An tat ca cac hang truoc do
     visibleRows.forEach(row => row.classList.add('pagination-hidden'));
 
-    // Show rows for current page
+    // Hien thi cac hang cho trang hien tai
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
@@ -706,19 +657,19 @@ function updatePagination() {
         row.classList.remove('pagination-hidden');
     });
 
-    // Update pagination UI
+    // Cap nhat UI
     updatePaginationUI();
 }
 
 function updatePaginationUI() {
-    // Update info text
+    // Cap nhat thong tin
     const startItem = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
     const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
     document.getElementById('paginationInfo').innerHTML =
         `Hiển thị <strong>${startItem}-${endItem}</strong> của <strong>${totalItems}</strong> sản phẩm`;
 
-    // Update buttons state
+    // Cap nhat trang thai nut
     document.getElementById('firstPage').disabled = currentPage === 1;
     document.getElementById('prevPage').disabled = currentPage === 1;
     document.getElementById('nextPage').disabled = currentPage === totalPages || totalPages === 0;
@@ -738,12 +689,11 @@ function generatePageNumbers() {
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-    // Adjust start if we're near the end
     if (endPage - startPage < maxVisiblePages - 1) {
         startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
 
-    // First page
+    // Trang dau tien
     if (startPage > 1) {
         addPageButton(1);
         if (startPage > 2) {
@@ -751,12 +701,12 @@ function generatePageNumbers() {
         }
     }
 
-    // Page numbers
+    // So trang
     for (let i = startPage; i <= endPage; i++) {
         addPageButton(i);
     }
 
-    // Last page
+    // Trang cuoi
     if (endPage < totalPages) {
         if (endPage < totalPages - 1) {
             addEllipsis();
@@ -784,8 +734,6 @@ function goToPage(page) {
     if (page < 1 || page > totalPages) return;
     currentPage = page;
     updatePagination();
-
-    // Scroll to top of table
     document.querySelector('.table-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -805,9 +753,8 @@ function goToLastPage() {
     goToPage(totalPages);
 }
 
-// ============================================
-// UPDATE APPLY FILTERS TO WORK WITH PAGINATION
-// ============================================
+
+
 function applyFilters() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     const categoryFilter = document.getElementById('filterType').value;
@@ -819,7 +766,7 @@ function applyFilters() {
     rows.forEach(row => {
         let showRow = true;
 
-        // Filter by search term
+        // Lọc theo tu khoa
         if (searchTerm) {
             const productName = row.querySelector('.product-name');
             if (productName) {
@@ -830,7 +777,7 @@ function applyFilters() {
             }
         }
 
-        // Filter by category
+        // Lọc theo loại
         if (categoryFilter && showRow) {
             const rowCategoryId = row.getAttribute('data-category-id');
             if (rowCategoryId !== categoryFilter) {
@@ -838,7 +785,7 @@ function applyFilters() {
             }
         }
 
-        // Filter by stock
+        // Lọc theo kho
         if (stockFilter && showRow) {
             const stockStatus = row.querySelector('.stock-status');
             if (stockStatus) {
@@ -856,12 +803,10 @@ function applyFilters() {
             }
         }
 
-        // Apply visibility for filtering
+        // Áp dụng visibility cho lọc
         row.style.display = showRow ? '' : 'none';
         if (showRow) visibleCount++;
     });
-
-    // Reset to first page when filters change
     currentPage = 1;
     updatePagination();
 

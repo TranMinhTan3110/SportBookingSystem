@@ -7,7 +7,6 @@
         return;
     }
 
-    // Chart data
     const data = {
         labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
         datasets: [{
@@ -40,7 +39,6 @@
         }]
     };
 
-    // Chart config
     const config = {
         type: 'bar',
         data: data,
@@ -124,7 +122,6 @@
         }
     };
 
-    // Create chart
     const chart = new Chart(ctx, config);
 
     console.log('📊 Chart.js loaded successfully!');

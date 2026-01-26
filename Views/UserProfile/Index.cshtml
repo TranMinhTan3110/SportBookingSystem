@@ -65,7 +65,30 @@
             Nhắc nhở quan trọng
         </h2>
 
-        @if (Model.UpcomingBooking != null)
+        @if (Model.LatestOrder != null)
+        {
+            <div class="reminder-card order-reminder">
+                <div class="reminder-icon" style="background: rgba(255, 159, 67, 0.1); color: #ff9f43;">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <div class="reminder-content">
+                    <h3 class="reminder-title">Đơn hàng đang chờ (#@Model.LatestOrder.OrderCode)</h3>
+                    <p class="reminder-time" style="color: #ff9f43;">
+                        <i class="far fa-clock"></i>
+                        Vừa đặt lúc: @Model.LatestOrder.OrderDate.ToString("HH:mm dd/MM")
+                    </p>
+                    <p class="reminder-warning">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Tổng tiền: @(Model.LatestOrder.TotalAmount?.ToString("N0"))₫ - @(Model.LatestOrder.OrderDetails.Count) món</span>
+                    </p>
+                </div>
+                <button class="btn-checkin btn-order-qr" data-order-id="@Model.LatestOrder.OrderId" style="background: linear-gradient(135deg, #ff9f43, #ee5253);">
+                    <i class="fas fa-qrcode"></i>
+                    Lấy mã Order
+                </button>
+            </div>
+        }
+        else if (Model.UpcomingBooking != null)
         {
             <div class="reminder-card">
                 <div class="reminder-icon">
@@ -92,7 +115,7 @@
                 </div>
                  @if (!string.IsNullOrEmpty(Model.UpcomingBooking.CheckInCode))
                  {
-                    <button class="btn-checkin">
+                    <button class="btn-checkin" data-code="@Model.UpcomingBooking.CheckInCode">
                         <i class="fas fa-qrcode"></i>
                         Lấy mã Check-in
                     </button>
@@ -264,6 +287,35 @@
         <div class="modal-footer">
             <button class="btn-cancel">Hủy</button>
             <button class="btn-save" id="savePassword">Lưu thay đổi</button>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel">Hủy</button>
+            <button class="btn-save" id="savePassword">Lưu thay đổi</button>
+        </div>
+    </div>
+</div>
+
+<!-- Check-in QR Modal -->
+<div id="checkInQrModal" class="modal">
+    <div class="modal-content text-center">
+        <div class="modal-header">
+            <h3>Mã Check-in Đặt Sân</h3>
+            <span class="close-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="qr-container p-3 mb-3">
+                <img id="checkInQrImage" src="" alt="QR Check-in" style="max-width: 250px; width: 100%;">
+                <p class="mt-2 text-muted" id="checkInCodeDisplay"></p>
+                <div id="qrCountdown" class="mt-2 fw-bold text-danger" style="font-size: 1.1rem; display: none;">
+                    Mã QR sẽ hết hạn sau: <span id="countdownTimer">15:00</span>
+                </div>
+            </div>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> Vui lòng đưa mã này cho nhân viên tại sân để nhận sân.
+            </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+            <button class="btn-cancel w-100">Đóng</button>
         </div>
     </div>
 </div>

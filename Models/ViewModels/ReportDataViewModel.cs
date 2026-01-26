@@ -16,8 +16,8 @@
         public decimal Revenue { get; set; }
         public int BookingCount { get; set; }
         public double Growth { get; set; }
-        public string IconClass { get; set; } // fas fa-futbol, fas fa-table-tennis, etc.
-        public string ColorClass { get; set; } // football, tennis, badminton
+        public string IconClass { get; set; } 
+        public string ColorClass { get; set; } 
     }
 
     public class MonthlySummaryViewModel

@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ Admin Profile page loaded successfully!');
 
-    // Modal elements
+
     const emailModal = document.getElementById('emailModal');
     const phoneModal = document.getElementById('phoneModal');
     const passwordModal = document.getElementById('passwordModal');
 
-    // Close buttons
+
     document.querySelectorAll('.close-modal, .btn-cancel').forEach(btn => {
         btn.addEventListener('click', () => {
             emailModal.classList.remove('active');
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Opening modals
     document.querySelector('.btn-change-email').addEventListener('click', () => {
         emailModal.classList.add('active');
     });
@@ -28,19 +27,16 @@ document.addEventListener('DOMContentLoaded', function () {
         passwordModal.classList.add('active');
     });
 
-    // Handle saving Email
     document.getElementById('saveEmail').addEventListener('click', async function () {
         const newEmail = document.getElementById('newEmail').value;
         await performUpdate(this, '/AdminProfile/ChangeEmail', { newEmail });
     });
 
-    // Handle saving Phone
     document.getElementById('savePhone').addEventListener('click', async function () {
         const newPhone = document.getElementById('newPhone').value;
         await performUpdate(this, '/AdminProfile/ChangePhone', { newPhone });
     });
 
-    // Handle saving Password
     document.getElementById('savePassword').addEventListener('click', async function () {
         const currentPassword = document.getElementById('currentPassword').value;
         const newPassword = document.getElementById('newPassword').value;
@@ -54,7 +50,6 @@ document.addEventListener('DOMContentLoaded', function () {
         await performUpdate(this, '/AdminProfile/ChangePassword', { currentPassword, newPassword, confirmPassword });
     });
 
-    // Universal update function
     async function performUpdate(btn, url, data) {
         const originalText = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang lưu...';
@@ -87,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Notification function
+
     function showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.className = `notification ${type}`;
@@ -114,7 +109,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Animations for notifications
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }

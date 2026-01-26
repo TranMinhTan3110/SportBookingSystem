@@ -1,9 +1,7 @@
-﻿// Set today's date as default
-const dateInput = document.getElementById('bookingDate');
+﻿const dateInput = document.getElementById('bookingDate');
 const today = new Date().toISOString().split('T')[0];
 dateInput.value = today;
 
-// Time slot selection
 let selectedSlotId = null;
 let currentPage = 1;
 const pageSize = 9;
@@ -310,7 +308,6 @@ function renderPagination(totalPages, currentPageNum) {
     });
 }
 
-// Filter clear
 document.querySelector('.filter-clear-btn').addEventListener('click', function () {
     document.querySelectorAll('.filter-option input').forEach(checkbox => {
         checkbox.checked = false;
