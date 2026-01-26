@@ -141,15 +141,16 @@
                                 </div>
                             </td>
                             <td>
-                                @if (item.Type == "Nạp tiền")
+                                @{ var type = (item.Type ?? "").Trim(); }
+                                @if (type == "Nạp tiền" || type == "Hoàn tiền")
                                 {
                                     <span class="badge badge-success">@item.Type</span>
                                 }
-                                else if (item.Type == "Thanh toán sân" || item.Type == "Thanh toán đồ")
+                                else if (type == "Thanh toán sân" || type == "Thanh toán đồ")
                                 {
                                     <span class="badge badge-default">@item.Type</span>
                                 }
-                                else if (item.Type == "Chuyển tiền")
+                                else if (type == "Chuyển tiền")
                                 {
                                     <span class="badge badge-info">@item.Type</span>
                                 }
@@ -159,7 +160,7 @@
                                 }
                             </td>
                             <td class="text-right">
-                                @if (item.Type == "Nạp tiền" || item.Type == "Chuyển tiền")
+                                @if (type != "Hoàn tiền")
                                 {
                                     <span class="amount-positive">+@item.Amount.ToString("N0")đ</span>
                                 }
@@ -437,7 +438,7 @@
     </div>
 </div>
 
-<!-- Order Fulfillment Modal -->
+
 <div class="modal fade" id="qrFulfillmentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark text-white border-secondary shadow-lg">

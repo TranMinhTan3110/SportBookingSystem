@@ -1,8 +1,4 @@
-﻿/* ============================================
-   HISTORY PAGE STYLES (PHẦN MỚI)
-   ============================================ */
-
-.history-container {
+﻿.history-container {
     max-width: 1200px;
     margin: 40px auto;
     padding: 0 24px;
@@ -40,14 +36,14 @@
     transition: all 0.3s ease;
 }
 
-    .tab-btn:hover {
-        color: var(--primary);
-    }
+.tab-btn:hover {
+    color: var(--primary);
+}
 
-    .tab-btn.active {
-        color: var(--primary);
-        border-bottom-color: var(--primary);
-    }
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
 
 /* Tab Content */
 .tab-content {
@@ -55,9 +51,9 @@
     animation: fadeIn 0.4s ease;
 }
 
-    .tab-content.active {
-        display: block;
-    }
+.tab-content.active {
+    display: block;
+}
 
 @keyframes fadeIn {
     from {
@@ -83,45 +79,49 @@
 .data-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px; /* Để scroll ngang trên mobile */
+    min-width: 800px;
+    /* Để scroll ngang trên mobile */
 }
 
-    .data-table th {
-        background: var(--surface-alt);
-        padding: 16px 24px;
-        text-align: left;
-        font-weight: 600;
-        color: var(--text-secondary);
-        border-bottom: 1px solid var(--border);
-    }
+.data-table th {
+    background: var(--surface-alt);
+    padding: 16px 24px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+}
 
-    .data-table td {
-        padding: 20px 24px;
-        border-bottom: 1px solid var(--border);
-        color: var(--text-primary);
-        vertical-align: middle;
-    }
+.data-table td {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-primary);
+    vertical-align: middle;
+}
 
-    .data-table tr:last-child td {
-        border-bottom: none;
-    }
+.data-table tr:last-child td {
+    border-bottom: none;
+}
 
-    .data-table tr:hover {
-        background-color: #F8FAFC;
-    }
+.data-table tr:hover {
+    background-color: #F8FAFC;
+}
 
 /* Table Elements Styling */
-.court-info, .trans-info {
+.court-info,
+.trans-info {
     display: flex;
     flex-direction: column;
 }
 
-.court-name, .trans-type {
+.court-name,
+.trans-type {
     font-weight: 700;
     color: var(--text-primary);
 }
 
-.court-date, .trans-method {
+.court-date,
+.trans-method {
     font-size: 13px;
     color: var(--text-secondary);
 }
@@ -190,20 +190,20 @@
     display: inline-block;
 }
 
-    .badge.success {
-        background: rgba(34, 197, 94, 0.1);
-        color: var(--success);
-    }
+.badge.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+}
 
-    .badge.warning {
-        background: rgba(245, 158, 11, 0.1);
-        color: var(--warning);
-    }
+.badge.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
 
-    .badge.danger {
-        background: rgba(239, 68, 68, 0.1);
-        color: var(--danger);
-    }
+.badge.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
 
 /* Action Button */
 .btn-action {
@@ -217,10 +217,10 @@
     transition: all 0.2s;
 }
 
-    .btn-action:hover {
-        border-color: var(--primary);
-        color: var(--primary);
-    }
+.btn-action:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
 
 /* Responsive Table */
 @media (max-width: 768px) {
@@ -234,5 +234,8 @@
 
     .nav-menu {
         display: none;
+
+        /* Ẩn menu trên mobile để demo đơn giản */
+
     }
 }

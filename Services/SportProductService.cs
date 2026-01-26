@@ -17,7 +17,9 @@ namespace SportBookingSystem.Services
 
         public async Task<IEnumerable<Products>> GetAllProductsAsync(string? search, string? type, string? brand, string? stockStatus)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _context.Products.Include(p => p.Category)
+                .Where(p => p.Category.Type == "Service") // Only "Service" products
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -56,28 +58,26 @@ namespace SportBookingSystem.Services
         public async Task<IEnumerable<Products>> GetProductsForUserAsync(string? search, string[]? categories, string[]? brands, decimal? minPrice, decimal? maxPrice, string? sortBy)
         {
             var query = _context.Products.Include(p => p.Category)
-                .Where(p => p.Status == true) // Chỉ lấy sản phẩm đang hoạt động
+                .Where(p => p.Status == true && p.Category.Type == "Service") // Chỉ lấy sản phẩm Service đang hoạt động
                 .AsQueryable();
 
-            // Search
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.ProductName.Contains(search) || (p.Brand != null && p.Brand.Contains(search)));
             }
 
-            // Categories (Multiple)
+
             if (categories != null && categories.Length > 0)
             {
                 query = query.Where(p => categories.Contains(p.Category.CategoryName));
             }
 
-            // Brands (Multiple)
+
             if (brands != null && brands.Length > 0)
             {
                 query = query.Where(p => brands != null && brands.Contains(p.Brand));
             }
 
-            // Price Range
             if (minPrice.HasValue)
             {
                 query = query.Where(p => p.Price >= minPrice.Value);
@@ -87,7 +87,6 @@ namespace SportBookingSystem.Services
                 query = query.Where(p => p.Price <= maxPrice.Value);
             }
 
-            // Sorting
             query = sortBy switch
             {
                 "price_asc" => query.OrderBy(p => p.Price),
