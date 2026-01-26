@@ -152,10 +152,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    console.log('🏟️ SportHub Layout loaded successfully!');
-    console.log('📱 Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
-    console.log('🛍️ Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
-    console.log('👤 User dropdown: ' + (userDropdown ? 'Ready' : 'Not found'));
+    // ============================================
+    // CONSOLE LOG (Development)
+    // ============================================
+    console.log(' SportHub Layout loaded successfully!');
+    console.log(' Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
+    console.log(' Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
+    console.log(' User dropdown: ' + (userDropdown ? 'Ready' : 'Not found'));
 });
 
 /**
@@ -171,13 +174,13 @@ function formatCurrency(amount) {
 }
 
 /**
-
+ * 
  * @param {string} message 
  * @param {string} type 
  */
 function showToast(message, type = 'info') {
     console.log(`[${type.toUpperCase()}] ${message}`);
-
+    
     alert(message);
 }
 

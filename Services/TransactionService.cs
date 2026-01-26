@@ -27,7 +27,7 @@ namespace SportBookingSystem.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Tính toán statistics từ TẤT CẢ giao dịch (không phân trang)
+            
             var allTransactions = await _context.Transactions.ToListAsync();
 
             return new PaymentDashboardDTO
@@ -143,12 +143,12 @@ namespace SportBookingSystem.Services
             };
         }
         public async Task<PaymentDashboardDTO> GetFilteredPaymentsAsync(
-           int page,
-           int pageSize,
-           string? searchTerm = null,
-           string? type = null,
-           string? status = null,
-           DateTime? date = null)
+       int page,
+       int pageSize,
+       string? searchTerm = null,
+       string? type = null,
+       string? status = null,
+       DateTime? date = null)
         {
             var query = _context.Transactions
                 .Include(t => t.Sender)
@@ -269,7 +269,7 @@ namespace SportBookingSystem.Services
         }
         public async Task SaveRewardSettingsAsync(RewardSettingDTO dto)
         {
-            // Danh sách các key cần lưu
+            
             var settings = new Dictionary<string, string>
             {
                 { "RewardAmountStep", dto.AmountStep.ToString() },
