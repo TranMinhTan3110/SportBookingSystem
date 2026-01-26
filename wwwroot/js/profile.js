@@ -376,5 +376,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    console.log('✅ Profile page loaded successfully!');
+    console.log(' Profile page loaded successfully!');
 });
