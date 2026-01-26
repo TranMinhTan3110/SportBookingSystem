@@ -1,7 +1,4 @@
-﻿// bookingAD.js - Hoàn chỉnh với SweetAlert2
-
-// ========== IMAGE PREVIEW ==========
-document.getElementById('fieldImageInput')?.addEventListener('change', function (e) {
+﻿document.getElementById('fieldImageInput')?.addEventListener('change', function (e) {
     const container = document.getElementById('imagePreviewContainer');
     container.innerHTML = '';
 

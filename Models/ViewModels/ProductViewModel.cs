@@ -11,7 +11,7 @@
         public string ProductType { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
-        public string StockStatus { get; set; } // "in", "low", "out"
+        public string StockStatus { get; set; } 
 
         public string StockStatusText
         {

@@ -10,5 +10,7 @@ namespace SportBookingSystem.Services
         Task<(bool Success, string Message)> ChangePhoneAsync(int userId, string newPhone);
         Task<(bool Success, string Message)> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
         Task<Bookings?> GetUpcomingBookingAsync(int userId);
+        Task<Orders?> GetLatestPendingOrderAsync(int userId);
+        Task<Orders?> GetOrderByIdAsync(int orderId, int userId);
     }
 }

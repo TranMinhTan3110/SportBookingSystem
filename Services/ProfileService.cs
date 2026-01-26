@@ -93,5 +93,23 @@ namespace SportBookingSystem.Services
                 .OrderBy(b => b.StartTime)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<Orders?> GetLatestPendingOrderAsync(int userId)
+        {
+
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .Where(o => o.UserId == userId && o.Status == 0) 
+                .OrderByDescending(o => o.OrderDate)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Orders?> GetOrderByIdAsync(int orderId, int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
+        }
     }
 }

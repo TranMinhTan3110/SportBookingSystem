@@ -1,5 +1,4 @@
-﻿// Controllers/BookingADController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SportBookingSystem.Services;
 
 namespace SportBookingSystem.Controllers
@@ -8,7 +7,6 @@ namespace SportBookingSystem.Controllers
     {
         private readonly IPitchService _pitchService;
 
-        // Inject PitchService
         public BookingADController(IPitchService pitchService)
         {
             _pitchService = pitchService;

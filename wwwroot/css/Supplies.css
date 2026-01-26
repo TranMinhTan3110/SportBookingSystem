@@ -1,10 +1,11 @@
-﻿
-.dropdown-toggle::after {
+﻿.dropdown-toggle::after {
     content: none !important;
     display: none !important;
 }
+
 .banner {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('/img/Supplies_BG.jpg'); /* Hãy đảm bảo đường dẫn ảnh đúng */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('/img/Supplies_BG.jpg');
+    /* Hãy đảm bảo đường dẫn ảnh đúng */
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -24,38 +25,38 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent);
 }
 
-    .breadcrumb a {
-        text-decoration: none;
-        color: #ffffff;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        padding: 6px 12px;
-        border-radius: 6px;
-        position: relative;
-    }
+.breadcrumb a {
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    padding: 6px 12px;
+    border-radius: 6px;
+    position: relative;
+}
 
-        .breadcrumb a:hover {
-            color: #4ade80;
-            background: rgba(74, 222, 128, 0.15);
-            transform: translateY(-2px);
-        }
+.breadcrumb a:hover {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.15);
+    transform: translateY(-2px);
+}
 
-        .breadcrumb a:active {
-            transform: translateY(0);
-        }
+.breadcrumb a:active {
+    transform: translateY(0);
+}
 
-    .breadcrumb .separator {
-        color: rgba(255, 255, 255, 0.5);
-        font-weight: 300;
-        user-select: none;
-    }
+.breadcrumb .separator {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+    user-select: none;
+}
 
-    .breadcrumb .current {
-        color: #fbbf24;
-        font-weight: 700;
-        pointer-events: none;
-        text-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
-    }
+.breadcrumb .current {
+    color: #fbbf24;
+    font-weight: 700;
+    pointer-events: none;
+    text-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
 
 .banner-content {
     padding: 60px 40px;
@@ -66,23 +67,23 @@
     gap: 16px;
 }
 
-    .banner-content h1 {
-        font-size: 3rem;
-        color: #ffffff;
-        font-weight: 800;
-        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-        letter-spacing: -1px;
-        animation: fadeInUp 0.8s ease-out;
-    }
+.banner-content h1 {
+    font-size: 3rem;
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    letter-spacing: -1px;
+    animation: fadeInUp 0.8s ease-out;
+}
 
-    .banner-content p {
-        font-size: 1.25rem;
-        color: #e2e8f0;
-        font-weight: 400;
-        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-        animation: fadeInUp 0.8s ease-out 0.2s;
-        animation-fill-mode: both;
-    }
+.banner-content p {
+    font-size: 1.25rem;
+    color: #e2e8f0;
+    font-weight: 400;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    animation: fadeInUp 0.8s ease-out 0.2s;
+    animation-fill-mode: both;
+}
 
 @keyframes fadeInUp {
     from {
@@ -123,12 +124,12 @@
     margin-bottom: 24px;
 }
 
-    .filter-group h5 {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #374151;
-        margin-bottom: 12px;
-    }
+.filter-group h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
 
 .filter-option {
     display: flex;
@@ -136,19 +137,19 @@
     padding: 8px 0;
 }
 
-    .filter-option input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        margin-right: 10px;
-        cursor: pointer;
-        accent-color: #4ade80;
-    }
+.filter-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #4ade80;
+}
 
-    .filter-option label {
-        cursor: pointer;
-        color: #4b5563;
-        font-size: 0.95rem;
-    }
+.filter-option label {
+    cursor: pointer;
+    color: #4b5563;
+    font-size: 0.95rem;
+}
 
 .price-range {
     display: flex;
@@ -156,13 +157,13 @@
     align-items: center;
 }
 
-    .price-range input {
-        width: 100%;
-        padding: 8px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 0.9rem;
-    }
+.price-range input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
 
 .btn-apply-filter {
     width: 100%;
@@ -177,11 +178,11 @@
     margin-top: 20px;
 }
 
-    .btn-apply-filter:hover {
-        background: #22c55e;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
-    }
+.btn-apply-filter:hover {
+    background: #22c55e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
 
 .btn-reset-filter {
     width: 100%;
@@ -196,10 +197,10 @@
     margin-top: 10px;
 }
 
-    .btn-reset-filter:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af;
-    }
+.btn-reset-filter:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
 
 /* ============================================
    PRODUCTS SECTION (DANH SÁCH SẢN PHẨM)
@@ -224,10 +225,10 @@
     color: #374151;
 }
 
-    .products-count strong {
-        color: #4ade80;
-        font-weight: 700;
-    }
+.products-count strong {
+    color: #4ade80;
+    font-weight: 700;
+}
 
 .sort-dropdown select {
     padding: 8px 16px;
@@ -256,10 +257,10 @@
     height: 100%;
 }
 
-    .product-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    }
+.product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
 
 .product-image {
     width: 100%;
@@ -272,11 +273,11 @@
     color: white;
 }
 
-    .product-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
 .product-info {
     padding: 16px;
@@ -289,7 +290,7 @@
     font-size: 1rem;
     font-weight: 600;
     margin-bottom: 8px;
-    color: var(--primary); 
+    color: var(--primary);
 }
 
 .product-name {
@@ -328,7 +329,6 @@
 
 /* Mobile */
 @media (max-width: 768px) {
-    /* Banner Responsive */
     .breadcrumb {
         font-size: 0.875rem;
         padding: 20px 24px;
@@ -354,9 +354,7 @@
         gap: 12px;
     }
 }
-/* ============================================
-   FIX DROPDOWN - OVERRIDE BOOTSTRAP
-   ============================================ */
+
 
 
 .header .dropdown-toggle::after {
@@ -408,11 +406,11 @@
     background: transparent;
 }
 
-    .header .dropdown-item:hover {
-        background: rgba(34, 197, 94, 0.1) !important;
-        color: var(--primary) !important;
-        padding-left: 20px;
-    }
+.header .dropdown-item:hover {
+    background: rgba(34, 197, 94, 0.1) !important;
+    color: var(--primary) !important;
+    padding-left: 20px;
+}
 
 
 .header .user-dropdown-menu {

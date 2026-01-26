@@ -2,7 +2,6 @@
     const balanceSpan = document.getElementById('depositUserBalance');
     const phoneInput = document.getElementById('depositUser');
 
-    // SweetAlert2 configuration
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -11,10 +10,6 @@
         timerProgressBar: true
     });
 
-    // ========================================
-    // FILTERING & SEARCH FUNCTIONALITY
-    // ========================================
-
     const searchInput = document.getElementById('searchInput');
     const typeFilter = document.getElementById('typeFilter');
     const statusFilter = document.getElementById('statusFilter');
@@ -22,7 +17,7 @@
     const resetButton = document.getElementById('resetFilters');
     let debounceTimer;
 
-    // Debounced search function
+
     function debounceSearch() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
@@ -30,7 +25,7 @@
         }, 500);
     }
 
-    // Apply all filters
+
     async function applyFilters() {
         const params = new URLSearchParams({
             search: searchInput?.value.trim() || '',
@@ -57,7 +52,6 @@
         }
     }
 
-    // Update table with data
     function updateTable(data) {
         const tbody = document.getElementById('paymentTableBody');
         if (!tbody) return;
@@ -77,7 +71,13 @@
         tbody.innerHTML = data.payments.map(item => {
             const avatar = item.user?.substring(0, 1).toUpperCase() || '?';
             const badgeClass = getBadgeClass(item.type);
-            const isPositive = item.type === 'Nạp tiền' || item.type === 'Chuyền tiền';
+
+            const type = (item.type || '').trim();
+            if (type.includes('Hoàn tiền') && type !== 'Hoàn tiền') {
+                console.log(`Mismatch found: '${type}' (Length: ${type.length}) vs 'Hoàn tiền'`);
+            }
+
+            const isPositive = type !== 'Hoàn tiền';
             const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
             const amountPrefix = isPositive ? '+' : '-';
             const statusHTML = getStatusHTML(item.status);
@@ -117,7 +117,6 @@
         }).join('');
     }
 
-    // Update pagination UI
     function updatePagination(data) {
         const paginationWrapper = document.querySelector('.pagination');
         if (!paginationWrapper) return;
@@ -184,9 +183,9 @@
         }
     }
 
-    // Helpers
     function getBadgeClass(type) {
-        if (type === 'Nạp tiền') return 'badge-success';
+        type = (type || '').trim();
+        if (type === 'Nạp tiền' || type === 'Hoàn tiền') return 'badge-success';
         if (type === 'Thanh toán sân' || type === 'Thanh toán đồ') return 'badge-default';
         if (type === 'Chuyển tiền') return 'badge-info';
         return 'badge-secondary';
@@ -217,7 +216,6 @@
         return new Date(dateString).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Event listeners
     searchInput?.addEventListener('input', debounceSearch);
     typeFilter?.addEventListener('change', applyFilters);
     statusFilter?.addEventListener('change', applyFilters);
@@ -230,9 +228,6 @@
         applyFilters();
     });
 
-    // ========================================
-    // TAB SWITCHING
-    // ========================================
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function () {
             document.querySelectorAll('.tab-btn, .tab-content').forEach(el => el.classList.remove('active'));
@@ -246,9 +241,7 @@
         });
     });
 
-    // ========================================
-    // DEPOSIT FORM LOGIC
-    // ========================================
+
     phoneInput?.addEventListener('change', async function () {
         const phone = this.value.trim();
         if (phone.length < 10) return;
@@ -313,9 +306,6 @@
         }
     });
 
-    // ========================================
-    // PURCHASE FORM LOGIC
-    // ========================================
     async function loadProducts() {
         const productSelect = document.getElementById('purchaseProduct');
         if (!productSelect || productSelect.options.length > 1) return;
@@ -373,19 +363,22 @@
         Swal.fire('Thông báo', 'Chức năng mua hàng đang được xử lý ở phía Backend!', 'info');
     });
 
-    // ========================================
-    // QR AUTOMATION & FULFILLMENT LOGIC
-    // ========================================
     const fulfillmentModal = new bootstrap.Modal(document.getElementById('qrFulfillmentModal'));
 
     window.handleQrDetails = async function (orderId, userId, productId, quantity) {
-        // Check if this is a fulfillment request (has orderId)
         if (orderId && orderId !== '0') {
+            const url = new URL(window.location.href);
+            url.searchParams.delete('qrOrder');
+            url.searchParams.delete('qrUser');
+            url.searchParams.delete('qrProduct');
+            url.searchParams.delete('qrQty');
+            window.history.replaceState({}, '', url);
+
             showFulfillmentModal(orderId);
             return;
         }
 
-        // Otherwise, it's a manual purchase pre-fill
+
         const purchaseBtn = document.querySelector('.tab-btn[data-tab="purchase"]');
         if (purchaseBtn) purchaseBtn.click();
 
@@ -425,6 +418,17 @@
             const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
             if (res.ok) {
                 const data = await res.json();
+
+                if (data.error) {
+                    fulfillmentModal.hide();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'QR Hết hạn',
+                        text: data.message
+                    });
+                    return;
+                }
+
                 document.getElementById('fOrderId').value = data.orderId;
                 document.getElementById('fOrderCode').textContent = data.orderCode;
                 document.getElementById('fCustomerName').textContent = data.customerName;
@@ -489,9 +493,7 @@
         setTimeout(() => window.handleQrDetails(qrOrder || 0, qrUser, qrProduct, qrQty), 1000);
     }
 
-    // ========================================
-    // REWARD SETTINGS LOGIC
-    // ========================================
+
     const modalElement = document.getElementById('rewardSettingsModal');
     modalElement?.addEventListener('show.bs.modal', async function () {
         try {

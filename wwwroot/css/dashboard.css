@@ -529,9 +529,7 @@
     text-align: center;
 }
 
-/* ============================================
-   RESPONSIVE - TABLET (768px - 1024px)
-   ============================================ */
+
 @media (max-width: 1024px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -583,9 +581,7 @@
     }
 }
 
-/* ============================================
-   RESPONSIVE - MOBILE (max-width: 768px)
-   ============================================ */
+
 @media (max-width: 768px) {
     .dashboard-container {
         padding: 0;
@@ -782,9 +778,7 @@
     }
 }
 
-/* ============================================
-   RESPONSIVE - SMALL MOBILE (max-width: 480px)
-   ============================================ */
+
 @media (max-width: 480px) {
     .stat-card {
         padding: 16px;

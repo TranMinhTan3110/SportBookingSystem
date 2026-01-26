@@ -32,7 +32,7 @@
         public List<int>? CategoryIds { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
-        public List<string>? StatusFilter { get; set; } // "available", "booked"
+        public List<string>? StatusFilter { get; set; } 
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 9;
     }

@@ -139,7 +139,7 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Số lượng phải lớn hơn 0" });
                 }
 
-                // Temporary Mock response for purchase
+
                 var orderCode = $"ORD-{DateTime.Now:yyyyMMddHHmmss}";
                 
                 return Json(new { 
@@ -159,6 +159,15 @@ namespace SportBookingSystem.Controllers
         {
             var order = await _transactionService.GetOrderDetailsByIdAsync(orderId);
             if (order == null) return NotFound();
+
+            if (order.Status == "0" && DateTime.Now > order.OrderDate.AddMinutes(15))
+            {
+                 return Json(new { 
+                     error = true, 
+                     message = "Mã QR đã hết hạn (quá 15 phút). Vui lòng yêu cầu khách hàng đặt lại." 
+                 });
+            }
+
             return Json(order);
         }
 

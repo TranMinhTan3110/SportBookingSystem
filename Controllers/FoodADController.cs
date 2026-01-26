@@ -141,7 +141,7 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Không có file được chọn!" });
                 }
 
-                // Validate file type
+
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 var extension = Path.GetExtension(imageFile.FileName).ToLower();
 
@@ -150,30 +150,25 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif, webp)!" });
                 }
 
-                // Validate file size (max 5MB)
                 if (imageFile.Length > 5 * 1024 * 1024)
                 {
                     return Json(new { success = false, message = "Kích thước file không được vượt quá 5MB!" });
                 }
 
-                // Create upload directory if not exists
                 var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "products");
                 if (!Directory.Exists(uploadFolder))
                 {
                     Directory.CreateDirectory(uploadFolder);
                 }
 
-                // Generate unique filename
                 var fileName = $"{Guid.NewGuid()}{extension}";
                 var filePath = Path.Combine(uploadFolder, fileName);
 
-                // Save file
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await imageFile.CopyToAsync(stream);
                 }
 
-                // Return URL
                 var imageUrl = $"/uploads/products/{fileName}";
                 return Json(new { success = true, url = imageUrl });
             }
