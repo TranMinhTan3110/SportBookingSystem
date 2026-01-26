@@ -11,7 +11,8 @@
         public string ProductType { get; set; }
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
-        public string StockStatus { get; set; } 
+        public string StockStatus { get; set; }
+        public bool Status { get; set; } // Thêm thuộc tính Status
 
         public string StockStatusText
         {
@@ -54,5 +55,9 @@
                 };
             }
         }
+
+        // Thêm thuộc tính mới để hiển thị trạng thái
+        public string StatusText => Status ? "Đang bán" : "Đã ẩn";
+        public string StatusClass => Status ? "status-active" : "status-hidden";
     }
 }

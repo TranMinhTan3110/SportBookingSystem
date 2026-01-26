@@ -1426,3 +1426,52 @@ textarea.form-control {
         display: none;
     }
 }
+/* Row bị ẩn */
+.row-hidden {
+    opacity: 0.5;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+/* Image grayscale khi bị ẩn */
+.img-grayscale {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.status-hidden {
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
+}
+
+/* Nút ẩn/hiện */
+.btn-hide {
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+}
+
+    .btn-hide:hover {
+        background: #F59E0B;
+        color: white;
+    }
+
+.btn-show {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+}
+
+    .btn-show:hover {
+        background: #10B981;
+        color: white;
+    }

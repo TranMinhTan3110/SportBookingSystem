@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SportBookingSystem.Models.ViewModels;
 using SportBookingSystem.Services;
-using SportBookingSystem.Models.ViewModels;
 
 namespace SportBookingSystem.Controllers
 {
@@ -93,18 +92,26 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật sản phẩm!" });
         }
 
-        // POST: FoodAD/Delete/{id} (API)
+        // POST: FoodAD/ToggleStatus/{id} (API) - Thay thế Delete
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> ToggleStatus(int id)
         {
-            var result = await _foodADService.DeleteProductAsync(id);
+            var product = await _foodADService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return Json(new { status = "error", message = "Không tìm thấy sản phẩm!" });
+            }
+
+            var result = await _foodADService.ToggleProductStatusAsync(id);
 
             if (result)
             {
-                return Json(new { status = "success", message = "Xóa sản phẩm thành công!" });
+                var newStatus = !product.Status;
+                var message = newStatus ? "Đã hiển thị sản phẩm!" : "Đã ẩn sản phẩm!";
+                return Json(new { status = "success", message = message, newStatus = newStatus });
             }
 
-            return Json(new { status = "error", message = "Có lỗi xảy ra khi xóa sản phẩm!" });
+            return Json(new { status = "error", message = "Có lỗi xảy ra khi thay đổi trạng thái!" });
         }
 
         // POST: FoodAD/AddStock (API)
@@ -131,6 +138,8 @@ namespace SportBookingSystem.Controllers
 
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật số lượng!" });
         }
+
+        // POST: FoodAD/UploadImage
         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile imageFile)
         {
@@ -141,7 +150,7 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Không có file được chọn!" });
                 }
 
-
+                // Validate file type
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 var extension = Path.GetExtension(imageFile.FileName).ToLower();
 
@@ -150,25 +159,30 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif, webp)!" });
                 }
 
+                // Validate file size (max 5MB)
                 if (imageFile.Length > 5 * 1024 * 1024)
                 {
                     return Json(new { success = false, message = "Kích thước file không được vượt quá 5MB!" });
                 }
 
+                // Create upload directory if not exists
                 var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "products");
                 if (!Directory.Exists(uploadFolder))
                 {
                     Directory.CreateDirectory(uploadFolder);
                 }
 
+                // Generate unique filename
                 var fileName = $"{Guid.NewGuid()}{extension}";
                 var filePath = Path.Combine(uploadFolder, fileName);
 
+                // Save file
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await imageFile.CopyToAsync(stream);
                 }
 
+                // Return URL
                 var imageUrl = $"/uploads/products/{fileName}";
                 return Json(new { success = true, url = imageUrl });
             }
@@ -177,5 +191,12 @@ namespace SportBookingSystem.Controllers
                 return Json(new { success = false, message = "Có lỗi xảy ra khi upload hình ảnh: " + ex.Message });
             }
         }
+    }
+
+    // ViewModel cho AddStock
+    public class AddStockViewModel
+    {
+        public int ProductId { get; set; }
+        public int Amount { get; set; }
     }
 }

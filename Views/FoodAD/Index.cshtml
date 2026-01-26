@@ -71,15 +71,21 @@
                 <tbody id="productTableBody">
                     @foreach (var product in Model)
                     {
-                        <tr data-category-id="@product.CategoryId">
+                        <tr data-category-id="@product.CategoryId" class="@(!product.Status ? "row-hidden" : "")">
                             <td>#@product.ProductId.ToString("D3")</td>
                             <td>
                                 <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "https://via.placeholder.com/200" : product.ImageUrl)"
-                                     alt="@product.ProductName" class="product-img">
+                                     alt="@product.ProductName" class="product-img @(!product.Status ? "img-grayscale" : "")">
                             </td>
                             <td>
                                 <div class="product-name">@product.ProductName</div>
                                 <div class="product-category">@product.CategoryName</div>
+                                @if (!product.Status)
+                                {
+                                    <span class="status-badge status-hidden">
+                                        <i class="fa-solid fa-eye-slash"></i> Đã ẩn
+                                    </span>
+                                }
                             </td>
                             <td>
                                 <span class="badge @product.BadgeClass">@product.CategoryName</span>
@@ -96,8 +102,10 @@
                                     <button class="btn-action btn-edit" onclick="openModal('edit', @product.ProductId)" title="Sửa">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </button>
-                                    <button class="btn-action btn-delete" onclick="deleteProduct(@product.ProductId)" title="Xóa">
-                                        <i class="fa-solid fa-trash"></i>
+                                    <button class="btn-action @(product.Status ? "btn-hide" : "btn-show")"
+                                            onclick="toggleProductStatus(@product.ProductId, @product.Status.ToString().ToLower())"
+                                            title="@(product.Status ? "Ẩn sản phẩm" : "Hiện sản phẩm")">
+                                        <i class="fa-solid @(product.Status ? "fa-eye-slash" : "fa-eye")"></i>
                                     </button>
                                 </div>
                             </td>
@@ -107,7 +115,6 @@
             </table>
         </div>
 
-        <!-- Pagination -->
         <div class="pagination-container">
             <div class="pagination-info">
                 <span id="paginationInfo">Hiển thị <strong>1-10</strong> của <strong>0</strong> sản phẩm</span>
@@ -120,7 +127,6 @@
                     <i class="fa-solid fa-chevron-left"></i>
                 </button>
                 <div class="pagination-pages" id="paginationPages">
-                    <!-- Dynamic page numbers will be inserted here -->
                 </div>
                 <button class="pagination-btn" id="nextPage" onclick="goToNextPage()" title="Trang sau">
                     <i class="fa-solid fa-chevron-right"></i>
@@ -132,7 +138,6 @@
         </div>
     </div>
 
-<!-- Add/Edit Product Modal -->
 <div class="modal-overlay" id="productModal">
     <div class="modal-content">
         <div class="modal-header">

@@ -54,7 +54,7 @@
 
             <div class="col-lg-9 col-md-8 col-12">
                 <div class="products-section">
-                    <div class="products-header">
+                    @* <div class="products-header">
                         <div class="products-count">
                             Hiển thị <strong>8</strong> / 156 sản phẩm
                         </div>
@@ -67,7 +67,7 @@
                                 <option>Mới nhất</option>
                             </select>
                         </div>
-                    </div>
+                    </div> *@
 
                 <div class="products-grid" id="productsList">
                     @foreach (var p in Model.Products)
@@ -84,9 +84,9 @@
                                 <button class="btn btn-primary py-2 fw-semibold flex-fill"  onclick="openPurchaseModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@p.ImageUrl')">
                                     <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
                                 </button>
-                <button class="btn btn-outline-primary py-2 fw-semibold flex-fill"onclick="addToCart(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price)">
-                    <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
-                </button>
+                                <button class="btn btn-outline-primary py-2 fw-semibold flex-fill"onclick="addToCart(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price)">
+                                    <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
+                                </button>
                                 </div>
                             </div>
                         </div>

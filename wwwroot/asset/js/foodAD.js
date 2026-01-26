@@ -462,9 +462,7 @@ function applyFilters() {
 
     return visibleCount;
 }
-// ============================================
 // TÌM KIẾM
-// ============================================
 function initializeSearch() {
     const searchInput = document.getElementById('searchInput');
     if (!searchInput) return;
@@ -474,9 +472,7 @@ function initializeSearch() {
     });
 }
 
-// ============================================
 // LỌC THEO LOẠI - DÙNG DATA ATTRIBUTE
-// ============================================
 function initializeTypeFilter() {
     const filterType = document.getElementById('filterType');
     if (!filterType) return;
@@ -507,9 +503,7 @@ function initializeTypeFilter() {
     });
 }
 
-// ============================================
 // LỌC THEO TÌNH TRẠNG KHO
-// ============================================
 function initializeStockFilter() {
     const filterStock = document.getElementById('filterStock');
     if (!filterStock) return;
@@ -556,9 +550,7 @@ function initializeModalClick() {
     });
 }
 
-// ============================================
 // TỔ HỢP PHÍM
-// ============================================
 function initializeKeyboardShortcuts() {
     document.addEventListener('keydown', function (e) {
         // ESC để đóng modal
@@ -811,4 +803,67 @@ function applyFilters() {
     updatePagination();
 
     return visibleCount;
+}
+// TOGGLE PRODUCT STATUS (HIDE/SHOW)
+function toggleProductStatus(id, currentStatus) {
+    const actionText = currentStatus ? 'ẩn' : 'hiện';
+    const actionIcon = currentStatus ? 'eye-slash' : 'eye';
+
+    Swal.fire({
+        title: `Xác nhận ${actionText} sản phẩm?`,
+        text: currentStatus
+            ? "Sản phẩm sẽ không hiển thị cho khách hàng"
+            : "Sản phẩm sẽ hiển thị trở lại cho khách hàng",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: currentStatus ? '#F59E0B' : '#10B981',
+        cancelButtonColor: '#6B7280',
+        confirmButtonText: currentStatus ? 'Ẩn sản phẩm' : 'Hiện sản phẩm',
+        cancelButtonText: 'Hủy'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Đang cập nhật...',
+                text: 'Vui lòng đợi',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch(`/FoodAD/ToggleStatus/${id}`, {
+                method: 'POST',
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Thành công!',
+                            text: result.message,
+                            confirmButtonColor: '#10B981',
+                            timer: 1500
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi!',
+                            text: result.message,
+                            confirmButtonColor: '#10B981'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi!',
+                        text: 'Có lỗi xảy ra khi thay đổi trạng thái!',
+                        confirmButtonColor: '#10B981'
+                    });
+                });
+        }
+    });
 }

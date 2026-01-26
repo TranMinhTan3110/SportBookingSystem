@@ -14,32 +14,29 @@ namespace SportBookingSystem.Services
             _context = context;
         }
 
-        /// <summary>
         /// Lấy dữ liệu ban đầu cho trang Food (Categories + Products)
-        /// </summary>
         public async Task<FoodIndexViewModel> GetInitialDataAsync()
         {
-            // 1. Lấy danh sách Categories có Type = 'Product'
+            // Lấy danh sách Categories có Type = 'Product'
             var categories = await _context.Categories
                 .Where(c => c.Type == "Product")
                 .Select(c => new CategoryFilterViewModel
                 {
                     CategoryId = c.CategoryId,
                     CategoryName = c.CategoryName,
-                    ProductCount = c.Products.Count(p => p.StockQuantity > 0) // Đếm sản phẩm còn hàng
+                    ProductCount = c.Products.Count(p => p.StockQuantity > 0 && p.Status == true) 
                 })
                 .OrderBy(c => c.CategoryName)
                 .ToListAsync();
 
-            // 2. Lấy tất cả sản phẩm thuộc các danh mục Product
+            // Lấy sản phẩm
             var categoryIds = categories.Select(c => c.CategoryId).ToList();
             var products = await _context.Products
                 .Include(p => p.Category)
-                .Where(p => categoryIds.Contains(p.CategoryId))
+                .Where(p => categoryIds.Contains(p.CategoryId) && p.Status == true) 
                 .OrderBy(p => p.ProductName)
                 .ToListAsync();
 
-            // 3. Map sang ProductViewModel
             var productViewModels = products.Select(p => MapToProductViewModel(p)).ToList();
 
             return new FoodIndexViewModel
@@ -50,18 +47,15 @@ namespace SportBookingSystem.Services
             };
         }
 
-        /// <summary>
         /// Lọc sản phẩm theo các tiêu chí
-        /// </summary>
         public async Task<FilterProductResponse> GetFilteredProductsAsync(FilterProductRequest request)
         {
             try
             {
-                // Bắt đầu query từ Products
                 var query = _context.Products
-                    .Include(p => p.Category)
-                    .Where(p => p.Category.Type == "Product")
-                    .AsQueryable();
+            .Include(p => p.Category)
+            .Where(p => p.Category.Type == "Product" && p.Status == true) 
+            .AsQueryable();
 
                 // 1. Lọc theo danh mục (nếu có)
                 if (request.CategoryIds != null && request.CategoryIds.Any())
