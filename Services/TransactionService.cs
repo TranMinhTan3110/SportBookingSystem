@@ -321,7 +321,8 @@ namespace SportBookingSystem.Services
                 ProductName = firstDetail?.Product?.ProductName,
                 Quantity = firstDetail?.Quantity ?? 0,
                 TotalAmount = order.TotalAmount ?? 0,
-                Status = order.Status.ToString()
+                Status = order.Status.ToString(),
+                OrderDate = order.OrderDate
             };
         }
 
@@ -360,7 +361,24 @@ namespace SportBookingSystem.Services
                     if (user != null)
                     {
                         user.WalletBalance += order.TotalAmount ?? 0;
-                        dbTransaction.BalanceAfter = user.WalletBalance;
+                        
+                        // Tạo giao dịch hoàn tiền mới
+                        var refundTrans = new Transactions
+                        {
+                            UserId = user.UserId,
+                            Amount = order.TotalAmount ?? 0,
+                            TransactionType = TransactionTypes.Refund,
+                            Source = "System",
+                            Status = TransactionStatus.Success,
+                            TransactionDate = DateTime.Now,
+                            BalanceAfter = user.WalletBalance,
+                            Message = $"Hoàn tiền đơn hàng {order.OrderCode}",
+                            OrderId = order.OrderId
+                        };
+                        _context.Transactions.Add(refundTrans);
+                        await _context.SaveChangesAsync(); // Save to get ID
+
+                        refundTrans.TransactionCode = $"{TransactionPrefixes.Refund}-{refundTrans.TransactionId:D4}";
                     }
 
                     // Trả lại kho
@@ -382,6 +400,28 @@ namespace SportBookingSystem.Services
             {
                 await transaction.RollbackAsync();
                 return (false, ex.Message);
+            }
+        }
+        public async Task CancelExpiredOrdersAsync()
+        {
+            try
+            {
+                var expirationTime = DateTime.Now.AddMinutes(-15);
+                var expiredOrderIds = await _context.Orders
+                    .Where(o => o.Status == 0 && o.OrderDate < expirationTime)
+                    .Select(o => o.OrderId)
+                    .ToListAsync();
+
+                if (!expiredOrderIds.Any()) return;
+
+                foreach (var orderId in expiredOrderIds)
+                {
+                    await UpdateOrderStatusAsync(orderId, TransactionStatus.Canceled);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error canceling expired orders: {ex.Message}");
             }
         }
     }

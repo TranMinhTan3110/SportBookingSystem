@@ -8,10 +8,43 @@ namespace SportBookingSystem.Controllers
     public class UserProfileController : Controller
     {
         private readonly IProfileService _profileService;
+        private readonly IQrService _qrService;
 
-        public UserProfileController(IProfileService profileService)
+        public UserProfileController(IProfileService profileService, IQrService qrService)
         {
             _profileService = profileService;
+            _qrService = qrService;
+        }
+
+        [HttpGet]
+        public IActionResult GenerateBookingQr(string checkInCode)
+        {
+            if (string.IsNullOrEmpty(checkInCode)) return BadRequest("Mã check-in không hợp lệ");
+            // Format: BOOKING:[CheckInCode]
+            string qrContent = $"BOOKING:{checkInCode}";
+            string qrBase64 = _qrService.GenerateQrCode(qrContent);
+            return Json(new { success = true, qrCode = qrBase64 });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GenerateOrderQr(int orderId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId)) return Unauthorized();
+
+            var order = await _profileService.GetOrderByIdAsync(orderId, userId);
+            if (order == null) return NotFound("Không tìm thấy đơn hàng");
+
+            var detail = order.OrderDetails.FirstOrDefault();
+            if (detail == null) return BadRequest("Đơn hàng lỗi (không có sản phẩm)");
+
+            string qrContent = $"PURCHASE:{order.OrderId}:{userId}:{detail.ProductId}:{detail.Quantity}";
+            string qrBase64 = _qrService.GenerateQrCode(qrContent);
+            
+            var remainingSeconds = (int)(order.OrderDate.AddMinutes(15) - DateTime.Now).TotalSeconds;
+            if (remainingSeconds < 0) remainingSeconds = 0;
+
+            return Json(new { success = true, qrCode = qrBase64, remainingSeconds = remainingSeconds });
         }
 
         public async Task<IActionResult> Index()
@@ -30,11 +63,13 @@ namespace SportBookingSystem.Controllers
             }
 
             var upcomingBooking = await _profileService.GetUpcomingBookingAsync(userId);
+            var latestOrder = await _profileService.GetLatestPendingOrderAsync(userId);
 
             var viewModel = new UserProfileViewModel
             {
                 User = user,
-                UpcomingBooking = upcomingBooking
+                UpcomingBooking = upcomingBooking,
+                LatestOrder = latestOrder
             };
 
             return View(viewModel);

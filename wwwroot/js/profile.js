@@ -19,10 +19,32 @@ document.addEventListener('DOMContentLoaded', function () {
     // CHECK-IN BUTTON
     // ============================================
     const checkinBtn = document.querySelector('.btn-checkin');
+    const checkInQrModal = document.getElementById('checkInQrModal');
+
     if (checkinBtn) {
         checkinBtn.addEventListener('click', function () {
-            // TODO: Generate QR code
-            alert('Đang tạo mã Check-in...');
+            const code = this.dataset.code;
+            if (!code) return showNotification('Không tìm thấy mã check-in', 'error');
+
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
+            this.disabled = true;
+
+            fetch(`/UserProfile/GenerateBookingQr?checkInCode=${code}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
+                        document.getElementById('checkInCodeDisplay').textContent = code;
+                        openModal(checkInQrModal);
+                    } else {
+                        showNotification('Lỗi tạo mã QR', 'error');
+                    }
+                })
+                .catch(err => showNotification('Lỗi kết nối', 'error'))
+                .finally(() => {
+                    this.innerHTML = '<i class="fas fa-qrcode"></i> Lấy mã Check-in';
+                    this.disabled = false;
+                });
         });
     }
 
@@ -310,6 +332,85 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     `;
     document.head.appendChild(style);
+
+
+    const orderQrBtns = document.querySelectorAll('.btn-order-qr');
+    if (orderQrBtns) {
+        orderQrBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const orderId = this.dataset.orderId;
+                if (!orderId) return showNotification('Không tìm thấy mã đơn hàng', 'error');
+
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
+                this.classList.add('disabled');
+
+                fetch(`/UserProfile/GenerateOrderQr?orderId=${orderId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
+                            document.getElementById('checkInCodeDisplay').textContent = 'Order #' + orderId;
+
+                            // Handle countdown
+                            const countdownDiv = document.getElementById('qrCountdown');
+                            const timerSpan = document.getElementById('countdownTimer');
+
+                            if (data.remainingSeconds > 0) {
+                                countdownDiv.style.display = 'block';
+                                startCountdown(data.remainingSeconds, timerSpan, countdownDiv);
+                            } else {
+                                countdownDiv.style.display = 'block';
+                                countdownDiv.innerHTML = "Mã QR đã hết hạn!";
+                                document.getElementById('checkInQrImage').style.opacity = '0.2';
+                            }
+
+                            openModal(checkInQrModal);
+                        } else {
+                            showNotification(data.message || 'Lỗi tạo mã QR', 'error');
+                        }
+                    })
+                    .catch(err => showNotification('Lỗi kết nối', 'error'))
+                    .finally(() => {
+                        this.innerHTML = '<i class="fas fa-qrcode"></i> Lấy mã Order';
+                        this.classList.remove('disabled');
+                    });
+            });
+        });
+    }
+
+    let countdownInterval;
+    function startCountdown(duration, display, container) {
+        if (countdownInterval) clearInterval(countdownInterval);
+
+        let timer = duration, minutes, seconds;
+
+        function updateDisplay() {
+            minutes = parseInt(timer / 60, 10);
+            seconds = parseInt(timer % 60, 10);
+
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+
+            display.textContent = minutes + ":" + seconds;
+
+            if (--timer < 0) {
+                clearInterval(countdownInterval);
+                container.innerHTML = "Mã QR đã hết hạn!";
+                const img = document.getElementById('checkInQrImage');
+                if (img) img.style.opacity = '0.2';
+            }
+        }
+
+        updateDisplay();
+        countdownInterval = setInterval(updateDisplay, 1000);
+    }
+
+    // Clear interval on modal close
+    document.querySelectorAll('.close-modal, .btn-cancel').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (countdownInterval) clearInterval(countdownInterval);
+        });
+    });
 
     console.log('✅ Profile page loaded successfully!');
 });

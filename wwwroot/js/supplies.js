@@ -93,9 +93,12 @@ function renderProducts(products) {
                     <div class="product-price text-primary fw-bold fs-5">${p.price.toLocaleString('vi-VN')}₫</div>
                     <div class="text-muted small"><i class="fa-solid fa-box-open me-1"></i>Còn: ${p.stockQuantity}</div>
                 </div>
-                <div class="d-grid gap-2">
-                        <button class="btn btn-primary py-2 fw-semibold" onclick="openPurchaseModal(${p.productId}, '${p.productName.replace(/'/g, "\\'")}', ${p.price}, '${p.imageUrl || '/img/placeholder.jpg'}')" style="border-radius: 10px;">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                     <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(${p.productId}, '${p.productName.replace(/'/g, "\\'")}', ${p.price}, '${p.imageUrl || '/img/placeholder.jpg'}')" style="border-radius: 10px;">
                         <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
+                    </button>
+                    <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="addToCart(${p.productId}, '${p.productName.replace(/'/g, "\\'")}', ${p.price})" style="border-radius: 10px;">
+                        <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
                     </button>
                 </div>
             </div>
@@ -155,6 +158,15 @@ function confirmPayment() {
             if (res.success) {
                 purchaseModal.hide();
                 document.getElementById('purchaseQrCode').src = 'data:image/png;base64,' + res.qrCode;
+
+                // Countdown logic
+                const timerSpan = document.getElementById('suppliesTimer');
+                const countdownDiv = document.getElementById('suppliesQrCountdown');
+                if (timerSpan && countdownDiv) {
+                    const remaining = res.remainingSeconds || 900;
+                    startSuppliesCountdown(remaining, timerSpan, countdownDiv);
+                }
+
                 if (!qrModal) {
                     qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
                 }
@@ -164,8 +176,49 @@ function confirmPayment() {
             }
         })
         .catch(error => {
+            console.error(error);
             Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Có lỗi xảy ra khi kết nối máy chủ.' });
         });
+}
+
+let suppliesInterval;
+function startSuppliesCountdown(duration, display, container) {
+    if (suppliesInterval) clearInterval(suppliesInterval);
+
+    let timer = duration, minutes, seconds;
+    const qrImg = document.getElementById('purchaseQrCode');
+    if (qrImg) qrImg.style.opacity = '1';
+
+    function updateDisplay() {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(suppliesInterval);
+            container.innerHTML = "Mã QR đã hết hạn!";
+            if (qrImg) qrImg.style.opacity = '0.2';
+        }
+    }
+
+    updateDisplay();
+    suppliesInterval = setInterval(updateDisplay, 1000);
+}
+
+function addToCart(id, name, price) {
+    // Simple placeholder for now as full cart logic wasn't specified but button was requested.
+    // Can be expanded to use LocalStorage or Backend Cart API.
+    Swal.fire({
+        icon: 'success',
+        title: 'Đã thêm vào giỏ',
+        text: `${name} đã được thêm vào giỏ hàng của bạn (Demo)`,
+        timer: 2000,
+        showConfirmButton: false
+    });
 }
 
 function resetFilters() {

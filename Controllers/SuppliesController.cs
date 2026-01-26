@@ -56,7 +56,8 @@ namespace SportBookingSystem.Controllers
                 return Json(new { 
                     success = result.Success, 
                     message = result.Message, 
-                    qrCode = result.QrCode 
+                    qrCode = result.QrCode,
+                    remainingSeconds = 900 // 15 minutes for new order
                 });
             }
             catch (Exception ex)

@@ -17,7 +17,9 @@ namespace SportBookingSystem.Services
 
         public async Task<IEnumerable<Products>> GetAllProductsAsync(string? search, string? type, string? brand, string? stockStatus)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _context.Products.Include(p => p.Category)
+                .Where(p => p.Category.Type == "Service") // Only "Service" products
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -56,7 +58,7 @@ namespace SportBookingSystem.Services
         public async Task<IEnumerable<Products>> GetProductsForUserAsync(string? search, string[]? categories, string[]? brands, decimal? minPrice, decimal? maxPrice, string? sortBy)
         {
             var query = _context.Products.Include(p => p.Category)
-                .Where(p => p.Status == true) // Chỉ lấy sản phẩm đang hoạt động
+                .Where(p => p.Status == true && p.Category.Type == "Service") // Chỉ lấy sản phẩm Service đang hoạt động
                 .AsQueryable();
 
             // Search

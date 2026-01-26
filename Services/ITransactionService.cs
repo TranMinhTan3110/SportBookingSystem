@@ -22,5 +22,6 @@ namespace SportBookingSystem.Services
         Task<List<ProductListDTO>> GetProductsAsync();
         Task<OrderFulfillmentDTO?> GetOrderDetailsByIdAsync(int orderId);
         Task<(bool Success, string Message)> UpdateOrderStatusAsync(int orderId, string newStatus);
+        Task CancelExpiredOrdersAsync();
     }
 }

@@ -23,13 +23,13 @@ namespace SportBookingSystem.Models.Entities
         [StringLength(255)]
         public string? Note { get; set; }
 
-        public int Status { get; set; } = 0; // 0: Pending, 1: Confirmed, 2: Cancelled
+        public int Status { get; set; } = 0; 
 
         [StringLength(50)]
         public string? CheckInCode { get; set; }
 
         // Khóa ngoại
-        public int? UserId { get; set; } // Cho phép null nếu khách vãng lai (tùy logic)
+        public int? UserId { get; set; } 
         [ForeignKey("UserId")]
         public Users? User { get; set; }
 
@@ -37,7 +37,6 @@ namespace SportBookingSystem.Models.Entities
         [ForeignKey("PitchId")]
         public Pitches Pitch { get; set; }
 
-        // Quan hệ: Dịch vụ đi kèm
         public ICollection<BookingServices> BookingServices { get; set; }
     }
 }

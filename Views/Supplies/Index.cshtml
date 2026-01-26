@@ -151,8 +151,11 @@
                     <p class="text-muted">Vui lòng lưu lại mã QR dưới đây và đưa cho nhân viên tại sân để nhận đồ.</p>
                 </div>
                 
-                <div class="qr-container p-3 bg-white border rounded-4 mb-4 shadow-sm">
+                 <div class="qr-container p-3 bg-white border rounded-4 mb-4 shadow-sm">
                     <img id="purchaseQrCode" src="" alt="QR Code" class="img-fluid" style="max-width: 250px;">
+                    <div id="suppliesQrCountdown" class="mt-3 fw-bold text-danger" style="font-size: 1.1rem;">
+                        Hết hạn sau: <span id="suppliesTimer">15:00</span>
+                    </div>
                 </div>
 
                 <button type="button" class="btn btn-primary w-100 py-3 fw-bold" onclick="location.reload()" style="border-radius: 15px;">Đã hiểu, Quay lại</button>

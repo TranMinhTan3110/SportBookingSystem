@@ -159,6 +159,16 @@ namespace SportBookingSystem.Controllers
         {
             var order = await _transactionService.GetOrderDetailsByIdAsync(orderId);
             if (order == null) return NotFound();
+
+            // Check expiration (15 minutes) for Pending orders
+            if (order.Status == "0" && DateTime.Now > order.OrderDate.AddMinutes(15))
+            {
+                 return Json(new { 
+                     error = true, 
+                     message = "Mã QR đã hết hạn (quá 15 phút). Vui lòng yêu cầu khách hàng đặt lại." 
+                 });
+            }
+
             return Json(order);
         }
 
