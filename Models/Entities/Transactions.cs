@@ -8,7 +8,7 @@ public class Transactions
     [Key]
     public int TransactionId { get; set; }
 
-    [StringLength(20)]
+    [StringLength(50)]
     public string? TransactionCode { get; set; }
 
     [Column(TypeName = "decimal(18, 2)")]

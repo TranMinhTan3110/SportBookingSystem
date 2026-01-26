@@ -1,17 +1,17 @@
 ﻿$(document).ready(function () {
     $(document).ready(function () {
         $(".btn-apply-filter").click(function () {
-            // 1. Thu thập ID danh mục
+            // Thu thập ID danh mục
             var selectedCats = [];
             $(".category-checkbox:checked").each(function () {
                 selectedCats.push(parseInt($(this).val()));
             });
 
-            // 2. Thu thập Khoảng giá - Quan trọng: Phải lấy đúng Selector
+            // Thu thập Khoảng giá - Quan trọng: Phải lấy đúng Selector
             var minVal = $(".price-range input[placeholder='Từ']").val();
             var maxVal = $(".price-range input[placeholder='Đến']").val();
 
-            // 3. Thu thập kiểu sắp xếp
+            // Thu thập kiểu sắp xếp
             var sortVal = $(".sort-dropdown select").val();
 
             // Gửi dữ liệu qua AJAX

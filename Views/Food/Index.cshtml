@@ -1,6 +1,5 @@
 ﻿@model SportBookingSystem.Models.ViewModels.FoodIndexViewModel
 @section Styles {
-    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/asset/css/food.css" />
 }
@@ -8,7 +7,6 @@
     ViewData["Title"] = "Dặt đồ ăn";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<!-- Banner -->
 <section class="banner">
     <div class="breadcrumb">
         <a href="/">Trang chủ</a>
@@ -24,7 +22,6 @@
 </section>
 <div class="container-fluid py-4">
         <div class="row g-4">
-            <!-- Bộ Lọc - 3 cột -->
             <div class="col-lg-3 col-md-4 col-12">
                 <div class="filter-sidebar">
                     <h4 class="filter-title">Bộ Lọc</h4>
@@ -41,7 +38,6 @@
                         }
                     </div>
 
-                    <!-- Khoảng giá -->
                     <div class="filter-group">
                         <h5>Khoảng giá</h5>
                         <div class="price-range">
@@ -56,10 +52,8 @@
                 </div>
             </div>
 
-            <!-- Sản phẩm - 9 cột -->
             <div class="col-lg-9 col-md-8 col-12">
                 <div class="products-section">
-                    <!-- Header -->
                     <div class="products-header">
                         <div class="products-count">
                             Hiển thị <strong>8</strong> / 156 sản phẩm
@@ -75,7 +69,6 @@
                         </div>
                     </div>
 
-                    <!-- Product Grid -->
                 <div class="products-grid" id="productsList">
                     @foreach (var p in Model.Products)
                     {

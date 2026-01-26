@@ -341,141 +341,105 @@ namespace SportBookingSystem.Migrations
                     b.ToTable("Roles");
                 });
 
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.TimeSlots", b =>
-            {
-                b.Property<int>("SlotId")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SlotId"));
-
-                b.Property<TimeSpan>("EndTime")
-                    .HasColumnType("time");
-
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
-
-                b.Property<string>("SlotName")
-                    .IsRequired()
-                    .HasMaxLength(50)
-                    .HasColumnType("nvarchar(50)");
-
-                b.Property<TimeSpan>("StartTime")
-                    .HasColumnType("time");
-
-                b.HasKey("SlotId");
-
-                b.ToTable("TimeSlots");
-
-                b.HasData(
-                    new
-                    {
-                        SlotId = 1,
-                        EndTime = new TimeSpan(0, 7, 30, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 1",
-                        StartTime = new TimeSpan(0, 6, 0, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 2,
-                        EndTime = new TimeSpan(0, 9, 0, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 2",
-                        StartTime = new TimeSpan(0, 7, 30, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 3,
-                        EndTime = new TimeSpan(0, 17, 30, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 3",
-                        StartTime = new TimeSpan(0, 16, 0, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 4,
-                        EndTime = new TimeSpan(0, 19, 0, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 4 (Vàng)",
-                        StartTime = new TimeSpan(0, 17, 30, 0, 0)
-                    },
-                    new
-                    {
-                        SlotId = 5,
-                        EndTime = new TimeSpan(0, 20, 30, 0, 0),
-                        IsActive = true,
-                        SlotName = "Ca 5 (Vàng)",
-                        StartTime = new TimeSpan(0, 19, 0, 0, 0)
-                    });
-            });
             modelBuilder.Entity("SportBookingSystem.Models.Entities.SystemSetting", b =>
-            {
-                b.Property<string>("SettingKey")
-                    .HasMaxLength(100)
-                    .HasColumnType("nvarchar(100)");
-
-                b.Property<string>("SettingValue")
-                    .IsRequired()
-                    .HasColumnType("nvarchar(max)");
-
-                b.HasKey("SettingKey");
-
-                b.ToTable("SystemSetting");
-
-                b.HasData(
-                    new
-                    {
-                        SettingKey = "RewardAmountStep",
-                        SettingValue = "10000"
-                    },
-                    new
-                    {
-                        SettingKey = "RewardPointBonus",
-                        SettingValue = "1"
-                    },
-                    new
-                    {
-                        SettingKey = "IsRewardActive",
-                        SettingValue = "true"
-                    });
-            });
-
-            modelBuilder.Entity("SportBookingSystem.Models.Entities.Transactions", b =>
                 {
-                    b.Property<int>("TransactionId")
+                    b.Property<string>("SettingKey")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SettingKey");
+
+                    b.ToTable("SystemSetting");
+
+                    b.HasData(
+                        new
+                        {
+                            SettingKey = "RewardAmountStep",
+                            SettingValue = "10000"
+                        },
+                        new
+                        {
+                            SettingKey = "RewardPointBonus",
+                            SettingValue = "1"
+                        },
+                        new
+                        {
+                            SettingKey = "IsRewardActive",
+                            SettingValue = "true"
+                        });
+                });
+
+            modelBuilder.Entity("SportBookingSystem.Models.Entities.TimeSlots", b =>
+                {
+                    b.Property<int>("SlotId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TransactionId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SlotId"));
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18, 2)");
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time");
 
-                    b.Property<string>("Message")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
-                    b.Property<int?>("ReceiverId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("TransactionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionType")
+                    b.Property<string>("SlotName")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time");
 
-                    b.HasKey("TransactionId");
+                    b.HasKey("SlotId");
 
-                    b.HasIndex("ReceiverId");
+                    b.ToTable("TimeSlots");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Transactions");
+                    b.HasData(
+                        new
+                        {
+                            SlotId = 1,
+                            EndTime = new TimeSpan(0, 7, 30, 0, 0),
+                            IsActive = true,
+                            SlotName = "Ca 1",
+                            StartTime = new TimeSpan(0, 6, 0, 0, 0)
+                        },
+                        new
+                        {
+                            SlotId = 2,
+                            EndTime = new TimeSpan(0, 9, 0, 0, 0),
+                            IsActive = true,
+                            SlotName = "Ca 2",
+                            StartTime = new TimeSpan(0, 7, 30, 0, 0)
+                        },
+                        new
+                        {
+                            SlotId = 3,
+                            EndTime = new TimeSpan(0, 17, 30, 0, 0),
+                            IsActive = true,
+                            SlotName = "Ca 3",
+                            StartTime = new TimeSpan(0, 16, 0, 0, 0)
+                        },
+                        new
+                        {
+                            SlotId = 4,
+                            EndTime = new TimeSpan(0, 19, 0, 0, 0),
+                            IsActive = true,
+                            SlotName = "Ca 4 (Vàng)",
+                            StartTime = new TimeSpan(0, 17, 30, 0, 0)
+                        },
+                        new
+                        {
+                            SlotId = 5,
+                            EndTime = new TimeSpan(0, 20, 30, 0, 0),
+                            IsActive = true,
+                            SlotName = "Ca 5 (Vàng)",
+                            StartTime = new TimeSpan(0, 19, 0, 0, 0)
+                        });
                 });
 
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Users", b =>
@@ -580,8 +544,8 @@ namespace SportBookingSystem.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("TransactionCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
