@@ -1,103 +1,86 @@
-﻿function openTab(evt, tabName) {
-    // Ẩn tất cả nội dung tab
-    var tabcontent = document.getElementsByClassName("tab-content");
-    for (var i = 0; i < tabcontent.length; i++) {
-        tabcontent[i].classList.remove("active");
-    }
+﻿// ============================================
+// BIẾN TOÀN CỤC
+// ============================================
+let currentBookingPage = 1;
+let currentTransactionPage = 1;
+let currentTransferPage = 1;
+const pageSize = 10; // Số bản ghi mỗi trang
 
-    // Xóa class active ở tất cả các nút tab
-    var tablinks = document.getElementsByClassName("tab-btn");
-    for (var i = 0; i < tablinks.length; i++) {
-        tablinks[i].classList.remove("active");
-    }
-
-    // Hiện tab hiện tại và thêm class active vào nút
-    document.getElementById(tabName).classList.add("active");
-    evt.currentTarget.classList.add("active");
-
-    // Load dữ liệu khi chuyển tab
-    if (tabName === 'booking-history') {
-        loadBookingHistory();
-    } else if (tabName === 'transaction-history') {
-        loadTransactionHistory();
-    }
-}
-
-// Load lịch sử đặt sân
-async function loadBookingHistory() {
+// ============================================
+// LOAD LỊCH SỬ ĐẶT SÂN
+// ============================================
+async function loadBookingHistory(page = 1) {
     try {
-        const response = await fetch('/api/transaction/bookings');
-        if (!response.ok) {
-            throw new Error('Không thể tải dữ liệu');
-        }
+        const response = await fetch(`/api/transaction/bookings?page=${page}&pageSize=${pageSize}`);
+        if (!response.ok) throw new Error('Không thể tải dữ liệu');
 
-        const bookings = await response.json();
-        const tbody = document.querySelector('#booking-history tbody');
+        const result = await response.json();
+        const tbody = document.querySelector('#booking-tbody');
 
-        if (bookings.length === 0) {
+        if (result.data.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align: center; padding: 40px; color: #999;">
+                    <td colspan="6" style="text-align: center; padding: 40px;">
                         <i class="bi bi-inbox" style="font-size: 48px;"></i>
-                        <p style="margin-top: 10px;">Chưa có lịch sử đặt sân</p>
+                        <p>Chưa có lịch sử đặt sân</p>
                     </td>
                 </tr>
             `;
+            document.getElementById('booking-pagination').innerHTML = '';
             return;
         }
 
-        tbody.innerHTML = bookings.map(booking => {
-            const statusClass = getBookingStatusClass(booking.status);
-            const statusText = booking.status;
-            const actionButton = getBookingActionButton(booking.status, booking.bookingCode);
+        tbody.innerHTML = result.data.map(booking => `
+            <tr>
+                <td>${booking.bookingCode}</td>
+                <td>
+                    <div class="court-info">
+                        <span class="court-name">${booking.pitchName}</span>
+                        <span class="court-date">${formatDate(booking.bookingDate)}</span>
+                    </div>
+                </td>
+                <td>-</td>
+                <td class="price">-</td>
+                <td><span class="badge success">Hoàn thành</span></td>
+                <td><button class="btn-action">Chi tiết</button></td>
+            </tr>
+        `).join('');
 
-            return `
-                <tr>
-                    <td>${booking.bookingCode}</td>
-                    <td>
-                        <div class="court-info">
-                            <span class="court-name">${booking.pitchName}</span>
-                            <span class="court-date">${formatDate(booking.bookingDate)}</span>
-                        </div>
-                    </td>
-                    <td>${formatTime(booking.startTime)} - ${formatTime(booking.endTime)}</td>
-                    <td class="price">${formatCurrency(booking.totalAmount)}</td>
-                    <td><span class="badge ${statusClass}">${statusText}</span></td>
-                    <td>${actionButton}</td>
-                </tr>
-            `;
-        }).join('');
+        // Render phân trang
+        renderPagination('booking-pagination', result.currentPage, result.totalPages, loadBookingHistory);
+        currentBookingPage = page;
+
     } catch (error) {
-        console.error('Lỗi khi tải lịch sử đặt sân:', error);
-        alert('Không thể tải dữ liệu. Vui lòng thử lại!');
+        console.error('Lỗi:', error);
     }
 }
 
-// Load lịch sử giao dịch
-async function loadTransactionHistory() {
+// ============================================
+// LOAD LỊCH SỬ GIAO DỊCH
+// ============================================
+async function loadTransactionHistory(page = 1) {
     try {
-        const response = await fetch('/api/transaction/history');
-        if (!response.ok) {
-            throw new Error('Không thể tải dữ liệu');
-        }
+        const response = await fetch(`/api/transaction/history?page=${page}&pageSize=${pageSize}`);
+        if (!response.ok) throw new Error('Không thể tải dữ liệu');
 
-        const transactions = await response.json();
-        const tbody = document.querySelector('#transaction-history tbody');
+        const result = await response.json();
+        const tbody = document.querySelector('#transaction-tbody');
 
-        if (transactions.length === 0) {
+        if (result.data.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="5" style="text-align: center; padding: 40px; color: #999;">
+                    <td colspan="5" style="text-align: center; padding: 40px;">
                         <i class="bi bi-inbox" style="font-size: 48px;"></i>
-                        <p style="margin-top: 10px;">Chưa có giao dịch nào</p>
+                        <p>Chưa có giao dịch nào</p>
                     </td>
                 </tr>
             `;
+            document.getElementById('transaction-pagination').innerHTML = '';
             return;
         }
 
-        tbody.innerHTML = transactions.map(trans => {
-            const statusClass = getTransactionStatusClass(trans.status);
+        tbody.innerHTML = result.data.map(trans => {
+            const statusClass = trans.status === 'Thành công' ? 'success' : 'warning';
             const typeClass = trans.isPositive ? 'deposit' : 'payment';
             const amountClass = trans.isPositive ? 'positive' : 'negative';
 
@@ -116,47 +99,127 @@ async function loadTransactionHistory() {
                 </tr>
             `;
         }).join('');
+
+        renderPagination('transaction-pagination', result.currentPage, result.totalPages, loadTransactionHistory);
+        currentTransactionPage = page;
+
     } catch (error) {
-        console.error('Lỗi khi tải lịch sử giao dịch:', error);
-        alert('Không thể tải dữ liệu. Vui lòng thử lại!');
+        console.error('Lỗi:', error);
     }
 }
 
-// Helper functions
-function getBookingStatusClass(status) {
-    switch (status) {
-        case 'Đã hoàn thành': return 'success';
-        case 'Sắp tới': return 'warning';
-        case 'Đã hủy': return 'danger';
-        default: return '';
+// ============================================
+// LOAD LỊCH SỬ CHUYỂN TIỀN
+// ============================================
+async function loadTransferHistory(page = 1) {
+    try {
+        const response = await fetch(`/api/transaction/transfers?page=${page}&pageSize=${pageSize}`);
+        if (!response.ok) throw new Error('Không thể tải dữ liệu');
+
+        const result = await response.json();
+        const tbody = document.getElementById('transfer-tbody');
+
+        if (result.data.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:40px;">
+                        Chưa có giao dịch chuyển tiền nào
+                    </td>
+                </tr>
+            `;
+            document.getElementById('transfer-pagination').innerHTML = '';
+            return;
+        }
+
+        tbody.innerHTML = result.data.map(t => `
+            <tr>
+                <td>${t.transactionCode}</td>
+                <td>${t.senderName}</td>
+                <td>${t.receiverName}</td>
+                <td>${formatDateTime(t.date)}</td>
+                <td class="amount ${t.amountClass}">${t.amountDisplay}</td>
+                <td>${t.message || '-'}</td>
+                <td><span class="badge ${t.status === 'Thành công' ? 'success' : 'warning'}">${t.status}</span></td>
+            </tr>
+        `).join('');
+
+        renderPagination('transfer-pagination', result.currentPage, result.totalPages, loadTransferHistory);
+        currentTransferPage = page;
+
+    } catch (error) {
+        console.error('Lỗi:', error);
     }
 }
 
-function getTransactionStatusClass(status) {
-    switch (status) {
-        case 'Thành công': return 'success';
-        case 'Chờ xử lý': return 'warning';
-        case 'Đã hủy': return 'danger';
-        default: return '';
+// ============================================
+// RENDER PHÂN TRANG
+// ============================================
+function renderPagination(containerId, currentPage, totalPages, loadFunction) {
+    const container = document.getElementById(containerId);
+
+    // Nếu không có dữ liệu (0 trang) thì ẩn phân trang
+    if (totalPages < 1) {
+        container.innerHTML = '';
+        return;
     }
+
+    let html = '<div class="pagination">';
+
+    // Nút Previous (chỉ hiện khi trang > 1)
+    if (currentPage > 1) {
+        html += `<button class="page-btn" onclick="${loadFunction.name}(${currentPage - 1})">‹</button>`;
+    }
+
+    // Tính toán dải trang hiển thị (tối đa 5 trang xung quanh trang hiện tại)
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, currentPage + 2);
+
+    // Trang đầu tiên và dấu ...
+    if (startPage > 1) {
+        html += `<button class="page-btn" onclick="${loadFunction.name}(1)">1</button>`;
+        if (startPage > 2) html += '<span class="page-dots">...</span>';
+    }
+
+    // Vòng lặp các trang ở giữa
+    for (let i = startPage; i <= endPage; i++) {
+        html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="${loadFunction.name}(${i})">${i}</button>`;
+    }
+
+    // Trang cuối cùng và dấu ...
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) html += '<span class="page-dots">...</span>';
+        html += `<button class="page-btn" onclick="${loadFunction.name}(${totalPages})">${totalPages}</button>`;
+    }
+
+    // Nút Next (chỉ hiện khi chưa đến trang cuối)
+    if (currentPage < totalPages) {
+        html += `<button class="page-btn" onclick="${loadFunction.name}(${currentPage + 1})">›</button>`;
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
 }
 
-function getBookingActionButton(status, bookingCode) {
-    switch (status) {
-        case 'Đã hoàn thành':
-            return `<button class="btn-action" onclick="viewDetail('${bookingCode}')">Chi tiết</button>`;
-        case 'Sắp tới':
-            return `<button class="btn-action" onclick="cancelBooking('${bookingCode}')">Hủy sân</button>`;
-        case 'Đã hủy':
-            return `<button class="btn-action" onclick="rebookPitch('${bookingCode}')">Đặt lại</button>`;
-        default:
-            return '';
-    }
+// ============================================
+// CHUYỂN TAB
+// ============================================
+function openTab(evt, tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+    document.getElementById(tabName).classList.add('active');
+    evt.currentTarget.classList.add('active');
+
+    if (tabName === 'booking-history') loadBookingHistory(currentBookingPage);
+    else if (tabName === 'transaction-history') loadTransactionHistory(currentTransactionPage);
+    else if (tabName === 'transfer-history') loadTransferHistory(currentTransferPage);
 }
 
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN');
+    return new Date(dateString).toLocaleDateString('vi-VN');
 }
 
 function formatDateTime(dateString) {
@@ -164,33 +227,9 @@ function formatDateTime(dateString) {
     return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
 
-function formatTime(timeString) {
-    // TimeSpan format: "HH:mm:ss"
-    const parts = timeString.split(':');
-    return `${parts[0]}:${parts[1]}`;
-}
-
-function formatCurrency(amount) {
-    return new Intl.NumberFormat('vi-VN').format(amount) + '₫';
-}
-
-// Action handlers
-function viewDetail(bookingCode) {
-    window.location.href = `/Booking/Detail/${bookingCode}`;
-}
-
-function cancelBooking(bookingCode) {
-    if (confirm('Bạn có chắc chắn muốn hủy đặt sân này?')) {
-        // TODO: Call API to cancel booking
-        alert('Chức năng đang phát triển');
-    }
-}
-
-function rebookPitch(bookingCode) {
-    window.location.href = '/Booking/Create';
-}
-
-// Load dữ liệu khi trang load lần đầu
+// ============================================
+// KHỞI TẠO
+// ============================================
 document.addEventListener('DOMContentLoaded', function () {
-    loadBookingHistory(); // Load tab đầu tiên
+    loadBookingHistory(1);
 });

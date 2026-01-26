@@ -18,32 +18,45 @@ namespace SportBookingSystem.Controllers.API
         }
 
         [HttpGet("history")]
-        public async Task<IActionResult> GetUserTransactions()
+        public async Task<IActionResult> GetUserTransactions([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            // Lấy userId từ Claims (user đang đăng nhập)
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized(new { message = "Vui lòng đăng nhập" });
             }
 
-            var transactions = await _transactionUserService.LoadUserTransactionAsync(userId);
-            return Ok(transactions);
+            var (data, totalRecords) = await _transactionUserService.LoadUserTransactionAsync(userId, page, pageSize);
+
+            return Ok(new
+            {
+                data = data,
+                currentPage = page,
+                pageSize = pageSize,
+                totalRecords = totalRecords,
+                totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+            });
         }
 
         [HttpGet("bookings")]
-        public async Task<IActionResult> GetUserBookings()
+        public async Task<IActionResult> GetUserBookings([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
             {
                 return Unauthorized(new { message = "Vui lòng đăng nhập" });
             }
 
-            var bookings = await _transactionUserService.LoadUserBookingsAsync(userId);
-            return Ok(bookings);
+            var (data, totalRecords) = await _transactionUserService.LoadUserBookingsAsync(userId, page, pageSize);
+
+            return Ok(new
+            {
+                data = data,
+                currentPage = page,
+                pageSize = pageSize,
+                totalRecords = totalRecords,
+                totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+            });
         }
         // API kiểm tra người nhận
         [HttpGet("check-receiver")]
@@ -75,6 +88,27 @@ namespace SportBookingSystem.Controllers.API
                 return Ok(new { success = true, message = "Chuyển tiền thành công" });
             else
                 return BadRequest(new { success = false, message = result });
+        }
+        // API lịch sử chuyển tiền
+        [HttpGet("transfers")]
+        public async Task<IActionResult> GetUserTransfers([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim) || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized(new { message = "Vui lòng đăng nhập" });
+            }
+
+            var (data, totalRecords) = await _transactionUserService.LoadUserTransfersAsync(userId, page, pageSize);
+
+            return Ok(new
+            {
+                data = data,
+                currentPage = page,
+                pageSize = pageSize,
+                totalRecords = totalRecords,
+                totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+            });
         }
     }
 }

@@ -131,15 +131,56 @@
 }
 
 .amount.positive {
-    color: var(--success);
+    color: #10b981; /* Xanh lá - Nhận tiền */
     font-weight: 700;
 }
 
 .amount.negative {
-    color: var(--danger);
+    color: #ef4444; /* Đỏ - Gửi tiền */
     font-weight: 700;
 }
+/* PHÂN TRANG */
+.pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    margin-top: 20px;
+}
 
+.pagination {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.page-btn {
+    min-width: 40px;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+    .page-btn:hover {
+        background: #f0f0f0;
+        border-color: #999;
+    }
+
+    .page-btn.active {
+        background: var(--primary, #3b82f6);
+        color: white;
+        border-color: var(--primary, #3b82f6);
+    }
+
+.page-dots {
+    padding: 0 8px;
+    color: #999;
+}
 /* Badges */
 .badge {
     padding: 6px 12px;
@@ -192,6 +233,6 @@
     }
 
     .nav-menu {
-        display: none; /* Ẩn menu trên mobile để demo đơn giản */
+        display: none;
     }
 }

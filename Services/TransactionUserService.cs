@@ -15,46 +15,64 @@
                 _context = context;
             }
 
-            public async Task<List<UserTransactionDTO>> LoadUserTransactionAsync(int userId)
-            {
-                return await _context.Transactions
-                    .Where(t => t.UserId == userId)
-                    .OrderByDescending(t => t.TransactionDate)
-                    .Select(t => new UserTransactionDTO
-                    {
-                        TransactionCode = t.TransactionCode,
-                        Amount = t.Amount,
-                        IsPositive = t.TransactionType == TransactionTypes.Recharge ||
-                                     t.TransactionType == TransactionTypes.Refund,
-                        TransactionType = t.TransactionType,
-                        TransactionSource = t.Source, // Thêm source
-                        Date = t.TransactionDate,
-                        Status = t.Status,
-                        Message = t.Message
-                    })
-                    .ToListAsync();
-            }
+        // Giao dịch chung
+        public async Task<(List<UserTransactionDTO> Data, int TotalRecords)> LoadUserTransactionAsync(int userId, int page, int pageSize)
+        {
+            var query = _context.Transactions
+                .Where(t => t.UserId == userId
+                && t.TransactionType != "Chuyển tiền"
+                    && t.TransactionType != "Nhận tiền"
+                )
+                .OrderByDescending(t => t.TransactionDate);
 
-            public async Task<List<UserBookingDTO>> LoadUserBookingsAsync(int userId)
-            {
-                return await _context.Bookings
-                    .Include(b => b.Pitch)
-                    .Where(b => b.UserId == userId)
-                    .OrderByDescending(b => b.BookingDate)
-                    .Select(b => new UserBookingDTO
-                    {
-                        BookingCode = "BK" + b.BookingId.ToString("D4"),
-                        PitchName = b.Pitch.PitchName,
-                        BookingDate = b.BookingDate
-                        //StartTime = b.StartTime,
-                        //EndTime = b.EndTime,
-                        //TotalAmount = b.TotalAmount,
-                        //Status = b.Status
-                    })
-                    .ToListAsync();
-            }
-            // Kiểm tra người nhận theo SĐT
-            public async Task<Users> GetUserByPhoneAsync(string phoneNumber)
+            var totalRecords = await query.CountAsync();
+
+            var data = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(t => new UserTransactionDTO
+                {
+                    TransactionCode = t.TransactionCode,
+                    Amount = t.Amount,
+                    IsPositive = t.TransactionType == TransactionTypes.Recharge ||
+                                 t.TransactionType == TransactionTypes.Refund,
+                    TransactionType = t.TransactionType,
+                    TransactionSource = t.Source,
+                    Date = t.TransactionDate,
+                    Status = t.Status,
+                    Message = t.Message
+                })
+                .ToListAsync();
+
+            return (data, totalRecords);
+        }
+
+        // Lịch sử đặt sân
+        public async Task<(List<UserBookingDTO> Data, int TotalRecords)> LoadUserBookingsAsync(int userId, int page, int pageSize)
+        {
+            var query = _context.Bookings
+                .Include(b => b.Pitch)
+                .Where(b => b.UserId == userId)
+                .OrderByDescending(b => b.BookingDate);
+
+            var totalRecords = await query.CountAsync();
+
+            var data = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new UserBookingDTO
+                {
+                    BookingCode = "BK" + b.BookingId.ToString("D4"),
+                    PitchName = b.Pitch.PitchName,
+                    BookingDate = b.BookingDate
+                })
+                .ToListAsync();
+
+            return (data, totalRecords);
+        }
+
+        // Kiểm tra người nhận theo SĐT
+        public async Task<Users> GetUserByPhoneAsync(string phoneNumber)
             {
                 return await _context.Users
                     .FirstOrDefaultAsync(u => u.Phone == phoneNumber);
@@ -85,25 +103,35 @@
                 if (receiver.UserId == senderId)
                     return "Không thể chuyển tiền cho chính mình";
 
-                // ✅ MÃ GIAO DỊCH NGẮN (< 50 ký tự)
-                var timestamp = DateTime.Now.ToString("yyMMddHHmmss"); // 12 ký tự
-                string senderCode = $"TRF-O{timestamp}{senderId}";      // TRF-O250124102233-1
-                string receiverCode = $"TRF-I{timestamp}{receiver.UserId}"; // TRF-I250124102233-2
+               
+                var timestamp = DateTime.Now.ToString("yyMMddHHmmss"); 
+                string senderCode = $"TRF-O{timestamp}{senderId}";      
+                string receiverCode = $"TRF-I{timestamp}{receiver.UserId}"; 
 
                 // Update số dư
                 sender.WalletBalance -= dto.Amount;
                 receiver.WalletBalance += dto.Amount;
 
                 // Message
-                string senderMsg = $"Chuyển {dto.Amount:N0}₫ cho {receiver.FullName}";
-                string receiverMsg = $"Nhận {dto.Amount:N0}₫ từ {sender.FullName}";
+                string senderMsg;
+                string receiverMsg;
 
                 if (!string.IsNullOrEmpty(dto.Message))
                 {
-                    senderMsg += $" - {dto.Message}";
-                    receiverMsg += $" - {dto.Message}";
+                    // TRƯỜNG HỢP 1: Có nhập lời nhắn -> Lấy đúng lời nhắn đó
+                    senderMsg = dto.Message;
+
+                    // Với người nhận, nên kèm tên người gửi để họ biết ai chuyển + lời nhắn
+                    receiverMsg = dto.Message;
+                }
+                else
+                {
+                    // TRƯỜNG HỢP 2: Không nhập gì -> Tự sinh nội dung mặc định
+                    senderMsg = $"Chuyển {dto.Amount:N0}₫ cho {receiver.FullName}";
+                    receiverMsg = $"Nhận {dto.Amount:N0}₫ từ {sender.FullName}";
                 }
 
+                // Cắt chuỗi nếu quá dài (để tránh lỗi database)
                 if (senderMsg.Length > 500) senderMsg = senderMsg.Substring(0, 497) + "...";
                 if (receiverMsg.Length > 500) receiverMsg = receiverMsg.Substring(0, 497) + "...";
 
@@ -148,6 +176,38 @@
                 Console.WriteLine($"Error: {ex.InnerException?.Message ?? ex.Message}");
                 return $"Lỗi: {ex.InnerException?.Message ?? ex.Message}";
             }
+        }
+        //hàm load cho tab lịch sử chuyển tiền
+        public async Task<(List<UserTransferDTO> Data, int TotalRecords)> LoadUserTransfersAsync(int userId, int page, int pageSize)
+        {
+            var query = _context.Transactions
+        .Include(t => t.Sender)
+        .Include(t => t.Receiver)
+  
+        .Where(t => t.UserId == userId
+                 && (t.TransactionType == "Chuyển tiền" || t.TransactionType == "Nhận tiền"))
+      
+        .OrderByDescending(t => t.TransactionDate);
+
+            var totalRecords = await query.CountAsync();
+
+            var data = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(t => new UserTransferDTO
+                {
+                    TransactionCode = t.TransactionCode,
+                    Amount = t.Amount,
+                    IsSender = t.UserId == userId,
+                    SenderName = t.Sender.FullName ?? t.Sender.Username,
+                    ReceiverName = t.Receiver != null ? (t.Receiver.FullName ?? t.Receiver.Username) : "N/A",
+                    Date = t.TransactionDate,
+                    Status = t.Status,
+                    Message = t.Message
+                })
+                .ToListAsync();
+
+            return (data, totalRecords);
         }
     }
     }
