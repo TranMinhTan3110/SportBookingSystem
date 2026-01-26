@@ -164,10 +164,8 @@
                     ReceiverId = senderId,
                     BalanceAfter = receiver.WalletBalance
                 });
-
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
-
                 return "success";
             }
             catch (Exception ex)

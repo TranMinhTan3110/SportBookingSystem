@@ -544,8 +544,8 @@ namespace SportBookingSystem.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("TransactionCode")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");

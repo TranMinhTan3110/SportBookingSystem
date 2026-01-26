@@ -33,7 +33,8 @@ builder.Services.AddScoped<ISportProductService, SportProductService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IQrService, QrService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>();
-
+builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddScoped<IVnPayService, VnPayService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
