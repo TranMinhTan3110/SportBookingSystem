@@ -41,21 +41,13 @@ namespace SportBookingSystem.Helper
                 if (!string.IsNullOrEmpty(kv.Value))
                 {
                     query.Append($"{WebUtility.UrlEncode(kv.Key)}={WebUtility.UrlEncode(kv.Value)}&");
-                    signData.Append($"{kv.Key}={kv.Value}&");
+                    signData.Append($"{kv.Key}={WebUtility.UrlEncode(kv.Value)}&");
                 }
             }
 
             var rawData = signData.ToString().TrimEnd('&');
 
-            Console.WriteLine("===== VNPAY RAW DATA =====");
-            Console.WriteLine(rawData);
-            Console.WriteLine("=========================");
-
             var secureHash = HmacSHA512(vnpHashSecret, rawData);
-
-            Console.WriteLine("===== VNPAY HASH =====");
-            Console.WriteLine(secureHash);
-            Console.WriteLine("======================");
 
             return $"{baseUrl}?{query}vnp_SecureHash={secureHash}";
         }
@@ -67,19 +59,11 @@ namespace SportBookingSystem.Helper
         {
             var rspRaw = GetResponseData();
 
-            Console.WriteLine("==================== RESPONSE RAW DATA ====================");
-            Console.WriteLine(rspRaw);
-            Console.WriteLine("===========================================================");
-
             var myChecksum = HmacSHA512(secretKey, rspRaw);
-
-            Console.WriteLine($"Input Hash (VNPay):  {inputHash}");
-            Console.WriteLine($"My Checksum (Calc):  {myChecksum}");
-            Console.WriteLine($"Match: {myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase)}");
-            Console.WriteLine("===========================================================");
 
             return myChecksum.Equals(inputHash, StringComparison.InvariantCultureIgnoreCase);
         }
+
 
         private string HmacSHA512(string key, string inputData)
         {
@@ -93,7 +77,7 @@ namespace SportBookingSystem.Helper
 
                 foreach (var b in hashValue)
                 {
-                    hash.Append(b.ToString("X2"));
+                    hash.Append(b.ToString("x2"));
                 }
             }
 
@@ -104,17 +88,9 @@ namespace SportBookingSystem.Helper
         {
             var data = new StringBuilder();
 
-            if (_responseData.ContainsKey("vnp_SecureHashType"))
-            {
-                _responseData.Remove("vnp_SecureHashType");
-            }
+            var signableData = _responseData.Where(kv => kv.Key != "vnp_SecureHash" && kv.Key != "vnp_SecureHashType");
 
-            if (_responseData.ContainsKey("vnp_SecureHash"))
-            {
-                _responseData.Remove("vnp_SecureHash");
-            }
-
-            foreach (var kv in _responseData.Where(kv => !string.IsNullOrEmpty(kv.Value)))
+            foreach (var kv in signableData)
             {
                 data.Append(kv.Key + "=" + kv.Value + "&");
             }

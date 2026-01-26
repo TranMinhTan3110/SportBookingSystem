@@ -36,16 +36,27 @@ namespace SportBookingSystem.Controllers
 
                 var userId = int.Parse(userIdClaim);
 
-                // Tạo mã giao dịch unique
-                var txnRef = $"{TransactionPrefixes.Recharge}{DateTime.Now.Ticks}";
+                var timestamp = DateTime.Now.ToString("yyMMddHHmmss");
+                Random rnd = new Random();
+                string txnRef = $"NAP-{rnd.Next(100000, 999999)}";
 
-                // Lưu giao dịch với trạng thái Pending
                 await _walletService.CreateRechargeTransactionAsync(userId, request.Amount, txnRef);
 
-                // Tạo URL thanh toán VNPay
                 var paymentUrl = _vnPayService.CreatePaymentUrl(request.Amount, txnRef, HttpContext);
 
-                return Json(new { success = true, paymentUrl });
+                return Json(new
+                {
+                    success = true,
+                    paymentUrl,
+                    debug = new
+                    {
+                        txnRef = txnRef,
+                        txnRefLength = txnRef.Length,
+                        amount = request.Amount,
+                        userId = userId,
+                        timestamp = timestamp
+                    }
+                });
             }
             catch (Exception ex)
             {
@@ -58,29 +69,30 @@ namespace SportBookingSystem.Controllers
         {
             try
             {
-                var vnPayResponse = _vnPayService.ProcessVnPayReturn(Request.Query);
+                var response = _vnPayService.ProcessVnPayReturn(Request.Query);
 
-                var (success, message) = await _walletService.ExecuteRechargeAsync(vnPayResponse);
+                var (success, message) = await _walletService.ExecuteRechargeAsync(response);
 
-                if (success)
+                if (response.Success)
                 {
-                    TempData["SuccessMessage"] = message;
-                    return RedirectToAction("Index", "Home");
+                    TempData["PaymentStatus"] = "success";
+                    TempData["PaymentMessage"] = $"Nạp tiền thành công {response.Amount:N0}₫ vào ví. Mã GD: {response.TransactionCode}";
                 }
                 else
                 {
-                    TempData["ErrorMessage"] = message;
-                    return RedirectToAction("Index", "Home");
+                    TempData["PaymentStatus"] = "error";
+                    TempData["PaymentMessage"] = "Giao dịch thất bại hoặc chữ ký không hợp lệ";
                 }
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Lỗi xử lý giao dịch: {ex.Message}";
+                TempData["PaymentStatus"] = "error";
+                TempData["PaymentMessage"] = $"Lỗi hệ thống: {ex.Message}";
                 return RedirectToAction("Index", "Home");
             }
         }
 
-        // ViewModel để nhận request từ client
         public class RechargeRequest
         {
             public decimal Amount { get; set; }

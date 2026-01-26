@@ -33,7 +33,6 @@ namespace SportBookingSystem.Services
                 TransactionDate = DateTime.Now,
                 UserId = userId,
                 BalanceAfter = user.WalletBalance
-                // KHÔNG set ReceiverId (để nó null tự nhiên)
             };
 
             _context.Transactions.Add(transaction);
@@ -71,10 +70,8 @@ namespace SportBookingSystem.Services
             using var dbTransaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Cập nhật số dư ví người dùng
                 transaction.Sender.WalletBalance += transaction.Amount;
 
-                // Cập nhật trạng thái giao dịch
                 transaction.Status = TransactionStatus.Success;
                 transaction.BalanceAfter = transaction.Sender.WalletBalance;
                 transaction.Message = $"Nạp tiền thành công qua VNPay - Mã GD: {vnPayResponse.TransactionNo}";

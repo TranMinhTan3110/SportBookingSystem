@@ -535,6 +535,19 @@
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @section Scripts {
     <script src="~/js/Home.js"></script>
+}
+@if (TempData["PaymentMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@(TempData["PaymentStatus"]?.ToString() == "success" ? "Thành công!" : "Thất bại!")',
+            html: '@Html.Raw(TempData["PaymentMessage"])',
+            icon: '@TempData["PaymentStatus"]',
+            confirmButtonText: 'Đồng ý',
+            confirmButtonColor: '#28a745'
+        });
+    </script>
 }
