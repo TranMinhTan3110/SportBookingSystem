@@ -16,5 +16,11 @@ namespace SportBookingSystem.Services
         Task<(bool Success, string Message)> DeletePitchAsync(int pitchId);
 
         Task<List<Categories>> GetPitchCategoriesAsync();
-    }
+
+        //hàm mới
+        Task<List<PitchPriceSetting>> GetPitchPricesAsync(int pitchId);
+        Task<(bool Success, string Message)> AddPitchPriceAsync(PitchPriceViewModel model);
+        Task<(bool Success, string Message)> DeletePitchPriceAsync(int id);
+        
+        }
 }

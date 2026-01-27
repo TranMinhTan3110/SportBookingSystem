@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportBookingSystem.Models.EF;
 
@@ -11,9 +12,11 @@ using SportBookingSystem.Models.EF;
 namespace SportBookingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260127062406_addtable")]
+    partial class addtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,13 +85,13 @@ namespace SportBookingSystem.Migrations
                     b.Property<int>("PitchId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SlotId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TimeSlotsSlotId")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
@@ -105,7 +108,7 @@ namespace SportBookingSystem.Migrations
 
                     b.HasIndex("PitchId");
 
-                    b.HasIndex("SlotId");
+                    b.HasIndex("TimeSlotsSlotId");
 
                     b.HasIndex("UserId");
 
@@ -235,9 +238,6 @@ namespace SportBookingSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PitchSlotId"));
-
-                    b.Property<string>("BookingCode")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("BookingId")
                         .HasColumnType("int");
@@ -438,7 +438,7 @@ namespace SportBookingSystem.Migrations
                             SlotId = 1,
                             EndTime = new TimeSpan(0, 7, 30, 0, 0),
                             IsActive = true,
-                            SlotName = "Ca Sáng 1 (1.5h)",
+                            SlotName = "Ca 1",
                             StartTime = new TimeSpan(0, 6, 0, 0, 0)
                         },
                         new
@@ -446,88 +446,32 @@ namespace SportBookingSystem.Migrations
                             SlotId = 2,
                             EndTime = new TimeSpan(0, 9, 0, 0, 0),
                             IsActive = true,
-                            SlotName = "Ca Sáng 2 (1.5h)",
+                            SlotName = "Ca 2",
                             StartTime = new TimeSpan(0, 7, 30, 0, 0)
                         },
                         new
                         {
                             SlotId = 3,
-                            EndTime = new TimeSpan(0, 10, 30, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Sáng 3 (1.5h)",
-                            StartTime = new TimeSpan(0, 9, 0, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 4,
-                            EndTime = new TimeSpan(0, 11, 30, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Trưa 1 (1h)",
-                            StartTime = new TimeSpan(0, 10, 30, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 5,
-                            EndTime = new TimeSpan(0, 12, 30, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Trưa 2 (1h)",
-                            StartTime = new TimeSpan(0, 11, 30, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 6,
-                            EndTime = new TimeSpan(0, 15, 0, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Chiều 1 (1h)",
-                            StartTime = new TimeSpan(0, 14, 0, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 7,
-                            EndTime = new TimeSpan(0, 16, 0, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Chiều 2 (1h)",
-                            StartTime = new TimeSpan(0, 15, 0, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 8,
                             EndTime = new TimeSpan(0, 17, 30, 0, 0),
                             IsActive = true,
-                            SlotName = "Ca Chiều 3 (1.5h)",
+                            SlotName = "Ca 3",
                             StartTime = new TimeSpan(0, 16, 0, 0, 0)
                         },
                         new
                         {
-                            SlotId = 9,
+                            SlotId = 4,
                             EndTime = new TimeSpan(0, 19, 0, 0, 0),
                             IsActive = true,
-                            SlotName = "Giờ Vàng 1 (1.5h)",
+                            SlotName = "Ca 4 (Vàng)",
                             StartTime = new TimeSpan(0, 17, 30, 0, 0)
                         },
                         new
                         {
-                            SlotId = 10,
+                            SlotId = 5,
                             EndTime = new TimeSpan(0, 20, 30, 0, 0),
                             IsActive = true,
-                            SlotName = "Giờ Vàng 2 (1.5h)",
+                            SlotName = "Ca 5 (Vàng)",
                             StartTime = new TimeSpan(0, 19, 0, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 11,
-                            EndTime = new TimeSpan(0, 22, 0, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Đêm 1 (1.5h)",
-                            StartTime = new TimeSpan(0, 20, 30, 0, 0)
-                        },
-                        new
-                        {
-                            SlotId = 12,
-                            EndTime = new TimeSpan(0, 23, 0, 0, 0),
-                            IsActive = true,
-                            SlotName = "Ca Vét (1h)",
-                            StartTime = new TimeSpan(0, 22, 0, 0, 0)
                         });
                 });
 
@@ -690,19 +634,15 @@ namespace SportBookingSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportBookingSystem.Models.Entities.TimeSlots", "TimeSlot")
+                    b.HasOne("SportBookingSystem.Models.Entities.TimeSlots", null)
                         .WithMany("Bookings")
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TimeSlotsSlotId");
 
                     b.HasOne("SportBookingSystem.Models.Entities.Users", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Pitch");
-
-                    b.Navigation("TimeSlot");
 
                     b.Navigation("User");
                 });

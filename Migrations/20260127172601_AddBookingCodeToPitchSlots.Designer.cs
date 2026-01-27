@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportBookingSystem.Models.EF;
 
@@ -11,9 +12,11 @@ using SportBookingSystem.Models.EF;
 namespace SportBookingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260127172601_AddBookingCodeToPitchSlots")]
+    partial class AddBookingCodeToPitchSlots
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,13 +85,13 @@ namespace SportBookingSystem.Migrations
                     b.Property<int>("PitchId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SlotId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TimeSlotsSlotId")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
@@ -105,7 +108,7 @@ namespace SportBookingSystem.Migrations
 
                     b.HasIndex("PitchId");
 
-                    b.HasIndex("SlotId");
+                    b.HasIndex("TimeSlotsSlotId");
 
                     b.HasIndex("UserId");
 
@@ -690,19 +693,15 @@ namespace SportBookingSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportBookingSystem.Models.Entities.TimeSlots", "TimeSlot")
+                    b.HasOne("SportBookingSystem.Models.Entities.TimeSlots", null)
                         .WithMany("Bookings")
-                        .HasForeignKey("SlotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TimeSlotsSlotId");
 
                     b.HasOne("SportBookingSystem.Models.Entities.Users", "User")
                         .WithMany("Bookings")
                         .HasForeignKey("UserId");
 
                     b.Navigation("Pitch");
-
-                    b.Navigation("TimeSlot");
 
                     b.Navigation("User");
                 });

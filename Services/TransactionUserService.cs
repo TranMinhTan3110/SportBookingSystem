@@ -20,7 +20,7 @@
         {
             var query = _context.Transactions
                 .Where(t => t.UserId == userId
-                && t.TransactionType != "Chuyển tiền"
+                    && t.TransactionType != "Chuyển tiền"
                     && t.TransactionType != "Nhận tiền"
                 )
                 .OrderByDescending(t => t.TransactionDate);
@@ -34,8 +34,12 @@
                 {
                     TransactionCode = t.TransactionCode,
                     Amount = t.Amount,
+                    // LOGIC QUAN TRỌNG: Xác định dấu + hay - dựa trên TransactionType
+                    // Nạp tiền, Hoàn tiền -> Dương (+)
+                    // Thanh toán Booking, Order -> Âm (-)
                     IsPositive = t.TransactionType == TransactionTypes.Recharge ||
                                  t.TransactionType == TransactionTypes.Refund,
+
                     TransactionType = t.TransactionType,
                     TransactionSource = t.Source,
                     Date = t.TransactionDate,
@@ -46,7 +50,6 @@
 
             return (data, totalRecords);
         }
-
         // Lịch sử đặt sân
         public async Task<(List<UserBookingDTO> Data, int TotalRecords)> LoadUserBookingsAsync(int userId, int page, int pageSize)
         {

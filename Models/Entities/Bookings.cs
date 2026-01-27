@@ -17,7 +17,9 @@ namespace SportBookingSystem.Models.Entities
 
         [Column(TypeName = "decimal(18, 2)")]
         public decimal PaidAmount { get; set; } = 0;
-
+        public int SlotId { get; set; }
+        [ForeignKey("SlotId")]
+        public TimeSlots TimeSlot { get; set; }
         public bool IsPaid { get; set; } = false;
 
         [StringLength(255)]

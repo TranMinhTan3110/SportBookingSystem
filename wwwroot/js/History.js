@@ -81,20 +81,29 @@ async function loadTransactionHistory(page = 1) {
 
         tbody.innerHTML = result.data.map(trans => {
             const statusClass = trans.status === 'Thành công' ? 'success' : 'warning';
-            const typeClass = trans.isPositive ? 'deposit' : 'payment';
+
+            // Xử lý hiển thị tiền:
+            // Nếu là tích cực (+) -> Màu xanh, có dấu +
+            // Nếu là tiêu cực (-) -> Màu đỏ, có dấu - (Amount trong DB đã lưu số âm rồi thì cứ hiển thị, hoặc format lại)
             const amountClass = trans.isPositive ? 'positive' : 'negative';
+            const sign = trans.isPositive ? '+' : ''; // Thêm dấu + nếu là dương, âm thì nó tự có dấu - từ DB rồi
+
+            // Format số tiền đẹp (ví dụ: -300,000đ)
+            const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(trans.amount);
 
             return `
                 <tr>
                     <td>${trans.transactionCode}</td>
                     <td>
                         <div class="trans-info">
-                            <span class="trans-type ${typeClass}">${trans.transactionType}</span>
-                            <span class="trans-method">${trans.transactionSource || 'N/A'}</span>
+                            <span class="trans-type">${trans.transactionType}</span>
+                            <span class="trans-method text-muted small">${trans.transactionSource || 'System'}</span>
                         </div>
                     </td>
                     <td>${formatDateTime(trans.date)}</td>
-                    <td class="amount ${amountClass}">${trans.amountDisplay}</td>
+                    <td class="amount ${amountClass}" style="font-weight: bold; color: ${trans.isPositive ? '#10b981' : '#ef4444'}">
+                        ${trans.isPositive ? '+' : ''}${formattedAmount}
+                    </td>
                     <td><span class="badge ${statusClass}">${trans.status}</span></td>
                 </tr>
             `;
@@ -231,5 +240,16 @@ function formatDateTime(dateString) {
 // KHỞI TẠO
 // ============================================
 document.addEventListener('DOMContentLoaded', function () {
-    loadBookingHistory(1);
+    // Mặc định load tab Lịch sử Giao dịch
+    // 1. Ẩn các tab khác, hiện tab transaction
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('transaction-history').classList.add('active');
+
+    // 2. Set active cho nút tab tương ứng
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    // Giả sử nút thứ 2 là nút Lịch sử Giao dịch (index 1)
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+
+    // 3. Load dữ liệu
+    loadTransactionHistory(1);
 });

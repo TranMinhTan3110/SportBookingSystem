@@ -8,7 +8,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!-- Banner -->
 <section class="banner">
     <div class="breadcrumb">
         <a href="/">🏠 Trang chủ</a>
@@ -21,34 +20,14 @@
     </div>
 </section>
 
-
 <div class="main-container">
     <aside class="filter-sidebar fade-in">
         <div class="filter-card">
-            <div class="filter-header">
-                <h3 class="filter-title">Bộ Lọc</h3>
-            </div>
-
-
-            <div class="filter-section">
-                <div class="filter-section-title">Chọn Ngày</div>
-                <div class="date-picker">
-                    <input type="date" class="date-input" id="bookingDate">
-                </div>
-            </div>
-
-
-            <div class="filter-section">
-                <div class="filter-section-title">Khung Giờ</div>
-                <div class="time-slots">
-                    @if (ViewBag.TimeSlots != null)
-                    {
-                        @foreach (var slot in ViewBag.TimeSlots)
-                        {
-                            <div class="time-slot" data-slot-id="@slot.SlotId">@slot.TimeRange</div>
-                        }
-                    }
-                </div>
+            <div class="filter-header d-flex justify-content-between align-items-center mb-3">
+                <h3 class="filter-title m-0">Bộ Lọc</h3>
+                <button class="btn btn-sm btn-outline-secondary btn-reset-filter" title="Làm mới bộ lọc">
+                    <i class="fas fa-sync-alt"></i> Làm mới
+                </button>
             </div>
 
             <div class="filter-section">
@@ -56,79 +35,70 @@
                 <div class="filter-options">
                     @if (ViewBag.Categories != null)
                     {
-                        @foreach (var category in ViewBag.Categories)
+                        foreach (var category in ViewBag.Categories)
                         {
                             <label class="filter-option" data-category-id="@category.CategoryId">
                                 <input type="checkbox">
                                 <div class="filter-checkbox"></div>
                                 <span class="filter-label">@category.CategoryName</span>
-                                <span class="filter-count"></span>
                             </label>
+
+                            @if (category.CategoryName.Contains("Bóng Đá"))
+                            {
+                                <div class="sub-filter-options ps-4 mt-2 mb-2">
+                                    <label class="filter-option" data-capacity="10">
+                                        <input type="checkbox">
+                                        <div class="filter-checkbox" style="width:16px;height:16px;"></div>
+                                        <span class="filter-label small">Sân 5 người</span>
+                                    </label>
+                                    <label class="filter-option" data-capacity="14">
+                                        <input type="checkbox">
+                                        <div class="filter-checkbox" style="width:16px;height:16px;"></div>
+                                        <span class="filter-label small">Sân 7 người</span>
+                                    </label>
+                                </div>
+                            }
                         }
                     }
                 </div>
             </div>
 
-            <div class="filter-section">
-                <div class="filter-section-title">Tình Trạng</div>
-                <div class="filter-options">
-                    <label class="filter-option" data-status="available">
-                        <input type="checkbox" checked>
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Còn trống</span>
-                        <span class="filter-count"></span>
-                    </label>
-                    <label class="filter-option" data-status="booked">
-                        <input type="checkbox">
-                        <div class="filter-checkbox"></div>
-                        <span class="filter-label">Đã đặt</span>
-                        <span class="filter-count"></span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="filter-section">
-                <div class="filter-section-title">Khoảng Giá</div>
-                <div class="price-range">
-                    <div class="price-inputs">
-                        <div class="price-input">
-                            <label>Từ</label>
-                            <input type="text" placeholder="0₫" value="0₫">
-                        </div>
-                        <div class="price-input">
-                            <label>Đến</label>
-                            <input type="text" placeholder="2,000,000₫" value="2,000,000₫">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="filter-actions">
-                <button type="button" class="filter-submit-btn">Lọc</button>
-                <button type="button" class="filter-clear-btn">Làm mới</button>
+            <div class="filter-actions mt-3">
+                <button type="button" class="filter-submit-btn w-100">Tìm kiếm</button>
             </div>
         </div>
     </aside>
 
     <section class="fields-section fade-in stagger-1">
         <div class="fields-header">
-            <div class="fields-count">
-                Đang tải...
-            </div>
-            <div class="fields-sort">
-                <span class="sort-label">Sắp xếp:</span>
-                <select class="sort-select">
-                    <option>Đề xuất</option>
-                    <option>Giá thấp đến cao</option>
-                    <option>Giá cao đến thấp</option>
-                </select>
-            </div>
+            <div class="fields-count">Đang tải...</div>
         </div>
-
-        <div class="fields-grid">
-            <!-- Dữ liệu sẽ được load bằng JavaScript -->
-        </div>
+        <div class="fields-grid"></div>
     </section>
+</div>
+
+<div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Đặt sân: <span id="modalPitchName" class="text-success"></span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="modalPitchId">
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Chọn ngày đá:</label>
+                    <input type="date" class="form-control form-control-lg" id="modalBookingDate">
+                </div>
+                <div class="mb-2">
+                    <label class="form-label fw-bold">Các khung giờ trống:</label>
+                    <div id="modalSlotsGrid" class="slots-grid-modal">
+                        <div class="text-center text-muted py-3">Vui lòng chọn ngày để xem lịch...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {

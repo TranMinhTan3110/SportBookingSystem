@@ -15,6 +15,7 @@ namespace SportBookingSystem.Models.Entities
         public int PitchId { get; set; }
         [ForeignKey("PitchId")]
         public Pitches Pitch { get; set; }
+        public string? BookingCode { get; set; }
 
         // Liên kết tới khung giờ
         public int SlotId { get; set; }
