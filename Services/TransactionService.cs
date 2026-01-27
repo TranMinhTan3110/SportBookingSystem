@@ -419,5 +419,56 @@ namespace SportBookingSystem.Services
                 Console.WriteLine($"Error canceling expired orders: {ex.Message}");
             }
         }
+
+        public async Task<TransactionDetailDTO?> GetTransactionDetailsAsync(string code)
+        {
+            var trans = await _context.Transactions
+                .Include(t => t.Sender)
+                .Include(t => t.Order)
+                    .ThenInclude(o => o.OrderDetails)
+                        .ThenInclude(od => od.Product)
+                .Include(t => t.Booking)
+                    .ThenInclude(b => b.Pitch)
+                .FirstOrDefaultAsync(t => t.TransactionCode == code);
+
+            if (trans == null) return null;
+
+            var result = new TransactionDetailDTO
+            {
+                Code = trans.TransactionCode,
+                User = trans.Sender?.FullName ?? trans.Sender?.Username,
+                Phone = trans.Sender?.Phone,
+                Amount = trans.Amount,
+                BalanceAfter = trans.BalanceAfter,
+                Date = trans.TransactionDate,
+                Type = trans.TransactionType,
+                Status = trans.Status,
+                Source = trans.Source,
+                Message = trans.Message
+            };
+
+            if (trans.Order != null)
+            {
+                result.Items = trans.Order.OrderDetails.Select(od => new OrderItemDetailDTO
+                {
+                    ProductName = od.Product?.ProductName,
+                    Quantity = od.Quantity,
+                    Price = od.Price
+                }).ToList();
+            }
+
+            if (trans.Booking != null)
+            {
+                result.Booking = new BookingInfoDetailDTO
+                {
+                    PitchName = trans.Booking.Pitch?.PitchName,
+                    StartTime = trans.Booking.StartTime,
+                    EndTime = trans.Booking.EndTime,
+                    TotalPrice = trans.Booking.TotalPrice ?? 0
+                };
+            }
+
+            return result;
+        }
     }
 }
