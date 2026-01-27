@@ -46,11 +46,27 @@ namespace SportBookingSystem.Controllers
                 .Take(5)
                 .ToListAsync();
 
+            var featuredFood = await _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.Status == true && p.Category.Type == "Product" && p.StockQuantity > 0)
+                .OrderByDescending(p => p.ProductId)
+                .Take(4)
+                .ToListAsync();
+
+            var featuredSupplies = await _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.Status == true && p.Category.Type == "Service" && p.StockQuantity > 0)
+                .OrderByDescending(p => p.ProductId)
+                .Take(4)
+                .ToListAsync();
+
             var viewModel = new HomeViewModel
             {
                 User = user,
                 UpcomingBookingsCount = upcomingBookingsCount,
-                RecentTransactions = recentTransactions
+                RecentTransactions = recentTransactions,
+                FeaturedFoodItems = featuredFood,
+                FeaturedSupplies = featuredSupplies
             };
 
             return View(viewModel);

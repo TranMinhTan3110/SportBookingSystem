@@ -7,5 +7,7 @@ namespace SportBookingSystem.Models.ViewModels
         public Users User { get; set; }
         public int UpcomingBookingsCount { get; set; }
         public List<Transactions> RecentTransactions { get; set; }
+        public List<Products> FeaturedFoodItems { get; set; }
+        public List<Products> FeaturedSupplies { get; set; }
     }
 }
