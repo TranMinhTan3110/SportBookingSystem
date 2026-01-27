@@ -65,28 +65,31 @@
             Nhắc nhở quan trọng
         </h2>
 
-        @if (Model.LatestOrder != null)
+        @if (Model.PendingOrders != null && Model.PendingOrders.Any())
         {
-            <div class="reminder-card order-reminder">
-                <div class="reminder-icon" style="background: rgba(255, 159, 67, 0.1); color: #ff9f43;">
-                    <i class="fas fa-utensils"></i>
+            @foreach (var order in Model.PendingOrders)
+            {
+                <div class="reminder-card order-reminder">
+                    <div class="reminder-icon" style="background: rgba(255, 159, 67, 0.1); color: #ff9f43;">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <div class="reminder-content">
+                        <h3 class="reminder-title">Đơn hàng đang chờ (#@(string.IsNullOrEmpty(order.OrderCode) ? order.OrderId.ToString() : order.OrderCode))</h3>
+                        <p class="reminder-time" style="color: #ff9f43;">
+                            <i class="far fa-clock"></i>
+                            Vừa đặt lúc: @order.OrderDate.ToString("HH:mm dd/MM")
+                        </p>
+                        <p class="reminder-warning">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Tổng tiền: @(order.TotalAmount?.ToString("N0"))₫ - @(order.OrderDetails.Count) món</span>
+                        </p>
+                    </div>
+                    <button class="btn-checkin btn-order-qr" data-order-id="@order.OrderId" style="background: linear-gradient(135deg, #ff9f43, #ee5253);">
+                        <i class="fas fa-qrcode"></i>
+                        Lấy mã Order
+                    </button>
                 </div>
-                <div class="reminder-content">
-                    <h3 class="reminder-title">Đơn hàng đang chờ (#@Model.LatestOrder.OrderCode)</h3>
-                    <p class="reminder-time" style="color: #ff9f43;">
-                        <i class="far fa-clock"></i>
-                        Vừa đặt lúc: @Model.LatestOrder.OrderDate.ToString("HH:mm dd/MM")
-                    </p>
-                    <p class="reminder-warning">
-                        <i class="fas fa-info-circle"></i>
-                        <span>Tổng tiền: @(Model.LatestOrder.TotalAmount?.ToString("N0"))₫ - @(Model.LatestOrder.OrderDetails.Count) món</span>
-                    </p>
-                </div>
-                <button class="btn-checkin btn-order-qr" data-order-id="@Model.LatestOrder.OrderId" style="background: linear-gradient(135deg, #ff9f43, #ee5253);">
-                    <i class="fas fa-qrcode"></i>
-                    Lấy mã Order
-                </button>
-            </div>
+            }
         }
         else if (Model.UpcomingBooking != null)
         {
@@ -295,7 +298,7 @@
 <div id="checkInQrModal" class="modal">
     <div class="modal-content text-center">
         <div class="modal-header">
-            <h3>Mã Check-in Đặt Sân</h3>
+            <h3 id="qrModalTitle">Mã Check-in Đặt Sân</h3>
             <span class="close-modal">&times;</span>
         </div>
         <div class="modal-body">
@@ -306,7 +309,7 @@
                     Mã QR sẽ hết hạn sau: <span id="countdownTimer">15:00</span>
                 </div>
             </div>
-            <div class="alert alert-info">
+            <div id="qrModalAlert" class="alert alert-info">
                 <i class="fas fa-info-circle"></i> Vui lòng đưa mã này cho nhân viên tại sân để nhận sân.
             </div>
         </div>
