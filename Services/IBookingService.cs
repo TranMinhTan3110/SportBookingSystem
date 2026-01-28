@@ -29,6 +29,8 @@ namespace SportBookingSystem.Services
             List<string>? statusFilter,
             int page,
             int pageSize);
+        Task<(bool Success, string Message, object? Data)> CheckInBookingAsync(string bookingCode);
+        Task<(bool Success, string Message)> ConfirmCheckInAsync(string bookingCode);
 
         Task<(bool Success, string Message, string? QrBase64, string? BookingCode)> BookPitchAsync(int userId, int pitchId, int slotId, DateTime date);
     }

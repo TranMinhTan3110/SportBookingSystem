@@ -230,7 +230,7 @@
     });
 
     // --- LOGIC QUẢN LÝ KHUNG GIỜ (TIME SLOT) ---
-
+    // Khởi tạo Modal khi DOM đã load
     const timeSlotModalElement = document.getElementById('manageTimeSlotModal');
     if (timeSlotModalElement) {
         window.timeSlotModal = new bootstrap.Modal(timeSlotModalElement);

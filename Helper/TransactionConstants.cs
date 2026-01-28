@@ -1,9 +1,10 @@
-﻿        namespace SportBookingSystem.Constants
+﻿namespace SportBookingSystem.Constants
 {
     public static class TransactionStatus
     {
         public const string Success = "Thành công";
         public const string Pending = "Chờ xử lý";
+        public const string PendingConfirm = "Chờ xác nhận";
         public const string Canceled = "Đã hủy";
     }
 
@@ -26,14 +27,21 @@
         public const string System = "System";
     }
 
-   
     public static class TransactionPrefixes
     {
-        public const string Recharge = "NAP";      // Nạp tiền
-        public const string Deposit = "DEP";       // Nạp tiền (nếu dùng riêng)
-        public const string Booking = "BKG";       // Thanh toán booking
-        public const string Order = "ORD";         // Thanh toán order
-        public const string Refund = "REF";        // Hoàn tiền
-        public const string Transfer = "TRF";      // Chuyển tiền
+        public const string Recharge = "NAP";
+        public const string Deposit = "DEP";
+        public const string Booking = "BKG";
+        public const string Order = "ORD";
+        public const string Refund = "REF";
+        public const string Transfer = "TRF";
+    }
+
+    public static class BookingStatus
+    {
+        public const int PendingConfirm = 1;
+        public const int CheckedIn = 2;
+        public const int Completed = 3;
+        public const int Cancelled = -1;
     }
 }

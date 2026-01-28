@@ -17,14 +17,12 @@
     const resetButton = document.getElementById('resetFilters');
     let debounceTimer;
 
-
     function debounceSearch() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             applyFilters();
         }, 500);
     }
-
 
     async function applyFilters() {
         const params = new URLSearchParams({
@@ -47,7 +45,6 @@
                 Toast.fire({ icon: 'error', title: 'Lỗi khi lọc dữ liệu' });
             }
         } catch (error) {
-            console.error('Filter error:', error);
             Toast.fire({ icon: 'error', title: 'Không thể kết nối đến máy chủ' });
         }
     }
@@ -71,16 +68,23 @@
         tbody.innerHTML = data.payments.map(item => {
             const avatar = item.user?.substring(0, 1).toUpperCase() || '?';
             const badgeClass = getBadgeClass(item.type);
-
             const type = (item.type || '').trim();
-            if (type.includes('Hoàn tiền') && type !== 'Hoàn tiền') {
-                console.log(`Mismatch found: '${type}' (Length: ${type.length}) vs 'Hoàn tiền'`);
-            }
-
-            const isPositive = type !== 'Hoàn tiền';
-            const amountClass = isPositive ? 'amount-positive' : 'amount-negative';
-            const amountPrefix = isPositive ? '+' : '-';
             const statusHTML = getStatusHTML(item.status);
+
+            const absAmount = Math.abs(item.amount);
+            let displaySign = '';
+            let displayClass = '';
+
+            if (type === 'Thanh toán Booking' || type === 'Thanh toán Order' || type === 'Nạp tiền') {
+                displaySign = '+';
+                displayClass = 'text-success fw-bold';
+            } else if (type === 'Hoàn tiền') {
+                displaySign = '-';
+                displayClass = 'text-danger fw-bold';
+            } else {
+                displaySign = item.amount >= 0 ? '+' : '-';
+                displayClass = item.amount >= 0 ? 'text-success' : 'text-danger';
+            }
 
             return `
                 <tr class="payment-row">
@@ -91,15 +95,9 @@
                             <span class="user-name">${item.user || 'N/A'}</span>
                         </div>
                     </td>
-                    <td>
-                        <span class="badge ${badgeClass}">${item.type || '-'}</span>
-                    </td>
-                    <td class="text-right">
-                        <span class="${amountClass}">${amountPrefix}${formatCurrency(item.amount)}</span>
-                    </td>
-                    <td>
-                        <span class="payment-source">${item.source || '-'}</span>
-                    </td>
+                    <td><span class="badge ${badgeClass}">${item.type || '-'}</span></td>
+                    <td class="text-right"><span class="${displayClass}">${displaySign}${formatCurrency(absAmount)}</span></td>
+                    <td><span class="payment-source">${item.source || '-'}</span></td>
                     <td>
                         <div class="date-cell">
                             <div class="date-main">${formatDate(item.date)}</div>
@@ -186,7 +184,7 @@
     function getBadgeClass(type) {
         type = (type || '').trim();
         if (type === 'Nạp tiền' || type === 'Hoàn tiền') return 'badge-success';
-        if (type === 'Thanh toán sân' || type === 'Thanh toán đồ') return 'badge-default';
+        if (type === 'Thanh toán Booking' || type === 'Thanh toán Order') return 'badge-default';
         if (type === 'Chuyển tiền') return 'badge-info';
         return 'badge-secondary';
     }
@@ -197,6 +195,8 @@
                 return `<span class="status-indicator"><span class="status-dot status-success"></span><span class="status-text status-success-text">Thành công</span></span>`;
             case 'Chờ xử lý':
                 return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xử lý</span></span>`;
+            case 'Chờ xác nhận':
+                return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xác nhận</span></span>`;
             case 'Đã hủy':
                 return `<span class="status-indicator"><span class="status-dot status-danger"></span><span class="status-text status-danger-text">Đã hủy</span></span>`;
             default:
@@ -240,7 +240,6 @@
             }
         });
     });
-
 
     phoneInput?.addEventListener('change', async function () {
         const phone = this.value.trim();
@@ -363,90 +362,80 @@
         Swal.fire('Thông báo', 'Chức năng mua hàng đang được xử lý ở phía Backend!', 'info');
     });
 
-    const fulfillmentModal = new bootstrap.Modal(document.getElementById('qrFulfillmentModal'));
+    const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
+    const fulfillmentModal = fulfillmentModalEl ? new bootstrap.Modal(fulfillmentModalEl) : null;
 
-    window.handleQrDetails = async function (orderId, userId, productId, quantity) {
-        if (orderId && orderId !== '0') {
-            const url = new URL(window.location.href);
-            url.searchParams.delete('qrOrder');
-            url.searchParams.delete('qrUser');
-            url.searchParams.delete('qrProduct');
-            url.searchParams.delete('qrQty');
-            window.history.replaceState({}, '', url);
-
-            showFulfillmentModal(orderId);
+    window.showFulfillmentModal = async function (orderId) {
+        if (!fulfillmentModal) {
+            Swal.fire('Lỗi', 'Modal chưa được khởi tạo.', 'error');
             return;
         }
 
-
-        const purchaseBtn = document.querySelector('.tab-btn[data-tab="purchase"]');
-        if (purchaseBtn) purchaseBtn.click();
-
-        fetch(`/AdminPayment/GetUserById/${userId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('purchaseUser').value = data.phone || data.username;
-                    document.getElementById('purchaseUserBalance').textContent = formatCurrency(data.balance);
-                    document.getElementById('purchaseUserBalance').dataset.userId = data.userId;
-
-                    const productSelect = document.getElementById('purchaseProduct');
-                    if (productSelect) {
-                        productSelect.value = productId;
-                        productSelect.dispatchEvent(new Event('change'));
-                    }
-
-                    const qtyField = document.getElementById('purchaseQuantity');
-                    if (qtyField) {
-                        qtyField.value = quantity;
-                        qtyField.dispatchEvent(new Event('input'));
-                    }
-                    Toast.fire({ icon: 'success', title: 'Tự động điền hoàn tất', text: `Khách hàng: ${data.fullName}` });
-                }
-            });
-    };
-
-    async function showFulfillmentModal(orderId) {
         const loading = document.getElementById('fulfillmentLoading');
         const content = document.getElementById('fulfillmentContent');
 
-        loading.classList.remove('d-none');
-        content.classList.add('d-none');
+        // Hiển thị loading
+        if (loading) loading.classList.remove('d-none');
+        if (content) content.classList.add('d-none');
+
         fulfillmentModal.show();
 
         try {
             const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
-            if (res.ok) {
-                const data = await res.json();
 
-                if (data.error) {
-                    fulfillmentModal.hide();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'QR Hết hạn',
-                        text: data.message
-                    });
-                    return;
-                }
-
-                document.getElementById('fOrderId').value = data.orderId;
-                document.getElementById('fOrderCode').textContent = data.orderCode;
-                document.getElementById('fCustomerName').textContent = data.customerName;
-                document.getElementById('fProductName').textContent = data.productName;
-                document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
-                document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
-
-                loading.classList.add('d-none');
-                content.classList.remove('d-none');
-            } else {
+            if (!res.ok) {
                 fulfillmentModal.hide();
-                Toast.fire({ icon: 'error', title: 'Không tìm thấy thông tin đơn hàng' });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi',
+                    text: 'Không thể tải thông tin đơn hàng'
+                });
+                return;
             }
+
+            const data = await res.json();
+
+         
+            if (data.error) {
+                fulfillmentModal.hide(); 
+
+                
+                setTimeout(() => {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Không thể xử lý',
+                        text: data.message,
+                        confirmButtonText: 'Đã hiểu',
+                        confirmButtonColor: '#f59e0b'
+                    });
+                }, 300);
+
+                return;
+            }
+
+           
+            document.getElementById('fOrderId').value = data.orderId;
+            document.getElementById('fOrderCode').textContent = data.orderCode;
+            document.getElementById('fCustomerName').textContent = data.customerName;
+            document.getElementById('fProductName').textContent = data.productName;
+            document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
+            document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
+
+            if (loading) loading.classList.add('d-none');
+            if (content) content.classList.remove('d-none');
+
         } catch (e) {
             fulfillmentModal.hide();
-            Toast.fire({ icon: 'error', title: 'Lỗi tải đơn hàng' });
+
+            setTimeout(() => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Lỗi kết nối',
+                    text: 'Không thể kết nối đến máy chủ'
+                });
+            }, 300);
         }
-    }
+    };
 
     async function processFulfillment(status) {
         const orderId = document.getElementById('fOrderId').value;
@@ -483,17 +472,6 @@
     document.getElementById('btnFulfillSuccess')?.addEventListener('click', () => processFulfillment('Thành công'));
     document.getElementById('btnFulfillCancel')?.addEventListener('click', () => processFulfillment('Đã hủy'));
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const qrOrder = urlParams.get('qrOrder');
-    const qrUser = urlParams.get('qrUser');
-    const qrProduct = urlParams.get('qrProduct');
-    const qrQty = urlParams.get('qrQty');
-
-    if (qrOrder || (qrUser && qrProduct && qrQty)) {
-        setTimeout(() => window.handleQrDetails(qrOrder || 0, qrUser, qrProduct, qrQty), 1000);
-    }
-
-
     const modalElement = document.getElementById('rewardSettingsModal');
     modalElement?.addEventListener('show.bs.modal', async function () {
         try {
@@ -529,4 +507,79 @@
             }
         } catch (e) { Swal.fire('Lỗi', e.message || 'Lỗi kết nối server', 'error'); }
     });
+
+    window.handleBookingScan = async function (bookingCode) {
+        try {
+            const res = await fetch('/Booking/ScanBookingQr', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bookingCode)
+            });
+            const response = await res.json();
+
+            if (response.success) {
+                const info = response.data;
+
+                Swal.fire({
+                    title: '✅ Thông tin đặt sân',
+                    html: `
+                        <div style="text-align:left; font-size:1.1em; line-height: 1.6;">
+                            <p>👤 <b>Khách:</b> ${info.customerName}</p>
+                            <p>🏟️ <b>Sân:</b> <span class="text-primary fw-bold">${info.pitchName}</span></p>
+                            <p>📅 <b>Ngày:</b> ${info.date}</p>
+                            <p>⏰ <b>Giờ đá:</b> <span class="text-danger fw-bold">${info.time}</span></p>
+                            <hr>
+                            <p class="text-success text-center mb-0"><i class="fas fa-check-circle"></i> Đủ điều kiện nhận sân</p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonText: '✅ Xác nhận & Vào sân',
+                    cancelButtonText: 'Hủy',
+                    confirmButtonColor: '#198754',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        confirmBookingCheckIn(bookingCode);
+                    }
+                });
+
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Không thể nhận sân',
+                    text: response.message,
+                    confirmButtonText: 'Đã hiểu'
+                });
+            }
+        } catch (e) {
+            Swal.fire('Lỗi', 'Không kết nối được server', 'error');
+        }
+    };
+
+    async function confirmBookingCheckIn(code) {
+        try {
+            const res = await fetch('/Booking/ConfirmBookingCheckIn', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(code)
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                Swal.fire('Thành công', 'Check-in hoàn tất!', 'success')
+                    .then(() => {
+                        if (typeof applyFilters === 'function') {
+                            applyFilters();
+                        } else {
+                            location.reload();
+                        }
+                    });
+            } else {
+                Swal.fire('Lỗi', result.message, 'error');
+            }
+        } catch (e) {
+            Swal.fire('Lỗi', 'Lỗi hệ thống', 'error');
+        }
+    }
 });

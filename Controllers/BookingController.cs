@@ -52,9 +52,9 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        // ============================================
-        // API: ĐẶT SÂN (ĐÃ FIX TRẢ VỀ newBalance)
-        // ============================================
+       
+        // APi ĐẶT SÂN 
+        
         [HttpPost]
         public async Task<IActionResult> BookPitch(int pitchId, int slotId, DateTime date)
         {
@@ -66,11 +66,11 @@ namespace SportBookingSystem.Controllers
 
                 if (userIdClaim != null && int.TryParse(userIdClaim.Value, out userId))
                 {
-                    // OK
+                    
                 }
                 else
                 {
-                    userId = 1; // Test mode
+                    userId = 1; 
                 }
 
                 // Gọi Service xử lý (Trừ tiền -> Lưu DB -> Tạo QR)
@@ -78,7 +78,7 @@ namespace SportBookingSystem.Controllers
 
                 if (result.Success)
                 {
-                    // ✅ LẤY SỐ DƯ MỚI SAU KHI ĐẶT SÂN
+                    // LẤY SỐ DƯ MỚI SAU KHI ĐẶT SÂN
                     var user = await _context.Users.FindAsync(userId);
 
                     return Json(new
@@ -98,6 +98,37 @@ namespace SportBookingSystem.Controllers
             catch (Exception ex)
             {
                 return Json(new { success = false, message = "Lỗi Controller: " + ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ScanBookingQr([FromBody] string code)
+        {
+            // API này dùng để: Quét mã -> Kiểm tra giờ -> Trả về thông tin sân để hiện Popup
+            try
+            {
+                var result = await _bookingService.CheckInBookingAsync(code);
+                return Json(new { success = result.Success, message = result.Message, data = result.Data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi server: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmBookingCheckIn([FromBody] string code)
+        {
+            // API này dùng để: Bấm nút "Xác nhận" trên Popup -> Lưu vào DB -> Chốt doanh thu
+            try
+            {
+                var result = await _bookingService.ConfirmCheckInAsync(code);
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
     }

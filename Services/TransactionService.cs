@@ -288,16 +288,24 @@ namespace SportBookingSystem.Services
             if (order == null) return null;
 
             var firstDetail = order.OrderDetails.FirstOrDefault();
+            string statusText = order.Status switch
+            {
+                1 => "Thành công",
+                0 => "Chờ xử lý",
+                -1 => "Đã hủy",
+                _ => "Không xác định"
+            };
 
             return new OrderFulfillmentDTO
             {
                 OrderId = order.OrderId,
                 OrderCode = order.OrderCode,
-                CustomerName = order.User?.FullName ?? order.User?.Username,
-                ProductName = firstDetail?.Product?.ProductName,
+                CustomerName = order.User?.FullName ?? order.User?.Username ?? "Khách vãng lai",
+                ProductName = firstDetail?.Product?.ProductName ?? "N/A",
                 Quantity = firstDetail?.Quantity ?? 0,
                 TotalAmount = order.TotalAmount ?? 0,
-                Status = order.Status.ToString(),
+                Status = statusText,
+                StatusCode = order.Status, 
                 OrderDate = order.OrderDate
             };
         }
@@ -314,21 +322,35 @@ namespace SportBookingSystem.Services
 
                 if (order == null) return (false, "Không tìm thấy đơn hàng");
 
-                var dbTransaction = await _context.Transactions.FirstOrDefaultAsync(t => t.OrderId == orderId);
-                if (dbTransaction == null) return (false, "Không tìm thấy giao dịch liên quan");
+                
+                if (order.Status == 1)
+                {
+                    return (false, "Đơn hàng này đã được xác nhận trước đó.");
+                }
 
-                if (newStatus == TransactionStatus.Success)
+                if (order.Status == -1)
+                {
+                    return (false, "Đơn hàng đã bị hủy, không thể xử lý.");
+                }
+
+                var dbTransaction = await _context.Transactions
+                    .FirstOrDefaultAsync(t => t.OrderId == orderId);
+
+                if (dbTransaction == null)
+                    return (false, "Không tìm thấy giao dịch liên quan");
+
+                if (newStatus == "Thành công")
                 {
                     order.Status = 1;
                     dbTransaction.Status = TransactionStatus.Success;
-                }
-                else if (newStatus == TransactionStatus.Canceled)
-                {
-                    if (dbTransaction.Status == TransactionStatus.Success || dbTransaction.Status == TransactionStatus.Canceled)
-                    {
-                        return (false, "Đơn hàng đã được xử lý trước đó");
-                    }
 
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return (true, "Xác nhận giao hàng thành công!");
+                }
+                else if (newStatus == "Đã hủy")
+                {
                     order.Status = -1;
                     dbTransaction.Status = TransactionStatus.Canceled;
 
@@ -355,6 +377,7 @@ namespace SportBookingSystem.Services
                         refundTrans.TransactionCode = $"{TransactionPrefixes.Refund}-{refundTrans.TransactionId:D4}";
                     }
 
+                
                     foreach (var detail in order.OrderDetails)
                     {
                         var product = await _context.Products.FindAsync(detail.ProductId);
@@ -363,16 +386,19 @@ namespace SportBookingSystem.Services
                             product.StockQuantity += detail.Quantity;
                         }
                     }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return (true, "Đã hủy đơn và hoàn tiền thành công!");
                 }
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return (true, "Cập nhật thành công");
+                return (false, "Trạng thái không hợp lệ");
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return (false, ex.Message);
+                return (false, $"Lỗi: {ex.Message}");
             }
         }
 

@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QRCoder;
+using SportBookingSystem.Constants;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
 using SportBookingSystem.Models.ViewModels;
-using System.Drawing;
-using System.Drawing.Imaging;
 
 namespace SportBookingSystem.Services
 {
@@ -17,56 +16,21 @@ namespace SportBookingSystem.Services
             _context = context;
         }
 
-        // CÁC HÀM LẤY DANH SÁCH SÂN
-
-        public async Task<FilterPitchesResponse> GetAvailablePitchesAsync(
-            DateTime date,
-            List<int>? slotIds,
-            List<int>? categoryIds,
-            List<int>? specificPitchIds,
-            List<int>? capacities)
+        public async Task<FilterPitchesResponse> GetAvailablePitchesAsync(DateTime date, List<int>? slotIds, List<int>? categoryIds, List<int>? specificPitchIds, List<int>? capacities)
         {
-            var allPitches = await _context.Pitches
-                .Include(p => p.Category)
-                .ToListAsync();
-
+            var allPitches = await _context.Pitches.Include(p => p.Category).ToListAsync();
             var priceSettings = await _context.PitchPriceSettings.ToListAsync();
+            var pitches = allPitches.Where(p => p.Status != null && p.Status.Trim() == "Sẵn sàng").ToList();
 
-            var pitches = allPitches
-                .Where(p => p.Status != null && p.Status.Trim() == "Sẵn sàng")
-                .ToList();
+            if (categoryIds != null && categoryIds.Any()) pitches = pitches.Where(p => categoryIds.Contains(p.CategoryId)).ToList();
+            if (specificPitchIds != null && specificPitchIds.Any()) pitches = pitches.Where(p => specificPitchIds.Contains(p.PitchId)).ToList();
+            if (capacities != null && capacities.Any()) pitches = pitches.Where(p => capacities.Contains(p.Capacity)).ToList();
 
-            if (categoryIds != null && categoryIds.Any())
-            {
-                pitches = pitches.Where(p => categoryIds.Contains(p.CategoryId)).ToList();
-            }
-
-            if (specificPitchIds != null && specificPitchIds.Any())
-            {
-                pitches = pitches.Where(p => specificPitchIds.Contains(p.PitchId)).ToList();
-            }
-
-            // Lọc theo sức chứa
-            if (capacities != null && capacities.Any())
-            {
-                pitches = pitches.Where(p => capacities.Contains(p.Capacity)).ToList();
-            }
-
-            var timeSlotsQuery = _context.TimeSlots
-                .Where(ts => ts.IsActive)
-                .OrderBy(ts => ts.StartTime)
-                .AsQueryable();
-
-            if (slotIds != null && slotIds.Any())
-            {
-                timeSlotsQuery = timeSlotsQuery.Where(ts => slotIds.Contains(ts.SlotId));
-            }
+            var timeSlotsQuery = _context.TimeSlots.Where(ts => ts.IsActive).OrderBy(ts => ts.StartTime).AsQueryable();
+            if (slotIds != null && slotIds.Any()) timeSlotsQuery = timeSlotsQuery.Where(ts => slotIds.Contains(ts.SlotId));
 
             var timeSlots = await timeSlotsQuery.ToListAsync();
-
-            var bookedSlots = await _context.PitchSlots
-                .Where(ps => ps.PlayDate.Date == date.Date)
-                .ToListAsync();
+            var bookedSlots = await _context.PitchSlots.Where(ps => ps.PlayDate.Date == date.Date).ToListAsync();
 
             var groupedResult = new List<PitchGroupViewModel>();
 
@@ -91,13 +55,8 @@ namespace SportBookingSystem.Services
                 foreach (var timeSlot in timeSlots)
                 {
                     decimal currentPricePerHour = pitch.PricePerHour;
-                    var specialPrice = currentPitchSettings.FirstOrDefault(s =>
-                        timeSlot.StartTime >= s.StartTime && timeSlot.StartTime < s.EndTime);
-
-                    if (specialPrice != null)
-                    {
-                        currentPricePerHour = specialPrice.Price;
-                    }
+                    var specialPrice = currentPitchSettings.FirstOrDefault(s => timeSlot.StartTime >= s.StartTime && timeSlot.StartTime < s.EndTime);
+                    if (specialPrice != null) currentPricePerHour = specialPrice.Price;
 
                     var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
                     decimal fullPrice = currentPricePerHour * (decimal)duration;
@@ -107,31 +66,23 @@ namespace SportBookingSystem.Services
                     string status = "available";
                     string statusText = "Còn trống";
 
-                    var bookingInfo = bookedSlots.FirstOrDefault(ps =>
-                        ps.PitchId == pitch.PitchId && ps.SlotId == timeSlot.SlotId);
-
-                    if (bookingInfo != null && bookingInfo.Status == 1)
+                    var bookingInfo = bookedSlots.FirstOrDefault(ps => ps.PitchId == pitch.PitchId && ps.SlotId == timeSlot.SlotId);
+                    if (bookingInfo != null && bookingInfo.Status >= 1)
                     {
                         status = "booked";
                         statusText = "Đã đặt";
                         isAvailable = false;
                     }
-                    //xét khi thời gian đã qua 
-                    DateTime slotEndTime = date.Date.Add(timeSlot.EndTime);
 
-                    // So sánh với thời gian hiện tại
-                    if (slotEndTime < DateTime.Now)
+                    DateTime slotEndTime = date.Date.Add(timeSlot.EndTime);
+                    if (slotEndTime < DateTime.Now && status != "booked")
                     {
-                        
-                        if (status != "booked")
-                        {
-                            status = "expired"; 
-                            statusText = "Đã qua";
-                            isAvailable = false; 
-                        }
+                        status = "expired";
+                        statusText = "Đã qua";
+                        isAvailable = false;
                     }
 
-                    var slotModel = new SlotInfoViewModel
+                    pitchGroup.Slots.Add(new SlotInfoViewModel
                     {
                         SlotId = timeSlot.SlotId,
                         SlotName = timeSlot.SlotName,
@@ -141,108 +92,57 @@ namespace SportBookingSystem.Services
                         Status = status,
                         StatusText = statusText,
                         IsAvailable = isAvailable
-                    };
-
-                    pitchGroup.Slots.Add(slotModel);
+                    });
                 }
 
-                if (pitchGroup.Slots.Any())
-                {
-                    groupedResult.Add(pitchGroup);
-                }
+                if (pitchGroup.Slots.Any()) groupedResult.Add(pitchGroup);
             }
 
-            return new FilterPitchesResponse
-            {
-                Pitches = groupedResult,
-                TotalCount = pitches.Count,
-                DisplayCount = groupedResult.Count
-            };
+            return new FilterPitchesResponse { Pitches = groupedResult, TotalCount = pitches.Count, DisplayCount = groupedResult.Count };
         }
 
-        public async Task<FilterPitchesResponse> GetFilteredPitchesAsync(
-            DateTime date,
-            List<int>? slotIds,
-            List<int>? categoryIds,
-            List<int>? specificPitchIds,
-            List<int>? capacities,
-            List<string>? statusFilter)
+        public async Task<FilterPitchesResponse> GetFilteredPitchesAsync(DateTime date, List<int>? slotIds, List<int>? categoryIds, List<int>? specificPitchIds, List<int>? capacities, List<string>? statusFilter)
         {
             var response = await GetAvailablePitchesAsync(date, slotIds, categoryIds, specificPitchIds, capacities);
-
-            if (statusFilter != null && statusFilter.Any())
-            {
-                response.Pitches = response.Pitches
-                    .Where(p => p.Slots.Any(s => statusFilter.Contains(s.Status)))
-                    .ToList();
-            }
-
+            if (statusFilter != null && statusFilter.Any()) response.Pitches = response.Pitches.Where(p => p.Slots.Any(s => statusFilter.Contains(s.Status))).ToList();
             response.DisplayCount = response.Pitches.Count;
             return response;
         }
 
-        public async Task<FilterPitchesResponse> GetFilteredPitchesWithPaginationAsync(
-            DateTime date,
-            List<int>? slotIds,
-            List<int>? categoryIds,
-            List<int>? specificPitchIds,
-            List<int>? capacities,
-            List<string>? statusFilter,
-            int page,
-            int pageSize)
+        public async Task<FilterPitchesResponse> GetFilteredPitchesWithPaginationAsync(DateTime date, List<int>? slotIds, List<int>? categoryIds, List<int>? specificPitchIds, List<int>? capacities, List<string>? statusFilter, int page, int pageSize)
         {
             var response = await GetFilteredPitchesAsync(date, slotIds, categoryIds, specificPitchIds, capacities, statusFilter);
-
             var totalItems = response.Pitches.Count;
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-            response.Pitches = response.Pitches
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-
+            response.Pitches = response.Pitches.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             response.TotalPages = totalPages;
             response.CurrentPage = page;
             response.DisplayCount = response.Pitches.Count;
-
             return response;
         }
-
-        // --- HÀM ĐẶT SÂN DUY NHẤT ---
 
         public async Task<(bool Success, string Message, string? QrBase64, string? BookingCode)> BookPitchAsync(int userId, int pitchId, int slotId, DateTime date)
         {
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-                // 1. Kiểm tra Slot có trống không
-                var slot = await _context.PitchSlots
-                    .FirstOrDefaultAsync(ps => ps.PitchId == pitchId && ps.SlotId == slotId && ps.PlayDate.Date == date.Date);
+                var slot = await _context.PitchSlots.FirstOrDefaultAsync(ps => ps.PitchId == pitchId && ps.SlotId == slotId && ps.PlayDate.Date == date.Date);
+                if (slot != null && slot.Status >= 1) return (false, "Sân này đã có người đặt rồi!", null, null);
 
-                if (slot != null && slot.Status == 1)
-                {
-                    return (false, "Sân này đã có người đặt rồi!", null, null);
-                }
-
-                // 2. Tính tiền
                 var pitch = await _context.Pitches.FindAsync(pitchId);
-                decimal amount = pitch.PricePerHour * 1.5m; 
+                var timeSlot = await _context.TimeSlots.FindAsync(slotId);
+                var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
+                decimal amount = pitch.PricePerHour * (decimal)duration;
 
-                // 3. Kiểm tra ví
                 var user = await _context.Users.FindAsync(userId);
-                if (user.WalletBalance < amount)
-                {
-                    return (false, "Số dư không đủ. Vui lòng nạp thêm!", null, null);
-                }
+                if (user.WalletBalance < amount) return (false, "Số dư không đủ. Vui lòng nạp thêm!", null, null);
 
-                // 4. TRỪ TIỀN VÍ
                 user.WalletBalance -= amount;
                 _context.Users.Update(user);
 
-                // 5. Tạo Mã Booking
-                string bookingCode = $"BKG-{DateTime.Now:yyMMdd}-{Guid.NewGuid().ToString().Substring(0, 4).ToUpper()}";
+                string bookingCode = $"BKG-{DateTime.Now:yyMMddHHmmss}";
 
-                // 6. Cập nhật PitchSlot
                 if (slot == null)
                 {
                     slot = new PitchSlots
@@ -250,36 +150,37 @@ namespace SportBookingSystem.Services
                         PitchId = pitchId,
                         SlotId = slotId,
                         PlayDate = date,
-                        Status = 1,
-                        BookingCode = bookingCode
+                        Status = BookingStatus.PendingConfirm,
+                        BookingCode = bookingCode,
+                        UserId = userId
                     };
                     _context.PitchSlots.Add(slot);
                 }
                 else
                 {
-                    slot.Status = 1;
+                    slot.Status = BookingStatus.PendingConfirm;
                     slot.BookingCode = bookingCode;
+                    slot.UserId = userId;
                     _context.PitchSlots.Update(slot);
                 }
 
-                // 7. Lưu Giao Dịch
                 var trans = new Transactions
                 {
                     UserId = userId,
-                    Amount = -amount, 
-                    TransactionType = "Thanh toán Booking",
-                    Status = "Thành công",
-                    Source = "Ví nội bộ",
+                    Amount = amount,
+                    TransactionType = TransactionTypes.Booking,
+                    Status = TransactionStatus.PendingConfirm,
+                    Source = TransactionSources.Wallet,
                     TransactionDate = DateTime.Now,
                     TransactionCode = bookingCode,
-                    Message = $"Đặt sân {pitch.PitchName} - {date:dd/MM/yyyy}"
+                    Message = $"Đặt sân {pitch.PitchName} - {date:dd/MM/yyyy}",
+                    BalanceAfter = user.WalletBalance
                 };
                 _context.Transactions.Add(trans);
 
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                // 8. Tạo QR
                 string qrContent = $"BOOKING:{bookingCode}";
                 string qrBase64 = GenerateQrCode(qrContent);
 
@@ -292,7 +193,66 @@ namespace SportBookingSystem.Services
             }
         }
 
-        // hàm gen mã qr
+        public async Task<(bool Success, string Message, object? Data)> CheckInBookingAsync(string bookingCode)
+        {
+            var slot = await _context.PitchSlots
+                .Include(p => p.Pitch)
+                .Include(p => p.TimeSlot)
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.BookingCode == bookingCode);
+
+            if (slot == null) return (false, "Mã đặt sân không tồn tại!", null);
+
+            if (slot.Status == BookingStatus.CheckedIn || slot.Status == BookingStatus.Completed)
+            {
+                return (false, $"Vé này đã được sử dụng lúc {slot.UpdatedAt:HH:mm dd/MM}!", null);
+            }
+
+            DateTime matchStartTime = slot.PlayDate.Date.Add(slot.TimeSlot.StartTime);
+            DateTime now = DateTime.Now;
+            DateTime allowedCheckInTime = matchStartTime.AddMinutes(-30);
+
+            if (now < allowedCheckInTime)
+            {
+                var minutesWait = (allowedCheckInTime - now).TotalMinutes;
+                return (false, $"Chưa đến giờ nhận sân! Vui lòng quay lại sau {Math.Ceiling(minutesWait)} phút nữa.", null);
+            }
+
+            DateTime matchEndTime = slot.PlayDate.Date.Add(slot.TimeSlot.EndTime);
+            if (now > matchEndTime.AddMinutes(30))
+            {
+                return (false, "Vé này đã quá hạn sử dụng!", null);
+            }
+
+            return (true, "Mã hợp lệ", new
+            {
+                BookingCode = slot.BookingCode,
+                PitchName = slot.Pitch.PitchName,
+                CustomerName = slot.User?.FullName ?? "Khách vãng lai",
+                Date = slot.PlayDate.ToString("dd/MM/yyyy"),
+                Time = $"{slot.TimeSlot.StartTime:hh\\:mm} - {slot.TimeSlot.EndTime:hh\\:mm}",
+                Status = "Chờ xác nhận"
+            });
+        }
+
+        public async Task<(bool Success, string Message)> ConfirmCheckInAsync(string bookingCode)
+        {
+            var slot = await _context.PitchSlots.FirstOrDefaultAsync(p => p.BookingCode == bookingCode);
+            if (slot == null || slot.Status >= BookingStatus.CheckedIn) return (false, "Lỗi xác nhận");
+
+            slot.Status = BookingStatus.CheckedIn;
+            slot.UpdatedAt = DateTime.Now;
+
+            var trans = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == bookingCode);
+            if (trans != null)
+            {
+                trans.Status = TransactionStatus.Success;
+                _context.Transactions.Update(trans);
+            }
+
+            await _context.SaveChangesAsync();
+            return (true, "Check-in thành công!");
+        }
 
         private string GenerateQrCode(string content)
         {
