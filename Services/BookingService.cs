@@ -17,7 +17,7 @@ namespace SportBookingSystem.Services
             _context = context;
         }
 
-        // --- CÁC HÀM LẤY DANH SÁCH SÂN (GIỮ NGUYÊN) ---
+        // CÁC HÀM LẤY DANH SÁCH SÂN
 
         public async Task<FilterPitchesResponse> GetAvailablePitchesAsync(
             DateTime date,
@@ -116,6 +116,20 @@ namespace SportBookingSystem.Services
                         statusText = "Đã đặt";
                         isAvailable = false;
                     }
+                    //xét khi thời gian đã qua 
+                    DateTime slotEndTime = date.Date.Add(timeSlot.EndTime);
+
+                    // So sánh với thời gian hiện tại
+                    if (slotEndTime < DateTime.Now)
+                    {
+                        
+                        if (status != "booked")
+                        {
+                            status = "expired"; 
+                            statusText = "Đã qua";
+                            isAvailable = false; 
+                        }
+                    }
 
                     var slotModel = new SlotInfoViewModel
                     {
@@ -194,7 +208,7 @@ namespace SportBookingSystem.Services
             return response;
         }
 
-        // --- HÀM ĐẶT SÂN DUY NHẤT (ĐÃ GỘP VÀ SỬA LỖI) ---
+        // --- HÀM ĐẶT SÂN DUY NHẤT ---
 
         public async Task<(bool Success, string Message, string? QrBase64, string? BookingCode)> BookPitchAsync(int userId, int pitchId, int slotId, DateTime date)
         {
@@ -212,7 +226,7 @@ namespace SportBookingSystem.Services
 
                 // 2. Tính tiền
                 var pitch = await _context.Pitches.FindAsync(pitchId);
-                decimal amount = pitch.PricePerHour * 1.5m; // Ví dụ slot 1.5h
+                decimal amount = pitch.PricePerHour * 1.5m; 
 
                 // 3. Kiểm tra ví
                 var user = await _context.Users.FindAsync(userId);
@@ -252,7 +266,7 @@ namespace SportBookingSystem.Services
                 var trans = new Transactions
                 {
                     UserId = userId,
-                    Amount = -amount, // Số âm
+                    Amount = -amount, 
                     TransactionType = "Thanh toán Booking",
                     Status = "Thành công",
                     Source = "Ví nội bộ",
@@ -278,7 +292,8 @@ namespace SportBookingSystem.Services
             }
         }
 
-        // --- HÀM PHỤ TRỢ TẠO QR ---
+        // hàm gen mã qr
+
         private string GenerateQrCode(string content)
         {
             using (QRCodeGenerator qrGenerator = new QRCodeGenerator())

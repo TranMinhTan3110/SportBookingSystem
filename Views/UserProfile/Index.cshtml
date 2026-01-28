@@ -51,7 +51,7 @@
         <div class="profile-wallet">
             <div class="wallet-label">Số dư khả dụng</div>
             <div class="wallet-balances">@Model.User.WalletBalance.ToString("N0")₫</div>
-            <button class="btn-recharge">
+            <button class="btn-recharge" data-bs-toggle="modal" data-bs-target="#topupModal">
                 <i class="fas fa-plus"></i>
                 Nạp thêm tiền
             </button>
@@ -201,7 +201,7 @@
                     <span class="info-label">Số điện thoại</span>
                     <span class="info-value">@Model.User.Phone</span>
                 </div>
-                <!-- Phone usually shouldn't be changed easily if it's login ID -->
+             
                 <button class="btn-change btn-change-phone">
                     <i class="fas fa-pen"></i> Đổi
                 </button>
@@ -319,6 +319,42 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="topupModal" tabindex="-1" aria-labelledby="topupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold" id="topupModalLabel">
+                    <i class="bi bi-plus-circle-fill text-primary me-2"></i>Nạp Tiền Vào Ví
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="topupForm">
+                    <label class="form-label small text-muted mb-3">Chọn số tiền muốn nạp</label>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4"><button type="button" class="btn btn-outline-primary w-100 py-2 btn-amount" data-amount="50000">50K</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-primary w-100 py-2 btn-amount" data-amount="100000">100K</button></div>
+                        <div class="col-4"><button type="button" class="btn btn-outline-primary w-100 py-2 btn-amount" data-amount="200000">200K</button></div>
+                    </div>
+
+                    <input type="number" class="form-control form-control-lg mb-4" id="topupAmount"
+                           placeholder="Hoặc nhập số tiền khác" min="10000" style="border-radius: 12px; background: #f8f9fa;">
+
+                    <label class="form-label small text-muted mb-2">Phương thức thanh toán</label>
+                    <div class="payment-option p-3 mb-4 d-flex align-items-center border rounded-3 active" style="cursor: pointer;">
+                        <input class="form-check-input me-3" type="radio" name="paymentMethod" checked>
+                        <img src="https://vinadesign.vn/uploads/images/2023/05/vnpay-logo-vinadesign-25-12-57-55.jpg" width="30" class="me-2">
+                        <span class="small fw-bold">Cổng thanh toán VNPay</span>
+                    </div>
+
+                    <button type="button" class="btn btn-success w-100 py-3 fw-bold shadow-sm"
+                            onclick="processTopup()" style="border-radius: 12px;">
+                        <i class="bi bi-shield-check me-2"></i>Tiến hành nạp tiền
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 
 @section Scripts {
     <script src="~/js/profile.js"></script>

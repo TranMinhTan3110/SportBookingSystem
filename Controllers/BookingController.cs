@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.ViewModels;
 using SportBookingSystem.Services;
-using System.Security.Claims; // Thêm cái này để sau này lấy User ID thật
+using System.Security.Claims;
 
 namespace SportBookingSystem.Controllers
 {
@@ -25,7 +25,6 @@ namespace SportBookingSystem.Controllers
                 .Where(c => c.Type == "Pitch")
                 .Select(c => new { c.CategoryId, c.CategoryName })
                 .ToListAsync();
-
             return View();
         }
 
@@ -45,7 +44,6 @@ namespace SportBookingSystem.Controllers
                     request.Page,
                     request.PageSize
                 );
-
                 return Json(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -54,26 +52,42 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        // API: Đặt sân (Xử lý thanh toán & Tạo QR)
+        // ============================================
+        // API: ĐẶT SÂN (ĐÃ FIX TRẢ VỀ newBalance)
+        // ============================================
         [HttpPost]
         public async Task<IActionResult> BookPitch(int pitchId, int slotId, DateTime date)
         {
             try
             {
-                // TODO: Sau này bạn thay dòng dưới bằng: int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-                int userId = 1;
+                // Lấy userId từ Claims (hoặc dùng userId = 1 để test)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                int userId;
+
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out userId))
+                {
+                    // OK
+                }
+                else
+                {
+                    userId = 1; // Test mode
+                }
 
                 // Gọi Service xử lý (Trừ tiền -> Lưu DB -> Tạo QR)
                 var result = await _bookingService.BookPitchAsync(userId, pitchId, slotId, date);
 
                 if (result.Success)
                 {
+                    // ✅ LẤY SỐ DƯ MỚI SAU KHI ĐẶT SÂN
+                    var user = await _context.Users.FindAsync(userId);
+
                     return Json(new
                     {
                         success = true,
                         message = result.Message,
-                        qrCode = result.QrBase64,      // Trả về ảnh QR (Base64 string)
-                        bookingCode = result.BookingCode // Trả về mã đặt sân (BKG-...)
+                        qrCode = result.QrBase64,
+                        bookingCode = result.BookingCode,
+                        newBalance = user.WalletBalance  // ← TRẢ VỀ SỐ DƯ MỚI
                     });
                 }
                 else

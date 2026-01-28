@@ -4,10 +4,10 @@
 let currentBookingPage = 1;
 let currentTransactionPage = 1;
 let currentTransferPage = 1;
-const pageSize = 10; // Số bản ghi mỗi trang
+const pageSize = 10;
 
 // ============================================
-// LOAD LỊCH SỬ ĐẶT SÂN
+// LOAD LỊCH SỬ ĐẶT SÂN (TAB 1) - FIXED
 // ============================================
 async function loadBookingHistory(page = 1) {
     try {
@@ -15,9 +15,11 @@ async function loadBookingHistory(page = 1) {
         if (!response.ok) throw new Error('Không thể tải dữ liệu');
 
         const result = await response.json();
+        console.log('📦 Booking API Response:', result); // Debug log
+
         const tbody = document.querySelector('#booking-tbody');
 
-        if (result.data.length === 0) {
+        if (!result.data || result.data.length === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="6" style="text-align: center; padding: 40px;">
@@ -30,34 +32,100 @@ async function loadBookingHistory(page = 1) {
             return;
         }
 
-        tbody.innerHTML = result.data.map(booking => `
+       
+        tbody.innerHTML = result.data.map(booking => {
+          
+
+            // Status
+            const statusClass = booking.status === 1 ? 'success' : 'warning';
+            const statusText = booking.status === 1 ? 'Hoàn thành' : 'Chờ xác nhận';
+
+            // Tổng tiền
+            const priceFormatted = booking.totalPrice
+                ? new Intl.NumberFormat('vi-VN').format(booking.totalPrice) + '₫'
+                : '0₫';
+
+            // Thời gian
+            let timeDisplay = '-';
+            if (booking.timeRange) {
+                timeDisplay = booking.timeRange;
+            } else if (booking.startTime && booking.endTime) {
+                const start = new Date(booking.startTime);
+                const end = new Date(booking.endTime);
+                timeDisplay = `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')} - ${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
+            }
+
+            return `
             <tr>
-                <td>${booking.bookingCode}</td>
+                <td><strong>${booking.bookingCode}</strong></td>
                 <td>
                     <div class="court-info">
                         <span class="court-name">${booking.pitchName}</span>
                         <span class="court-date">${formatDate(booking.bookingDate)}</span>
                     </div>
                 </td>
-                <td>-</td>
-                <td class="price">-</td>
-                <td><span class="badge success">Hoàn thành</span></td>
-                <td><button class="btn-action">Chi tiết</button></td>
+                <td><strong>${timeDisplay}</strong></td>
+                <td class="price" style="font-weight: bold; color: #ef4444;">-${priceFormatted}</td>
+                <td><span class="badge ${statusClass}">${statusText}</span></td>
+                <td>
+                    ${booking.checkInCode ?
+                    `<button class="btn-action btn-qr" data-code="${booking.checkInCode}" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-qrcode"></i> Xem QR
+                        </button>`
+                    : '<span class="text-muted" style="font-size: 13px;">Không có mã</span>'
+                }
+                </td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
 
-        // Render phân trang
+        // Gắn sự kiện cho nút QR
+        document.querySelectorAll('.btn-qr').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const code = this.dataset.code;
+                showBookingQR(code);
+            });
+        });
+
         renderPagination('booking-pagination', result.currentPage, result.totalPages, loadBookingHistory);
         currentBookingPage = page;
 
     } catch (error) {
-        console.error('Lỗi:', error);
+        console.error('❌ Lỗi load booking:', error);
     }
 }
 
-// ============================================
-// LOAD LỊCH SỬ GIAO DỊCH
-// ============================================
+// Hiển thị QR cho booking
+function showBookingQR(checkInCode) {
+    fetch(`/UserProfile/GenerateBookingQr?checkInCode=${checkInCode}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Mã Check-in Đặt Sân',
+                    html: `
+                        <div style="text-align: center;">
+                            <p style="color: #64748b; margin-bottom: 10px;">Mã: <strong>${checkInCode}</strong></p>
+                            <div style="background: #fff; padding: 10px; display: inline-block; border: 1px dashed #ccc; border-radius: 8px;">
+                                <img src="data:image/png;base64,${data.qrCode}" alt="QR Code" style="width: 250px; height: 250px;">
+                            </div>
+                            <div class="alert alert-info mt-3" style="font-size: 13px; text-align: left;">
+                                <i class="fas fa-info-circle"></i> Vui lòng đưa mã này cho nhân viên tại sân.
+                            </div>
+                        </div>
+                    `,
+                    icon: 'success',
+                    confirmButtonText: 'Đóng',
+                    confirmButtonColor: '#10b981'
+                });
+            }
+        })
+        .catch(err => console.error('❌ Lỗi tạo QR:', err));
+}
+
+
+// load lịch sử giao dịch 
+
 async function loadTransactionHistory(page = 1) {
     try {
         const response = await fetch(`/api/transaction/history?page=${page}&pageSize=${pageSize}`);
@@ -66,7 +134,7 @@ async function loadTransactionHistory(page = 1) {
         const result = await response.json();
         const tbody = document.querySelector('#transaction-tbody');
 
-        if (result.data.length === 0) {
+        if (!result.data || result.data.length === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="5" style="text-align: center; padding: 40px;">
@@ -81,14 +149,7 @@ async function loadTransactionHistory(page = 1) {
 
         tbody.innerHTML = result.data.map(trans => {
             const statusClass = trans.status === 'Thành công' ? 'success' : 'warning';
-
-            // Xử lý hiển thị tiền:
-            // Nếu là tích cực (+) -> Màu xanh, có dấu +
-            // Nếu là tiêu cực (-) -> Màu đỏ, có dấu - (Amount trong DB đã lưu số âm rồi thì cứ hiển thị, hoặc format lại)
             const amountClass = trans.isPositive ? 'positive' : 'negative';
-            const sign = trans.isPositive ? '+' : ''; // Thêm dấu + nếu là dương, âm thì nó tự có dấu - từ DB rồi
-
-            // Format số tiền đẹp (ví dụ: -300,000đ)
             const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(trans.amount);
 
             return `
@@ -113,13 +174,11 @@ async function loadTransactionHistory(page = 1) {
         currentTransactionPage = page;
 
     } catch (error) {
-        console.error('Lỗi:', error);
+        console.error('❌ Lỗi load transaction:', error);
     }
 }
 
-// ============================================
-// LOAD LỊCH SỬ CHUYỂN TIỀN
-// ============================================
+// load lịch sử chuyển tiền
 async function loadTransferHistory(page = 1) {
     try {
         const response = await fetch(`/api/transaction/transfers?page=${page}&pageSize=${pageSize}`);
@@ -128,7 +187,7 @@ async function loadTransferHistory(page = 1) {
         const result = await response.json();
         const tbody = document.getElementById('transfer-tbody');
 
-        if (result.data.length === 0) {
+        if (!result.data || result.data.length === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align:center; padding:40px;">
@@ -140,23 +199,31 @@ async function loadTransferHistory(page = 1) {
             return;
         }
 
-        tbody.innerHTML = result.data.map(t => `
+        tbody.innerHTML = result.data.map(t => {
+            const amountClass = t.isSender ? 'negative' : 'positive';
+            const formattedAmount = new Intl.NumberFormat('vi-VN').format(t.amount) + '₫';
+            const amountDisplay = t.isSender ? `-${formattedAmount}` : `+${formattedAmount}`;
+
+            return `
             <tr>
                 <td>${t.transactionCode}</td>
                 <td>${t.senderName}</td>
                 <td>${t.receiverName}</td>
                 <td>${formatDateTime(t.date)}</td>
-                <td class="amount ${t.amountClass}">${t.amountDisplay}</td>
+                <td class="amount ${amountClass}" style="font-weight: bold; color: ${t.isSender ? '#ef4444' : '#10b981'}">
+                    ${amountDisplay}
+                </td>
                 <td>${t.message || '-'}</td>
                 <td><span class="badge ${t.status === 'Thành công' ? 'success' : 'warning'}">${t.status}</span></td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
 
         renderPagination('transfer-pagination', result.currentPage, result.totalPages, loadTransferHistory);
         currentTransferPage = page;
 
     } catch (error) {
-        console.error('Lỗi:', error);
+        console.error('❌ Lỗi load transfer:', error);
     }
 }
 
@@ -166,7 +233,6 @@ async function loadTransferHistory(page = 1) {
 function renderPagination(containerId, currentPage, totalPages, loadFunction) {
     const container = document.getElementById(containerId);
 
-    // Nếu không có dữ liệu (0 trang) thì ẩn phân trang
     if (totalPages < 1) {
         container.innerHTML = '';
         return;
@@ -174,33 +240,27 @@ function renderPagination(containerId, currentPage, totalPages, loadFunction) {
 
     let html = '<div class="pagination">';
 
-    // Nút Previous (chỉ hiện khi trang > 1)
     if (currentPage > 1) {
         html += `<button class="page-btn" onclick="${loadFunction.name}(${currentPage - 1})">‹</button>`;
     }
 
-    // Tính toán dải trang hiển thị (tối đa 5 trang xung quanh trang hiện tại)
     const startPage = Math.max(1, currentPage - 2);
     const endPage = Math.min(totalPages, currentPage + 2);
 
-    // Trang đầu tiên và dấu ...
     if (startPage > 1) {
         html += `<button class="page-btn" onclick="${loadFunction.name}(1)">1</button>`;
         if (startPage > 2) html += '<span class="page-dots">...</span>';
     }
 
-    // Vòng lặp các trang ở giữa
     for (let i = startPage; i <= endPage; i++) {
         html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="${loadFunction.name}(${i})">${i}</button>`;
     }
 
-    // Trang cuối cùng và dấu ...
     if (endPage < totalPages) {
         if (endPage < totalPages - 1) html += '<span class="page-dots">...</span>';
         html += `<button class="page-btn" onclick="${loadFunction.name}(${totalPages})">${totalPages}</button>`;
     }
 
-    // Nút Next (chỉ hiện khi chưa đến trang cuối)
     if (currentPage < totalPages) {
         html += `<button class="page-btn" onclick="${loadFunction.name}(${currentPage + 1})">›</button>`;
     }
@@ -237,19 +297,17 @@ function formatDateTime(dateString) {
 }
 
 // ============================================
-// KHỞI TẠO
+// KHỞI TẠO - MẶC ĐỊNH LOAD TAB ĐẶT SÂN
 // ============================================
 document.addEventListener('DOMContentLoaded', function () {
-    // Mặc định load tab Lịch sử Giao dịch
-    // 1. Ẩn các tab khác, hiện tab transaction
+    console.log('✅ History.js loaded');
+
+    // Mặc định hiển thị tab Đặt sân
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.getElementById('transaction-history').classList.add('active');
+    document.getElementById('booking-history').classList.add('active');
 
-    // 2. Set active cho nút tab tương ứng
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    // Giả sử nút thứ 2 là nút Lịch sử Giao dịch (index 1)
-    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
 
-    // 3. Load dữ liệu
-    loadTransactionHistory(1);
+    loadBookingHistory(1);
 });

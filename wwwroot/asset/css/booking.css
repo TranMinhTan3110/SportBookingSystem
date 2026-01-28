@@ -8,7 +8,7 @@
 }
 
 .filter-sidebar {
-    position: sticky;
+
     top: 100px;
     height: fit-content;
 }
@@ -863,7 +863,13 @@
         text-decoration: line-through;
         color: #94a3b8;
     }
-/* --- CODE CŨ GIỮ NGUYÊN (Layout chung) --- */
+.slot-modal.expired {
+    background-color: #f3f4f6; 
+    color: #9ca3af; 
+    border: 1px solid #e5e7eb;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
 .main-container {
     max-width: 1400px;
     margin: 0 auto;

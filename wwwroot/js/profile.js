@@ -3,12 +3,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const rechargeBtn = document.querySelector('.btn-recharge');
-    if (rechargeBtn) {
-        rechargeBtn.addEventListener('click', function () {
-
-            alert('Chức năng nạp tiền đang được phát triển');
-        });
-    }
+   
     const checkinBtn = document.querySelector('.btn-checkin');
     const checkInQrModal = document.getElementById('checkInQrModal');
 

@@ -6,6 +6,8 @@ const bookingModalElement = document.getElementById('bookingModal');
 const bookingModal = bookingModalElement ? new bootstrap.Modal(bookingModalElement) : null;
 
 document.addEventListener('DOMContentLoaded', function () {
+    console.log(' booking.js loaded');
+
     const modalDateInput = document.getElementById('modalBookingDate');
     if (modalDateInput) {
         modalDateInput.value = today;
@@ -167,12 +169,26 @@ function renderModalSlots(slots, pitchId, pitchName) {
     }
 
     const html = slots.map(slot => {
+        // 1. Kiểm tra các trạng thái từ Server trả về
         const isBooked = slot.status === 'booked';
-        const btnClass = isBooked ? 'slot-modal booked' : 'slot-modal available';
+        const isExpired = slot.status === 'expired'; // Server trả về "expired" khi hết giờ
+
+        // 2. Xác định class CSS
+        let btnClass = 'slot-modal available'; // Mặc định là xanh
+        if (isBooked) {
+            btnClass = 'slot-modal booked';    // Màu xám đậm / đỏ
+        } else if (isExpired) {
+            btnClass = 'slot-modal expired';   // Màu xám nhạt (Mới)
+        }
+
+        // 3. Xác định trạng thái Disable (Không cho bấm)
+        // Nếu đã đặt HOẶC hết giờ thì disable
+        const isDisabled = isBooked || isExpired;
+
         const price = new Intl.NumberFormat('vi-VN').format(slot.fullPrice);
 
         return `
-            <button class="${btnClass}" ${isBooked ? 'disabled' : ''}
+            <button class="${btnClass}" ${isDisabled ? 'disabled' : ''}
                     onclick="confirmBooking(${pitchId}, ${slot.slotId}, '${pitchName}', '${slot.timeRange}', ${slot.fullPrice}, ${slot.depositPrice})">
                 <span class="time">${slot.timeRange}</span>
                 <span class="price">${price}đ</span>
@@ -184,12 +200,11 @@ function renderModalSlots(slots, pitchId, pitchName) {
     container.innerHTML = html;
 }
 
-// --- HÀM XỬ LÝ ĐẶT SÂN & HIỂN THỊ QR ---
+//hàm dặt sân
 window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPrice, depositPrice) {
     const dateSelected = document.getElementById('modalBookingDate').value;
     const fullPriceFmt = new Intl.NumberFormat('vi-VN').format(fullPrice);
 
-    // Ẩn modal chọn giờ để hiện Swal
     if (bookingModal) bookingModal.hide();
 
     if (typeof Swal === 'undefined') {
@@ -216,7 +231,6 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
         cancelButtonColor: '#6b7280'
     }).then(async (res) => {
         if (res.isConfirmed) {
-            // Show loading
             Swal.fire({
                 title: 'Đang xử lý...',
                 text: 'Vui lòng chờ trong giây lát',
@@ -230,13 +244,26 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                 formData.append('slotId', slotId);
                 formData.append('date', dateSelected);
 
+                console.log(' Đang gửi request đặt sân...');
+
                 const response = await fetch('/Booking/BookPitch', { method: 'POST', body: formData });
                 const data = await response.json();
 
+                console.log(' Response từ server:', data);
+
                 if (data.success) {
-                    // --- HIỂN THỊ POPUP THÀNH CÔNG KÈM QR ---
+                    console.log(' Số dư mới:', data.newBalance);
+
+                    //  CẬP NHẬT SỐ DƯ VÍ NGAY LẬP TỨC
+                    if (data.newBalance !== undefined) {
+                        console.log(' Đang cập nhật số dư ví...');
+                        updateWalletBalance(data.newBalance);
+                    } else {
+                        console.warn(' Server không trả về newBalance!');
+                    }
+
                     await Swal.fire({
-                        title: '🎉 Đặt sân thành công!',
+                        title: ' Đặt sân thành công!',
                         html: `
                             <div style="text-align: center;">
                                 <p style="color: #64748b; margin-bottom: 10px;">Mã đặt sân: <strong>${data.bookingCode}</strong></p>
@@ -247,8 +274,8 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
 
                                 <div class="alert alert-info mt-3" style="font-size: 13px; text-align: left;">
                                     <i class="fas fa-info-circle"></i> <strong>Hướng dẫn:</strong><br>
-                                    - Vui lòng đưa mã này cho nhân viên để nhận sân.<br>
-                                    - Bạn có thể xem lại mã này trong phần <b>Lịch sử</b>.
+                                    - Vui lòng đưa mã này cho nhân viên tại sân để nhận sân.<br>
+                                    - Bạn có thể xem lại mã này trong phần <b>Lịch sử > Đặt sân</b>.
                                 </div>
                             </div>
                         `,
@@ -258,7 +285,6 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                         allowOutsideClick: false
                     });
 
-                    // Load lại lịch để cập nhật trạng thái ô vừa đặt
                     if (bookingModal) {
                         bookingModal.show();
                         loadSlotsForModal(pitchId, dateSelected);
@@ -274,12 +300,49 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                     });
                 }
             } catch (e) {
+                console.error(' Lỗi:', e);
                 Swal.fire('Lỗi', 'Lỗi hệ thống.', 'error');
                 if (bookingModal) bookingModal.show();
             }
         } else {
-            // Nếu bấm Hủy thì hiện lại modal chọn giờ
             if (bookingModal) bookingModal.show();
         }
     });
+}
+
+//hàm cập nhật số dư
+
+function updateWalletBalance(newBalance) {
+    console.log(' updateWalletBalance được gọi với số dư:', newBalance);
+
+    // --- THÊM DÒNG NÀY ĐỂ SỬA LỖI ---
+    // Chọn tất cả các phần tử hiển thị số dư (bạn kiểm tra lại class trong HTML của bạn là gì nhé, thường là .wallet-balance)
+    const walletElements = document.querySelectorAll('.wallet-balance');
+    // --------------------------------
+
+    if (walletElements.length > 0) {
+        walletElements.forEach((el) => {
+            el.textContent = new Intl.NumberFormat('vi-VN').format(newBalance) + '₫';
+
+            // Hiệu ứng nhấp nháy
+            el.style.transition = 'all 0.3s ease';
+            el.style.color = '#10b981';
+            el.style.fontWeight = 'bold';
+            setTimeout(() => {
+                el.style.color = '';
+                el.style.fontWeight = '';
+            }, 1500);
+        });
+    }
+
+
+    const headerWallet = document.querySelector('.wallet-balances');
+    if (headerWallet) {
+        headerWallet.textContent = new Intl.NumberFormat('vi-VN').format(newBalance) + '₫';
+    }
+
+    const navWallet = document.querySelector('.navbar .wallet-balance');
+    if (navWallet) {
+        navWallet.textContent = new Intl.NumberFormat('vi-VN').format(newBalance) + '₫';
+    }
 }

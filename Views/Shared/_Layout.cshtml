@@ -91,7 +91,7 @@
                 @if (User.Identity.IsAuthenticated && currentUser != null)
                 {
                     <!-- Wallet Balance -->
-                    <div class="wallet-balance" onclick="window.location.href='@Url.Action("Index", "Wallet")'">
+                    <div class="wallet-balance" data-wallet-balance onclick="window.location.href='@Url.Action("Index", "Wallet")'">
                         <i class="bi bi-wallet-fill"></i> <span>@currentUser.WalletBalance.ToString("N0")₫</span>
                     </div>
 
