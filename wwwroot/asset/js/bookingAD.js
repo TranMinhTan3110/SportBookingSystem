@@ -230,7 +230,7 @@
     });
 
     // --- LOGIC QUẢN LÝ KHUNG GIỜ (TIME SLOT) ---
-    // Khởi tạo Modal khi DOM đã load
+
     const timeSlotModalElement = document.getElementById('manageTimeSlotModal');
     if (timeSlotModalElement) {
         window.timeSlotModal = new bootstrap.Modal(timeSlotModalElement);
@@ -256,7 +256,7 @@
                 });
                 Toast.fire({ icon: 'success', title: 'Đã thêm khung giờ' });
 
-                // Reset form & reload list
+                //reset
                 this.reset();
                 loadTimeSlots();
             } else {
@@ -268,9 +268,9 @@
     });
 });
 
-// --- GLOBAL FUNCTIONS (Functions called from HTML onclick) ---
 
-// Hàm Load danh sách giá (API)
+
+// Hàm Load danh sách giá 
 async function loadPitchPrices(pitchId) {
     const tbody = document.getElementById('priceTableBody');
     tbody.innerHTML = '<tr><td colspan="4" class="text-center">Đang tải...</td></tr>';
@@ -301,7 +301,7 @@ async function loadPitchPrices(pitchId) {
     }
 }
 
-// Hàm Xóa Giá (Global)
+// Hàm Xóa Giá
 window.deletePrice = async function (id) {
     const confirmResult = await Swal.fire({
         title: 'Xóa khung giờ này?',
@@ -346,13 +346,13 @@ window.deletePrice = async function (id) {
     }
 };
 
-// 1. Mở Modal & Load dữ liệu (Global Function)
+// 1. Mở Modal & Load dữ liệu
 window.openTimeSlotModal = function () {
     if (window.timeSlotModal) {
         window.timeSlotModal.show();
         loadTimeSlots();
     } else {
-        // Fallback incase initialization failed or DOM wasn't ready earlier
+      
         const el = document.getElementById('manageTimeSlotModal');
         if (el) {
             window.timeSlotModal = new bootstrap.Modal(el);
@@ -364,7 +364,7 @@ window.openTimeSlotModal = function () {
     }
 }
 
-// 2. Load danh sách từ API (Global Helper)
+// 2. Load danh sách từ API 
 async function loadTimeSlots() {
     const tbody = document.getElementById('timeSlotTableBody');
     if (!tbody) return;
@@ -399,7 +399,7 @@ async function loadTimeSlots() {
     }
 }
 
-// 4. Xử lý Xóa Time Slot (Global Function)
+// 4. Xử lý Xóa Time Slot 
 window.deleteTimeSlot = async function (id) {
     if (!confirm('Bạn có chắc muốn xóa khung giờ này không?')) return;
 

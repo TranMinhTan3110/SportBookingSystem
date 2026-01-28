@@ -15,16 +15,15 @@ namespace SportBookingSystem.Services
             _context = context;
         }
 
-        // ============================================
-        // GIAO DỊCH CHUNG (LOẠI TRỪ BOOKING & TRANSFER)
-        // ============================================
+        //giao dịch chung
+
         public async Task<(List<UserTransactionDTO> Data, int TotalRecords)> LoadUserTransactionAsync(int userId, int page, int pageSize)
         {
             var query = _context.Transactions
                 .Where(t => t.UserId == userId
                     && t.TransactionType != "Chuyển tiền"
                     && t.TransactionType != "Nhận tiền"
-                    && t.TransactionType != "Thanh toán Booking"  // ← FIX: LOẠI TRỪ BOOKING
+                    && t.TransactionType != "Thanh toán Booking" 
                 )
                 .OrderByDescending(t => t.TransactionDate);
 
