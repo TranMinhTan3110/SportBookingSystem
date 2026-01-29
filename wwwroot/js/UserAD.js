@@ -1,4 +1,4 @@
-﻿let allUsersData = []; // Biến lưu trữ danh sách gốc từ server
+﻿let allUsersData = [];
 async function loadAllUser() {
     try {
         const [countRes, userRes] = await Promise.all([
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('searchInput').addEventListener('input', applyFilters);
 });
 
-    // Xử lý sự kiện tìm kiếm (Search)
+    // Xử lý sự kiện tìm kiếm
     document.getElementById('searchInput').addEventListener('input', function () {
         const keyword = this.value.toLowerCase();
         const filtered = allUsersData.filter(u =>
@@ -168,8 +168,3 @@ function applyFilters() {
 
     renderUserTable(filtered);
 }
-
-
-
-
-

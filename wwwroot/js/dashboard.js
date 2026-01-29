@@ -3,7 +3,7 @@
     const ctx = document.getElementById('revenueChart');
 
     if (!ctx) {
-        console.log('⚠️ Chart canvas not found');
+        console.log('Chart canvas not found');
         return;
     }
 
@@ -124,5 +124,5 @@
 
     const chart = new Chart(ctx, config);
 
-    console.log('📊 Chart.js loaded successfully!');
+    console.log('Chart.js loaded successfully!');
 });

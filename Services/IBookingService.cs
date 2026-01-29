@@ -4,7 +4,6 @@ namespace SportBookingSystem.Services
 {
     public interface IBookingService
     {
-        // Các hàm lọc sân cũ (giữ nguyên)
         Task<FilterPitchesResponse> GetAvailablePitchesAsync(
             DateTime date,
             List<int>? slotIds,

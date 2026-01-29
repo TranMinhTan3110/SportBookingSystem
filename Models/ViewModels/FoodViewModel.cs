@@ -1,8 +1,6 @@
 ﻿namespace SportBookingSystem.Models.ViewModels
 {
-    /// <summary>
     /// ViewModel cho trang hiển thị sản phẩm đồ ăn
-    /// </summary>
     public class FoodIndexViewModel
     {
         // Danh sách danh mục để hiển thị trong bộ lọc
@@ -11,13 +9,11 @@
         // Danh sách sản phẩm ban đầu
         public List<ProductViewModelUser> Products { get; set; } = new();
 
-        // Tổng số sản phẩm (để hiển thị "Hiển thị X/Y sản phẩm")
+        // Tổng số sản phẩm 
         public int TotalProducts { get; set; }
     }
 
-    /// <summary>
-    /// ViewModel cho danh mục (dùng trong bộ lọc)
-    /// </summary>
+    /// ViewModel cho danh mục
     public class CategoryFilterViewModel
     {
         public int CategoryId { get; set; }
@@ -25,9 +21,7 @@
         public int ProductCount { get; set; } // Số lượng sản phẩm trong danh mục
     }
 
-    /// <summary>
-    /// ViewModel cho sản phẩm (dùng để hiển thị trong grid)
-    /// </summary>
+    /// ViewModel cho sản phẩm
     public class ProductViewModelUser
     {
         public int ProductId { get; set; }
@@ -44,12 +38,10 @@
         public bool IsAvailable => StockQuantity > 0;
     }
 
-    /// <summary>
     /// Request model cho API lọc sản phẩm
-    /// </summary>
     public class FilterProductRequest
     {
-        // Danh sách ID danh mục được chọn (có thể null nếu không lọc)
+        // Danh sách ID danh mục được chọn 
         public List<int>? CategoryIds { get; set; }
 
         // Khoảng giá tối thiểu
@@ -62,9 +54,7 @@
         public string SortBy { get; set; } = "default";
     }
 
-    /// <summary>
     /// Response model cho API lọc sản phẩm
-    /// </summary>
     public class FilterProductResponse
     {
         public List<ProductViewModelUser> Products { get; set; } = new();

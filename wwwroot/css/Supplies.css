@@ -5,7 +5,6 @@
 
 .banner {
     background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url('/img/Supplies_BG.jpg');
-    /* Hãy đảm bảo đường dẫn ảnh đúng */
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -97,9 +96,6 @@
     }
 }
 
-/* ============================================
-   FILTER SIDEBAR (BỘ LỌC)
-   ============================================ */
 .filter-sidebar {
     background: white;
     border-radius: 12px;
@@ -202,9 +198,6 @@
     border-color: #9ca3af;
 }
 
-/* ============================================
-   PRODUCTS SECTION (DANH SÁCH SẢN PHẨM)
-   ============================================ */
 .products-section {
     padding: 0 15px;
 }
@@ -238,7 +231,6 @@
     font-size: 0.95rem;
 }
 
-/* Product Grid */
 .products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -317,9 +309,6 @@
     margin-top: auto;
 }
 
-
-
-/* Tablet & Smaller Desktop */
 @media (max-width: 992px) {
     .filter-sidebar {
         position: static;
@@ -327,7 +316,6 @@
     }
 }
 
-/* Mobile */
 @media (max-width: 768px) {
     .breadcrumb {
         font-size: 0.875rem;
@@ -343,7 +331,6 @@
         font-size: 1rem;
     }
 
-    /* Products Grid Responsive */
     .products-grid {
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
         gap: 16px;

@@ -13,7 +13,6 @@ namespace SportBookingSystem.Controllers
             _foodADService = foodADService;
         }
 
-        // GET: FoodAD/Index
         public async Task<IActionResult> Index(string searchTerm = null, int? categoryId = null, string stockFilter = null)
         {
             var products = await _foodADService.GetAllProductsAsync(searchTerm, categoryId, stockFilter);
@@ -27,7 +26,6 @@ namespace SportBookingSystem.Controllers
             return View(products);
         }
 
-        // POST: FoodAD/Create (API)
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductCreateEditViewModel model)
         {
@@ -46,7 +44,6 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi thêm sản phẩm!" });
         }
 
-        // GET: FoodAD/GetProduct/{id} (API)
         [HttpGet]
         public async Task<IActionResult> GetProduct(int id)
         {
@@ -73,7 +70,6 @@ namespace SportBookingSystem.Controllers
             });
         }
 
-        // POST: FoodAD/Update (API)
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] ProductCreateEditViewModel model)
         {
@@ -92,7 +88,6 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật sản phẩm!" });
         }
 
-        // POST: FoodAD/ToggleStatus/{id} (API) - Thay thế Delete
         [HttpPost]
         public async Task<IActionResult> ToggleStatus(int id)
         {
@@ -114,7 +109,6 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi thay đổi trạng thái!" });
         }
 
-        // POST: FoodAD/AddStock (API)
         [HttpPost]
         public async Task<IActionResult> AddStock([FromBody] AddStockViewModel model)
         {
@@ -139,7 +133,6 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật số lượng!" });
         }
 
-        // POST: FoodAD/UploadImage
         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile imageFile)
         {
@@ -149,8 +142,7 @@ namespace SportBookingSystem.Controllers
                 {
                     return Json(new { success = false, message = "Không có file được chọn!" });
                 }
-
-                // Validate file type
+e
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 var extension = Path.GetExtension(imageFile.FileName).ToLower();
 
@@ -159,30 +151,25 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Chỉ chấp nhận file hình ảnh (jpg, jpeg, png, gif, webp)!" });
                 }
 
-                // Validate file size (max 5MB)
                 if (imageFile.Length > 5 * 1024 * 1024)
                 {
                     return Json(new { success = false, message = "Kích thước file không được vượt quá 5MB!" });
                 }
 
-                // Create upload directory if not exists
                 var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "products");
                 if (!Directory.Exists(uploadFolder))
                 {
                     Directory.CreateDirectory(uploadFolder);
                 }
 
-                // Generate unique filename
                 var fileName = $"{Guid.NewGuid()}{extension}";
                 var filePath = Path.Combine(uploadFolder, fileName);
 
-                // Save file
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     await imageFile.CopyToAsync(stream);
                 }
 
-                // Return URL
                 var imageUrl = $"/uploads/products/{fileName}";
                 return Json(new { success = true, url = imageUrl });
             }
@@ -193,7 +180,6 @@ namespace SportBookingSystem.Controllers
         }
     }
 
-    // ViewModel cho AddStock
     public class AddStockViewModel
     {
         public int ProductId { get; set; }

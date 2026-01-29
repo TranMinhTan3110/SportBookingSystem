@@ -19,7 +19,6 @@ namespace SportBookingSystem.Services
         {
             try
             {
-                // Chuẩn hóa thời gian: fromDate 00:00:00, toDate 23:59:59
                 fromDate = fromDate.Date;
                 toDate = toDate.Date.AddDays(1).AddTicks(-1);
 

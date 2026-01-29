@@ -1,10 +1,8 @@
-﻿/* Dashboard Container */
-.dashboard-container {
+﻿.dashboard-container {
     width: 100%;
     max-width: 100%;
 }
 
-/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -121,7 +119,6 @@
     font-weight: 500;
 }
 
-/* Content Grid */
 .content-grid {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -130,7 +127,6 @@
     animation: fadeInUp 0.6s ease 0.4s backwards;
 }
 
-/* Card Styles */
 .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -200,7 +196,6 @@
     height: 100% !important;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .chartjs-container {
         height: 280px;
@@ -215,7 +210,6 @@
     }
 }
 
-/* Activity List */
 .activity-list {
     display: flex;
     flex-direction: column;
@@ -283,7 +277,6 @@
     color: var(--text-secondary);
 }
 
-/* Bookings List */
 .bookings-card {
     margin-bottom: 32px;
     animation: fadeInUp 0.6s ease 0.5s backwards;
@@ -381,7 +374,6 @@
     color: #3B82F6;
 }
 
-/* Bottom Grid */
 .bottom-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -389,7 +381,6 @@
     animation: fadeInUp 0.6s ease 0.6s backwards;
 }
 
-/* Top Fields */
 .top-fields-list {
     display: flex;
     flex-direction: column;
@@ -464,7 +455,6 @@
     flex-shrink: 0;
 }
 
-/* Quick Actions */
 .quick-actions {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -546,7 +536,6 @@
         gap: 20px;
     }
 
-    /* Chart Tablet */
     .chart-container {
         height: 300px;
         padding: 18px;
@@ -587,7 +576,6 @@
         padding: 0;
     }
 
-    /* Stats Grid */
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -606,7 +594,6 @@
         font-size: 13px;
     }
 
-    /* Content Grid */
     .content-grid {
         grid-template-columns: 1fr;
         gap: 16px;
@@ -634,7 +621,6 @@
         padding: 10px 16px;
     }
 
-    /* Chart Mobile */
     .chart-container {
         height: 280px;
         padding: 16px;
@@ -668,7 +654,6 @@
         max-width: 50px;
     }
 
-    /* Activity List */
     .activity-item {
         padding: 12px;
         gap: 12px;
@@ -688,7 +673,6 @@
         font-size: 11px;
     }
 
-    /* Bookings */
     .bookings-card {
         margin-bottom: 24px;
     }
@@ -726,13 +710,11 @@
         margin-top: 8px;
     }
 
-    /* Bottom Grid */
     .bottom-grid {
         grid-template-columns: 1fr;
         gap: 16px;
     }
 
-    /* Top Fields */
     .field-item {
         padding: 14px;
         gap: 12px;
@@ -756,7 +738,6 @@
         font-size: 14px;
     }
 
-    /* Quick Actions */
     .quick-actions {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -801,7 +782,6 @@
         font-size: 18px;
     }
 
-    /* Chart Small Mobile */
     .chart-container {
         height: 260px;
         padding: 14px;

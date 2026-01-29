@@ -1,10 +1,4 @@
-﻿/* ==========================================
-   SPORTS BOOKING AUTHENTICATION STYLES
-   Modern Glassmorphism Design
-   ========================================== */
-
-/* ========== CSS VARIABLES ========== */
-:root {
+﻿:root {
     --primary-green: #28a745;
     --neon-green: #00ff88;
     --dark-navy: #0a1929;
@@ -17,7 +11,6 @@
     --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
-/* ========== GLOBAL STYLES ========== */
 * {
     margin: 0;
     padding: 0;
@@ -29,18 +22,15 @@ body {
     overflow-x: hidden;
 }
 
-/* ========== BACKGROUND SETUP ========== */
 .auth-container {
     position: relative;
     min-height: 100vh;
     background-image: url("https://images.unsplash.com/photo-1489944440615-453fc2b6a9a9?q=80&w=2000");
-    /* background-color: #0a1929; */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-    /* Dark Overlay */
     .auth-container::before {
         content: "";
         position: absolute;
@@ -53,13 +43,11 @@ body {
         z-index: 1;
     }
 
-    /* Container positioning */
     .auth-container > .container {
         position: relative;
         z-index: 2;
     }
 
-/* ========== BRAND / LOGO ========== */
 .brand-logo {
     width: 80px;
     height: 80px;
@@ -102,7 +90,6 @@ body {
     font-weight: 400;
 }
 
-/* ========== GLASSMORPHISM CARD ========== */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
@@ -130,7 +117,6 @@ body {
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
 }
 
-/* ========== FORM ELEMENTS ========== */
 .form-title {
     color: var(--text-primary);
     font-weight: 700;
@@ -146,7 +132,6 @@ body {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* Input Group Styling */
 .input-group {
     position: relative;
 }
@@ -187,7 +172,6 @@ body {
         color: var(--text-primary) !important;
     }
 
-/* ========== CHECKBOX & LINKS ========== */
 .form-check-input {
     background-color: var(--input-bg);
     border: 1px solid var(--glass-border);
@@ -218,7 +202,6 @@ body {
 
     .link-primary:hover {
         color: var(--primary-green) !important;
-        /* text-decoration: underline; */
     }
 
 .link-success {
@@ -242,7 +225,6 @@ body {
         color: var(--text-primary) !important;
     }
 
-/* ========== BUTTONS ========== */
 .btn-primary-custom {
     background: linear-gradient(140deg, var(--primary-green), var(--neon-green));
     border: none;
@@ -258,7 +240,6 @@ body {
     position: relative;
     overflow: hidden;
 }
-    /* lớp ánh sáng ảo lướt qua */
     .btn-primary-custom::before {
         content: "";
         position: absolute;
@@ -283,7 +264,6 @@ body {
         transform: translateY(-1px);
     }
 
-/* ========== DIVIDER ========== */
 .divider {
     display: flex;
     align-items: center;
@@ -305,7 +285,6 @@ body {
         font-weight: 600;
     }
 
-/* ========== FORGOT PASSWORD ICON ========== */
 .forgot-password-icon {
     width: 70px;
     height: 70px;
@@ -320,7 +299,6 @@ body {
     box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
 }
 
-/* ========== CUSTOM ALERT ========== */
 .alert-info-custom {
     background: var(--glass-bg);
     backdrop-filter: blur(10px);
@@ -339,14 +317,12 @@ body {
         font-size: 1.3rem;
     }
 
-/* ========== FOOTER TEXT ========== */
 .footer-text {
     color: var(--text-secondary);
     font-size: 0.85rem;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* ========== RESPONSIVE DESIGN ========== */
 @media (max-width: 768px) {
     .brand-logo {
         width: 70px;
@@ -397,7 +373,6 @@ body {
     }
 }
 
-/* ========== SMOOTH SCROLLBAR ========== */
 ::-webkit-scrollbar {
     width: 8px;
 }
@@ -411,17 +386,14 @@ body {
     border-radius: 4px;
 }
 
-    /* scroll-bar's color */
     ::-webkit-scrollbar-thumb:hover {
         background: var(--neon-green);
     }
 
-/* ========== ACCESSIBILITY ========== */
 *:focus {
     outline: none;
 }
 
-/* ========== ADDITIONAL ANIMATIONS ========== */
 @keyframes slideInRight {
     from {
         opacity: 0;
@@ -439,7 +411,6 @@ body {
     animation: slideInRight 0.6s ease;
 }
 
-/* ========== PRINT STYLES ========== */
 @media print {
     .auth-container::before {
         display: none;

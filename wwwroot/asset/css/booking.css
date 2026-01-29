@@ -324,16 +324,6 @@
     overflow: hidden;
 }
 
-/*    .field-image::before {
-        content: '🏟️';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-size: 100px;
-        opacity: 0.3;
-    }*/
-
 .field-status-badge {
     position: absolute;
     top: 16px;
@@ -704,7 +694,6 @@
     }
 }
 
-/* Tùy chỉnh phần nút bấm mới */
 .filter-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -728,7 +717,6 @@
 
 .filter-clear-btn:hover {
     background: #ef4444;
-    /* Màu đỏ nhạt khi muốn xóa */
     color: white;
     border-color: #ef4444;
 }
@@ -754,17 +742,14 @@
     display: none;
 }
 
-/* --- CSS CHO GIAO DIỆN GOM NHÓM --- */
-
 .field-card.group-card {
     display: flex;
     flex-direction: column;
-    /* Card cao tự động theo nội dung */
     height: auto;
 }
 
 .field-image {
-    height: 180px; /* Thu nhỏ ảnh lại chút cho gọn */
+    height: 180px; 
 }
 
     .field-image img {
@@ -805,10 +790,9 @@
     color: #334155;
 }
 
-/* Lưới hiển thị các nút giờ */
 .slots-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Tự động xuống dòng */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); 
     gap: 8px;
 }
 
@@ -836,7 +820,6 @@
     color: #64748b;
 }
 
-/* Trạng thái nút */
 .slot-btn:hover:not(:disabled) {
     border-color: #10b981;
     background: #ecfdf5;
@@ -895,7 +878,6 @@
     gap: 28px;
 }
 
-/* Responsive */
 @media (max-width: 1024px) {
     .main-container {
         grid-template-columns: 1fr;
@@ -912,8 +894,6 @@
     }
 }
 
-/* --- CSS MỚI CHO CARD GOM NHÓM --- */
-
 .field-card.group-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -922,7 +902,6 @@
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
-    /* Card cao tự động */
     height: auto;
 }
 
@@ -933,7 +912,7 @@
 }
 
 .field-image {
-    height: 180px; /* Ảnh nhỏ gọn hơn */
+    height: 180px; 
     width: 100%;
     position: relative;
 }
@@ -982,7 +961,6 @@
         margin-right: 4px;
     }
 
-/* Khu vực hiển thị Slot */
 .slots-container {
     border-top: 1px solid #e2e8f0;
     padding-top: 15px;
@@ -996,14 +974,12 @@
     color: #334155;
 }
 
-/* Lưới các nút giờ */
 .slots-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr)); /* Tự động xuống dòng */
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
     gap: 8px;
 }
 
-/* Style cho nút giờ */
 .slot-btn {
     padding: 8px 4px;
     border: 1px solid #cbd5e1;
@@ -1030,7 +1006,6 @@
     margin-top: 2px;
 }
 
-/* Các trạng thái của nút */
 .slot-btn:hover:not(:disabled) {
     border-color: #10b981;
     background: #ecfdf5;
@@ -1060,7 +1035,6 @@
         color: #94a3b8;
     }
 
-/* Pagination */
 .pagination-btn {
     width: 40px;
     height: 40px;
@@ -1076,7 +1050,7 @@
         color: white;
         border-color: #10b981;
     }
-/* Nút Đặt Ngay ở trang chủ */
+
 .btn-book-now {
     width: 100%;
     padding: 12px;
@@ -1094,7 +1068,6 @@
         transform: translateY(-2px);
     }
 
-/* CSS cho Modal Lịch */
 .slots-grid-modal {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -1155,7 +1128,6 @@
             color: #94a3b8;
         }
 
-/* Custom Date Input */
 .date-picker-custom {
     border: 2px solid #e2e8f0;
     border-radius: 10px;

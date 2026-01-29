@@ -433,7 +433,7 @@
             fulfillmentModal.show();
 
         } catch (e) {
-            console.error('❌ Lỗi kết nối:', e);
+            console.error('Lỗi kết nối:', e);
 
             Swal.close(); // Đóng loading
 
@@ -632,7 +632,7 @@
                     html: `
                         <div style="text-align:left; font-size:1.1em; line-height: 1.6;">
                             <p> <b>Khách:</b> ${info.customerName}</p>
-                            <p>🏟 <b>Sân:</b> <span class="text-primary fw-bold">${info.pitchName}</span></p>
+                            <p> <b>Sân:</b> <span class="text-primary fw-bold">${info.pitchName}</span></p>
                             <p> <b>Ngày:</b> ${info.date}</p>
                             <p> <b>Giờ đá:</b> <span class="text-danger fw-bold">${info.time}</span></p>
                             <hr>

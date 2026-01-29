@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✅ Admin Profile page loaded successfully!');
+    console.log('Admin Profile page loaded successfully!');
 
 
     const emailModal = document.getElementById('emailModal');

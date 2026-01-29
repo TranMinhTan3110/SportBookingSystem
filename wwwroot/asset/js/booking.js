@@ -6,7 +6,7 @@ const bookingModalElement = document.getElementById('bookingModal');
 const bookingModal = bookingModalElement ? new bootstrap.Modal(bookingModalElement) : null;
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✅ booking.js loaded');
+    console.log('booking.js loaded');
 
     const modalDateInput = document.getElementById('modalBookingDate');
     if (modalDateInput) {

@@ -80,121 +80,6 @@
                     </tr>
                 </thead>
                 <tbody id="userTableBody">
-                    @* <tr data-status="active" data-id="1" data-username="nguyenvana" data-fullname="Nguyễn Văn A" data-email="nguyenvana@email.com" data-phone="0901234567" data-role="Customer" data-roleid="2" data-joindate="15/01/2024" data-lastlogin="20/12/2024 14:30" data-wallet="500000" data-points="120" data-bookings="15" data-spent="2500000">
-                        <td>#1</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">N</div>
-                                <div class="user-details">
-                                    <h4>Nguyễn Văn A</h4>
-                                  
-                                </div>
-                            </div>
-                        </td>
-                        <td>0901234567</td>
-                        <td>nguyenvana@email.com</td>
-                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
-                        <td>15/01/2024</td>
-                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
-                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr data-status="active" data-id="2" data-username="tranthib" data-fullname="Trần Thị B" data-email="tranthib@email.com" data-phone="0912345678" data-role="Customer" data-roleid="2" data-joindate="20/02/2024" data-lastlogin="19/12/2024 09:15" data-wallet="250000" data-points="85" data-bookings="8" data-spent="1200000">
-                        <td>#2</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">T</div>
-                                <div class="user-details">
-                                    <h4>Trần Thị B</h4>
-                                  
-                                </div>
-                            </div>
-                        </td>
-                        <td>0912345678</td>
-                        <td>tranthib@email.com</td>
-                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
-                        <td>20/02/2024</td>
-                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
-                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr data-status="blocked" data-id="3" data-username="levanc" data-fullname="Lê Văn C" data-email="levanc@email.com" data-phone="0923456789" data-role="Customer" data-roleid="2" data-joindate="10/03/2024" data-lastlogin="15/11/2024 16:20" data-wallet="0" data-points="0" data-bookings="2" data-spent="300000">
-                        <td>#3</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">L</div>
-                                <div class="user-details">
-                                    <h4>Lê Văn C</h4>
-                                   
-                                </div>
-                            </div>
-                        </td>
-                        <td>0923456789</td>
-                        <td>levanc@email.com</td>
-                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
-                        <td>10/03/2024</td>
-                        <td><span class="status-badge blocked"><i class="fas fa-ban"></i> Bị khóa</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
-                                <button class="btn btn-unblock"><i class="fas fa-unlock"></i> Mở</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr data-status="active" data-id="4" data-username="admin" data-fullname="Quản Trị Viên" data-email="admin@sporthub.com" data-phone="0934567890" data-role="Admin" data-roleid="1" data-joindate="01/12/2023" data-lastlogin="21/12/2024 08:00" data-wallet="1000000" data-points="500" data-bookings="0" data-spent="0">
-                        <td>#4</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">Q</div>
-                                <div class="user-details">
-                                    <h4>Quản Trị Viên</h4>
-                                  
-                                </div>
-                            </div>
-                        </td>
-                        <td>0934567890</td>
-                        <td>admin@sporthub.com</td>
-                        <td><span class="role-badge admin"><i class="fas fa-user-shield"></i> Admin</span></td>
-                        <td>01/12/2023</td>
-                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
-                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr data-status="active" data-id="5" data-username="phamthid" data-fullname="Phạm Thị D" data-email="phamthid@email.com" data-phone="0945678901" data-role="Customer" data-roleid="2" data-joindate="15/12/2024" data-lastlogin="21/12/2024 10:45" data-wallet="750000" data-points="200" data-bookings="3" data-spent="450000">
-                        <td>#5</td>
-                        <td>
-                            <div class="user-info">
-                                <div class="user-avatar">P</div>
-                                <div class="user-details">
-                                    <h4>Phạm Thị D</h4>
-                                
-                                </div>
-                            </div>
-                        </td>
-                        <td>0945678901</td>
-                        <td>phamthid@email.com</td>
-                        <td><span class="role-badge"><i class="fas fa-user"></i> Customer</span></td>
-                        <td>15/12/2024</td>
-                        <td><span class="status-badge active"><i class="fas fa-check-circle"></i> Hoạt động</span></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-view" onclick="viewUser(this)"><i class="fas fa-eye"></i> Chi tiết</button>
-                                <button class="btn btn-block"><i class="fas fa-lock"></i> Khóa</button>
-                            </div>
-                        </td>
-                    </tr> *@
                 </tbody>
             </table>
             <div id="noResults" class="no-results">
@@ -219,8 +104,6 @@
 </div>
 
 @section Scripts{
-
     <script src="~/js/UserAD.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        }
+}

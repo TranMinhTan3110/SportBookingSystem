@@ -18,7 +18,7 @@ namespace SportBookingSystem.Controllers
             _context = context;
         }
 
-        // GET: Hiển thị trang đặt sân
+        // Hiển thị trang đặt sân
         public async Task<IActionResult> Index()
         {
             ViewBag.Categories = await _context.Categories
@@ -28,7 +28,7 @@ namespace SportBookingSystem.Controllers
             return View();
         }
 
-        // API: Lấy danh sách sân theo bộ lọc (Filter)
+        // Lấy danh sách sân theo bộ lọc 
         [HttpPost]
         public async Task<IActionResult> GetFilteredPitches([FromBody] FilterPitchesRequest request)
         {
@@ -60,7 +60,7 @@ namespace SportBookingSystem.Controllers
         {
             try
             {
-                // Lấy userId từ Claims (hoặc dùng userId = 1 để test)
+                // Lấy userId từ Claims 
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 int userId;
 
@@ -73,12 +73,10 @@ namespace SportBookingSystem.Controllers
                     userId = 1; 
                 }
 
-                // Gọi Service xử lý (Trừ tiền -> Lưu DB -> Tạo QR)
                 var result = await _bookingService.BookPitchAsync(userId, pitchId, slotId, date);
 
                 if (result.Success)
                 {
-                    // LẤY SỐ DƯ MỚI SAU KHI ĐẶT SÂN
                     var user = await _context.Users.FindAsync(userId);
 
                     return Json(new
@@ -87,7 +85,7 @@ namespace SportBookingSystem.Controllers
                         message = result.Message,
                         qrCode = result.QrBase64,
                         bookingCode = result.BookingCode,
-                        newBalance = user.WalletBalance  // ← TRẢ VỀ SỐ DƯ MỚI
+                        newBalance = user.WalletBalance 
                     });
                 }
                 else
@@ -105,7 +103,6 @@ namespace SportBookingSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> ScanBookingQr([FromBody] string code)
         {
-            // API này dùng để: Quét mã -> Kiểm tra giờ -> Trả về thông tin sân để hiện Popup
             try
             {
                 var result = await _bookingService.CheckInBookingAsync(code);
@@ -120,7 +117,6 @@ namespace SportBookingSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmBookingCheckIn([FromBody] string code)
         {
-            // API này dùng để: Bấm nút "Xác nhận" trên Popup -> Lưu vào DB -> Chốt doanh thu
             try
             {
                 var result = await _bookingService.ConfirmCheckInAsync(code);

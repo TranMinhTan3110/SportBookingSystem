@@ -14,7 +14,7 @@ namespace SportBookingSystem.Services
             _context = context;
         }
 
-        /// Lấy dữ liệu ban đầu cho trang Food (Categories + Products)
+        /// Lấy dữ liệu ban đầu cho trang Food 
         public async Task<FoodIndexViewModel> GetInitialDataAsync()
         {
             // Lấy danh sách Categories có Type = 'Product'
@@ -57,25 +57,21 @@ namespace SportBookingSystem.Services
             .Where(p => p.Category.Type == "Product" && p.Status == true) 
             .AsQueryable();
 
-                // 1. Lọc theo danh mục (nếu có)
                 if (request.CategoryIds != null && request.CategoryIds.Any())
                 {
                     query = query.Where(p => request.CategoryIds.Contains(p.CategoryId));
                 }
 
-                // 2. Lọc theo giá tối thiểu
                 if (request.MinPrice.HasValue)
                 {
                     query = query.Where(p => p.Price >= request.MinPrice.Value);
                 }
 
-                // 3. Lọc theo giá tối đa
                 if (request.MaxPrice.HasValue)
                 {
                     query = query.Where(p => p.Price <= request.MaxPrice.Value);
                 }
 
-                // 4. Sắp xếp theo yêu cầu
                 query = request.SortBy switch
                 {
                     "price-asc" => query.OrderBy(p => p.Price),
@@ -85,10 +81,8 @@ namespace SportBookingSystem.Services
                     _ => query.OrderBy(p => p.ProductName) // Mặc định sắp xếp theo tên
                 };
 
-                // 5. Thực thi query
                 var products = await query.ToListAsync();
 
-                // 6. Map sang ViewModel
                 var productViewModels = products.Select(p => MapToProductViewModel(p)).ToList();
 
                 return new FilterProductResponse
@@ -108,9 +102,6 @@ namespace SportBookingSystem.Services
             }
         }
 
-        /// <summary>
-        /// Map từ Product entity sang ProductViewModel
-        /// </summary>
         private ProductViewModelUser MapToProductViewModel(Models.Entities.Products product)
         {
             return new ProductViewModelUser
@@ -129,9 +120,6 @@ namespace SportBookingSystem.Services
             };
         }
 
-        /// <summary>
-        /// Format giá tiền sang định dạng VND
-        /// </summary>
         private string FormatCurrency(decimal amount)
         {
             var culture = new CultureInfo("vi-VN");

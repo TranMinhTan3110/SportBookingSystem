@@ -29,14 +29,12 @@ namespace SportBookingSystem.Services
 
         public async Task<List<UserInfo>> getAllUserAsync()
         {
-            // 1. Lấy dữ liệu từ DB về trước (giữ nguyên kiểu dữ liệu gốc)
             var rawData = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .OrderByDescending(u => u.CreatedAt)
                 .ToListAsync();
 
-            // 2. Định dạng lại dữ liệu trên bộ nhớ (C#) để tránh lỗi SQL Translation
             var datas = rawData.Select(u => new UserInfo
             {
                 Id = u.UserId.ToString(),
@@ -44,7 +42,6 @@ namespace SportBookingSystem.Services
                 PhoneNumber = u.Phone,
                 Email = u.Email,
                 Role = u.Role != null ? u.Role.RoleName : "Chưa có quyền",
-                // Chuyển đổi format ngày tháng tại đây
                 CreatedAt = u.CreatedAt.ToString("dd/MM/yyyy"),
                 IsActive = u.IsActive,
             }).ToList();

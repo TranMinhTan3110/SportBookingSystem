@@ -18,7 +18,7 @@ namespace SportBookingSystem.Services
         public async Task<IEnumerable<Products>> GetAllProductsAsync(string? search, string? type, string? brand, string? stockStatus)
         {
             var query = _context.Products.Include(p => p.Category)
-                .Where(p => p.Category.Type == "Service") // Only "Service" products
+                .Where(p => p.Category.Type == "Service") 
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -113,7 +113,7 @@ namespace SportBookingSystem.Services
                     product.ImageUrl = await SaveImageAsync(imageFile);
                 }
 
-                product.Status = true; // Mặc định khi tạo mới là hiện
+                product.Status = true; 
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
                 return true;
@@ -181,7 +181,7 @@ namespace SportBookingSystem.Services
                 var product = await _context.Products.FindAsync(id);
                 if (product == null) return false;
 
-                product.Status = !product.Status; // Đảo ngược trạng thái
+                product.Status = !product.Status; 
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -218,17 +218,15 @@ namespace SportBookingSystem.Services
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            // Lấy tên file gốc (tránh ký tự lạ nếu cần, nhưng IFormFile.FileName thường ổn)
+            // Lấy tên file gốc 
             string fileName = imageFile.FileName;
             string filePath = Path.Combine(uploadsFolder, fileName);
 
-            // Kiểm tra nếu file đã tồn tại thì sử dụng luôn, không lưu đè hoặc lưu mới
             if (System.IO.File.Exists(filePath))
             {
                 return "/asset/img/" + fileName;
             }
 
-            // Nếu chưa có thì mới thực hiện lưu
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await imageFile.CopyToAsync(fileStream);

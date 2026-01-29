@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
                 this.disabled = true;
 
-                // Reset modal content for Booking
                 const modalTitle = document.getElementById('qrModalTitle');
                 const modalAlert = document.getElementById('qrModalAlert');
                 if (modalTitle) modalTitle.textContent = "Mã Check-in Đặt Sân";
@@ -39,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
                             document.getElementById('checkInCodeDisplay').textContent = code;
 
-                            // Hide countdown for bookings if not applicable (or reset if needed)
                             document.getElementById('qrCountdown').style.display = 'none';
 
                             openModal(checkInQrModal);
@@ -325,7 +323,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
                 this.classList.add('disabled');
 
-                // Update modal content for Order
                 const modalTitle = document.getElementById('qrModalTitle');
                 const modalAlert = document.getElementById('qrModalAlert');
                 if (modalTitle) modalTitle.textContent = "Mã QR Đơn Hàng";

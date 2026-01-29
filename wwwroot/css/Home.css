@@ -73,17 +73,6 @@
     box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
 }
 
-/* .btn-primary {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
-    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(16, 185, 129, 0.4);
-} */
-
 .btn-secondary {
     background: var(--surface-light);
     color: var(--text-primary);
@@ -100,14 +89,12 @@
     border-color: #0d6efd !important;
 }
 
-/* Container */
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 60px 24px;
 }
 
-/* Section Title */
 .section-header {
     display: flex;
     justify-content: space-between;
@@ -127,9 +114,6 @@
     color: var(--text-secondary);
 }
 
-
-
-/* Fields Grid */
 .fields-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -161,7 +145,7 @@
 }
 
 .field-image::before {
-    content: '🏟️';
+    content: '';
     position: absolute;
     top: 50%;
     left: 50%;
@@ -327,7 +311,6 @@
     font-size: 15px;
 }
 
-/* Wallet Section */
 .wallet-section {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -563,7 +546,6 @@
     overflow: hidden;
 }
 
-/* Food Backgrounds */
 .food-bg-1 {
     background: linear-gradient(135deg, #F59E0B, #EF4444);
 }
@@ -576,7 +558,6 @@
     background: linear-gradient(135deg, #06B6D4, #3B82F6);
 }
 
-/* Product Backgrounds */
 .product-bg-1 {
     background: linear-gradient(135deg, #10B981, #14B8A6);
 }
@@ -600,7 +581,6 @@
     opacity: 0.5;
 }
 
-/* Product Badge */
 .product-badge {
     position: absolute;
     top: 16px;
@@ -631,7 +611,6 @@
     background: rgba(59, 130, 246, 0.9);
 }
 
-/* Product Content */
 .product-content {
     padding: 24px;
 }
@@ -675,7 +654,6 @@
     overflow: hidden;
 }
 
-/* Product Footer */
 .product-footer {
     display: flex;
     justify-content: space-between;
@@ -713,7 +691,6 @@
     margin-left: 8px;
 }
 
-/* Add to Cart Button */
 .btn-add-cart {
     padding: 12px 24px;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -750,7 +727,6 @@
     gap: 10px;
 }
 
-/* Giỏ hàng Button */
 .btn-add-cart {
     flex: 1;
     padding: 12px 16px;
@@ -773,8 +749,6 @@
     box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
 }
 
-
-/* Mua ngay Button */
 .btn-buy-now {
     flex: 1;
     padding: 12px 16px;
@@ -799,7 +773,6 @@
     transform: scale(0.95);
 }
 
-/* Thuê ngay Button */
 .btn-rent-now {
     width: 70%;
     padding: 12px 24px;
@@ -1177,7 +1150,6 @@
     animation: addToCart 0.3s ease;
 }
 
-/* History Section */
 .history-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -1364,7 +1336,6 @@
     border-radius: 24px;
     padding: 32px;
     overflow: hidden;
-    /* ← QUAN TRỌNG: Ngăn nội dung lòi ra */
 }
 
 .history-header {
@@ -1373,14 +1344,12 @@
     align-items: center;
     margin-bottom: 28px;
     gap: 16px;
-    /* ← Thêm gap */
 }
 
 .history-title {
     font-size: 24px;
     font-weight: 700;
     flex-shrink: 0;
-    /* ← Không cho title bị co lại */
 }
 
 .history-list {
@@ -1393,14 +1362,12 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    /* ← Giảm gap từ 20px xuống 16px */
     padding: 20px;
     background: var(--surface-light);
     border: 1px solid var(--border);
     border-radius: 16px;
     transition: all 0.3s ease;
     min-width: 0;
-    /* ← QUAN TRỌNG: Cho phép flex items co lại */
 }
 
 .history-item:hover {
@@ -1418,15 +1385,12 @@
     justify-content: center;
     font-size: 26px;
     flex-shrink: 0;
-    /* ← Không cho icon bị co */
 }
 
 .history-details {
     flex: 1;
     min-width: 0;
-    /* ← QUAN TRỌNG: Cho phép text truncate */
     overflow: hidden;
-    /* ← Ngăn text lòi ra */
 }
 
 .history-item-title {
@@ -1435,9 +1399,7 @@
     margin-bottom: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
-    /* ← Thêm ... khi text dài */
     white-space: nowrap;
-    /* ← Không wrap xuống dòng */
 }
 
 .history-item-date {
@@ -1451,9 +1413,7 @@
     font-weight: 800;
     font-family: 'JetBrains Mono', monospace;
     flex-shrink: 0;
-    /* ← Không cho amount bị co */
     white-space: nowrap;
-    /* ← Không wrap */
 }
 
 .history-amount.positive {
@@ -1471,9 +1431,7 @@
     font-weight: 700;
     text-transform: uppercase;
     flex-shrink: 0;
-    /* ← Không cho status bị co */
     white-space: nowrap;
-    /* ← Không wrap */
 }
 
 .history-status.success {
@@ -1537,7 +1495,6 @@
         gap: 12px;
     }
 
-    /* LAYOUT MỚI: 2 hàng thay vì 1 hàng */
     .history-item {
         display: grid;
         grid-template-columns: auto 1fr;
@@ -1547,10 +1504,8 @@
         border-radius: 14px;
     }
 
-    /* Icon + Details (hàng 1) */
     .history-icon {
         grid-row: 1 / 3;
-        /* Icon chiếm 2 hàng */
         width: 48px;
         height: 48px;
         font-size: 24px;
@@ -1571,14 +1526,11 @@
         font-size: 12px;
     }
 
-    /* Amount + Status (hàng 2) */
     .history-amount {
         grid-column: 2;
         grid-row: 2;
         font-size: 16px;
-        /* ← Giảm size cho mobile */
         text-align: left;
-        /* ← Căn trái */
     }
 
     .history-status {
@@ -1587,7 +1539,6 @@
         padding: 4px 10px;
         font-size: 10px;
         justify-self: end;
-        /* ← Căn phải */
         align-self: center;
     }
 }

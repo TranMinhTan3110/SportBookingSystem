@@ -5,12 +5,12 @@ using SportBookingSystem.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Đăng ký DbContext 
+// Đăng ký DbContext 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// 2. Đăng ký Authentication với Cookie 
+// Đăng ký Authentication với Cookie 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -19,7 +19,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
     });
 
-// 3. Đăng ký Dependency Injection cho LoginServices 
+// Đăng ký Dependency Injection cho LoginServices 
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IPitchService, PitchService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -47,7 +47,6 @@ builder.Services.AddMemoryCache();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -59,7 +58,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// 4. Bật Authentication trước Authorization 
 app.UseAuthentication();
 app.UseAuthorization();
 
