@@ -184,25 +184,32 @@
     function getBadgeClass(type) {
         type = (type || '').trim();
         if (type === 'Nạp tiền' || type === 'Hoàn tiền') return 'badge-success';
-        if (type === 'Thanh toán Booking' || type === 'Thanh toán Order') return 'badge-default';
+        if (type === 'Thanh toán Booking' || type === 'Thanh toán Order') return 'badge-secondary';
         if (type === 'Chuyển tiền') return 'badge-info';
         return 'badge-secondary';
     }
 
     function getStatusHTML(status) {
-        switch (status) {
+  
+        const s = (status || '').trim();
+
+        switch (s) {
             case 'Thành công':
                 return `<span class="status-indicator"><span class="status-dot status-success"></span><span class="status-text status-success-text">Thành công</span></span>`;
+
             case 'Chờ xử lý':
-                return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xử lý</span></span>`;
-            case 'Chờ xác nhận':
+            case 'Chờ xác nhận': 
                 return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xác nhận</span></span>`;
+
             case 'Đã hủy':
                 return `<span class="status-indicator"><span class="status-dot status-danger"></span><span class="status-text status-danger-text">Đã hủy</span></span>`;
+
             default:
-                return `<span>${status}</span>`;
+               
+                return `<span class="status-text">${s}</span>`;
         }
     }
+
 
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
@@ -366,54 +373,51 @@
     const fulfillmentModal = fulfillmentModalEl ? new bootstrap.Modal(fulfillmentModalEl) : null;
 
     window.showFulfillmentModal = async function (orderId) {
-        if (!fulfillmentModal) {
-            Swal.fire('Lỗi', 'Modal chưa được khởi tạo.', 'error');
-            return;
-        }
-
-        const loading = document.getElementById('fulfillmentLoading');
-        const content = document.getElementById('fulfillmentContent');
-
-        // Hiển thị loading
-        if (loading) loading.classList.remove('d-none');
-        if (content) content.classList.add('d-none');
-
-        fulfillmentModal.show();
+      
+        Swal.fire({
+            title: 'Đang kiểm tra...',
+            text: 'Vui lòng đợi',
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
 
         try {
             const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
-
-            if (!res.ok) {
-                fulfillmentModal.hide();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Lỗi',
-                    text: 'Không thể tải thông tin đơn hàng'
-                });
-                return;
-            }
-
             const data = await res.json();
 
-         
+           
             if (data.error) {
-                fulfillmentModal.hide(); 
+                Swal.close(); // Đóng loading
 
-                
-                setTimeout(() => {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Không thể xử lý',
-                        text: data.message,
-                        confirmButtonText: 'Đã hiểu',
-                        confirmButtonColor: '#f59e0b'
-                    });
-                }, 300);
+                // Hiện thông báo lỗi
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Thông báo',
+                    text: data.message,
+                    confirmButtonText: 'Đã hiểu',
+                    confirmButtonColor: '#dc3545'
+                });
 
                 return;
             }
 
-           
+          
+            Swal.close();
+
+            
+            const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
+            if (!fulfillmentModalEl) {
+                Swal.fire('Lỗi', 'Giao diện xử lý chưa sẵn sàng.', 'error');
+                return;
+            }
+
+            const fulfillmentModal = bootstrap.Modal.getInstance(fulfillmentModalEl) || new bootstrap.Modal(fulfillmentModalEl);
+            const loading = document.getElementById('fulfillmentLoading');
+            const content = document.getElementById('fulfillmentContent');
+
+            // Đổ dữ liệu vào modal
             document.getElementById('fOrderId').value = data.orderId;
             document.getElementById('fOrderCode').textContent = data.orderCode;
             document.getElementById('fCustomerName').textContent = data.customerName;
@@ -421,19 +425,24 @@
             document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
             document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
 
+            
             if (loading) loading.classList.add('d-none');
             if (content) content.classList.remove('d-none');
 
-        } catch (e) {
-            fulfillmentModal.hide();
+            // Mở modal
+            fulfillmentModal.show();
 
-            setTimeout(() => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Lỗi kết nối',
-                    text: 'Không thể kết nối đến máy chủ'
-                });
-            }, 300);
+        } catch (e) {
+            console.error('❌ Lỗi kết nối:', e);
+
+            Swal.close(); // Đóng loading
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: 'Không thể kết nối đến máy chủ',
+                confirmButtonColor: '#dc3545'
+            });
         }
     };
 
@@ -521,20 +530,20 @@
                 const info = response.data;
 
                 Swal.fire({
-                    title: '✅ Thông tin đặt sân',
+                    title: ' Thông tin đặt sân',
                     html: `
                         <div style="text-align:left; font-size:1.1em; line-height: 1.6;">
-                            <p>👤 <b>Khách:</b> ${info.customerName}</p>
-                            <p>🏟️ <b>Sân:</b> <span class="text-primary fw-bold">${info.pitchName}</span></p>
-                            <p>📅 <b>Ngày:</b> ${info.date}</p>
-                            <p>⏰ <b>Giờ đá:</b> <span class="text-danger fw-bold">${info.time}</span></p>
+                            <p> <b>Khách:</b> ${info.customerName}</p>
+                            <p>🏟 <b>Sân:</b> <span class="text-primary fw-bold">${info.pitchName}</span></p>
+                            <p> <b>Ngày:</b> ${info.date}</p>
+                            <p> <b>Giờ đá:</b> <span class="text-danger fw-bold">${info.time}</span></p>
                             <hr>
                             <p class="text-success text-center mb-0"><i class="fas fa-check-circle"></i> Đủ điều kiện nhận sân</p>
                         </div>
                     `,
                     icon: 'info',
                     showCancelButton: true,
-                    confirmButtonText: '✅ Xác nhận & Vào sân',
+                    confirmButtonText: ' Xác nhận & Vào sân',
                     cancelButtonText: 'Hủy',
                     confirmButtonColor: '#198754',
                     cancelButtonColor: '#6c757d'
@@ -583,3 +592,16 @@
         }
     }
 });
+
+
+const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
+if (fulfillmentModalEl) {
+    fulfillmentModalEl.addEventListener('hidden.bs.modal', function () {
+        console.log(' Modal đã đóng hoàn toàn');
+        // Reset lại trạng thái
+        const loading = document.getElementById('fulfillmentLoading');
+        const content = document.getElementById('fulfillmentContent');
+        if (loading) loading.classList.remove('d-none');
+        if (content) content.classList.add('d-none');
+    });
+}

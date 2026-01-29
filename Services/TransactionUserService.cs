@@ -15,15 +15,13 @@ namespace SportBookingSystem.Services
             _context = context;
         }
 
-        //giao dịch chung
-
         public async Task<(List<UserTransactionDTO> Data, int TotalRecords)> LoadUserTransactionAsync(int userId, int page, int pageSize)
         {
             var query = _context.Transactions
                 .Where(t => t.UserId == userId
                     && t.TransactionType != "Chuyển tiền"
                     && t.TransactionType != "Nhận tiền"
-                    && t.TransactionType != "Thanh toán Booking" 
+                    && t.TransactionType != "Thanh toán Booking"
                 )
                 .OrderByDescending(t => t.TransactionDate);
 
@@ -49,30 +47,27 @@ namespace SportBookingSystem.Services
             return (data, totalRecords);
         }
 
-        // ============================================
-        // LỊCH SỬ ĐẶT SÂN (CHỈ LẤY BOOKING)
-        // ============================================
         public async Task<(List<UserBookingDTO> Data, int TotalRecords)> LoadUserBookingsAsync(int userId, int page, int pageSize)
         {
-            // Lấy danh sách Booking từ bảng PitchSlots (hoặc Bookings nếu bạn có)
-            var query = _context.PitchSlots
-                .Include(ps => ps.Pitch)
-                .Include(ps => ps.TimeSlot)
-                .Where(ps => ps.Status == 1)  // Status = 1 nghĩa là đã đặt
-                .OrderByDescending(ps => ps.PlayDate);
-
-            // Lọc theo UserId nếu có quan hệ
-            // Nếu PitchSlots không có UserId, phải JOIN với Transactions
+            // ✅ FIX 1: Dùng constant TransactionTypes.Booking thay vì hard-code string
             var transactionCodes = await _context.Transactions
-                .Where(t => t.UserId == userId && t.TransactionType == "Thanh toán Booking")
+                .Where(t => t.UserId == userId && t.TransactionType == TransactionTypes.Booking)
+                //                                                          ↑ THAY ĐỔI TẠI ĐÂY
                 .Select(t => t.TransactionCode)
                 .ToListAsync();
 
-            var filteredQuery = query.Where(ps => transactionCodes.Contains(ps.BookingCode));
+            // ✅ FIX 2: Dùng constant BookingStatus.PendingConfirm (= 1) để rõ ràng
+            var query = _context.PitchSlots
+                .Include(ps => ps.Pitch)
+                .Include(ps => ps.TimeSlot)
+                .Where(ps => transactionCodes.Contains(ps.BookingCode)
+                          && ps.Status >= BookingStatus.PendingConfirm)
+                //                  ↑ THAY ĐỔI TẠI ĐÂY (thay vì ps.Status >= 1)
+                .OrderByDescending(ps => ps.PlayDate);
 
-            var totalRecords = await filteredQuery.CountAsync();
+            var totalRecords = await query.CountAsync();
 
-            var data = await filteredQuery
+            var data = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(ps => new UserBookingDTO
@@ -83,7 +78,7 @@ namespace SportBookingSystem.Services
                     StartTime = ps.PlayDate.Add(ps.TimeSlot.StartTime),
                     EndTime = ps.PlayDate.Add(ps.TimeSlot.EndTime),
                     TimeRange = ps.TimeSlot.StartTime.ToString(@"hh\:mm") + " - " + ps.TimeSlot.EndTime.ToString(@"hh\:mm"),
-                    TotalPrice = ps.Pitch.PricePerHour * 1.5m,  // Tạm tính
+                    TotalPrice = ps.Pitch.PricePerHour * 1.5m,
                     Status = ps.Status,
                     CheckInCode = ps.BookingCode
                 })
@@ -92,14 +87,15 @@ namespace SportBookingSystem.Services
             return (data, totalRecords);
         }
 
-        // Kiểm tra người nhận theo SĐT
+
+
+
         public async Task<Users> GetUserByPhoneAsync(string phoneNumber)
         {
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Phone == phoneNumber);
         }
 
-        // Xử lý chuyển tiền
         public async Task<string> TransferMoneyAsync(int senderId, TransferDTO dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -189,7 +185,6 @@ namespace SportBookingSystem.Services
             }
         }
 
-        // LỊCH SỬ CHUYỂN TIỀN
         public async Task<(List<UserTransferDTO> Data, int TotalRecords)> LoadUserTransfersAsync(int userId, int page, int pageSize)
         {
             var query = _context.Transactions

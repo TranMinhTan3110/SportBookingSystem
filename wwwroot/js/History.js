@@ -7,7 +7,7 @@ let currentTransferPage = 1;
 const pageSize = 10;
 
 // ============================================
-// LOAD LỊCH SỬ ĐẶT SÂN (TAB 1) - FIXED
+// LOAD LỊCH SỬ ĐẶT SÂN (TAB 1) 
 // ============================================
 async function loadBookingHistory(page = 1) {
     try {
@@ -15,7 +15,7 @@ async function loadBookingHistory(page = 1) {
         if (!response.ok) throw new Error('Không thể tải dữ liệu');
 
         const result = await response.json();
-        console.log('📦 Booking API Response:', result); // Debug log
+        console.log('📦 Booking API Response:', result);
 
         const tbody = document.querySelector('#booking-tbody');
 
@@ -32,20 +32,37 @@ async function loadBookingHistory(page = 1) {
             return;
         }
 
-       
         tbody.innerHTML = result.data.map(booking => {
-          
+           
+            let statusClass, statusText;
 
-            // Status
-            const statusClass = booking.status === 1 ? 'success' : 'warning';
-            const statusText = booking.status === 1 ? 'Hoàn thành' : 'Chờ xác nhận';
+            // Tìm đoạn này trong History.js và thay thế
+            switch (booking.status) {
+                case 1: // PendingConfirm (Chờ xác nhận)
+                    statusClass = 'warning';
+                    statusText = 'Chờ xác nhận';
+                    break;
+                case 2: // CheckedIn (Đã check-in / Đã nhận sân)
+                    statusClass = 'success'; // Đổi từ secondary sang success để có màu xanh
+                    statusText = 'Đã nhận sân';
+                    break;
+                case 3: // Completed (Hoàn thành)
+                    statusClass = 'success'; // Màu xanh lá
+                    statusText = 'Hoàn thành';
+                    break;
+                case -1: // Cancelled (Đã hủy)
+                    statusClass = 'danger'; // Màu đỏ
+                    statusText = 'Đã hủy';
+                    break;
+                default:
+                    statusClass = 'secondary';
+                    statusText = 'Không xác định';
+            }
 
-            // Tổng tiền
             const priceFormatted = booking.totalPrice
                 ? new Intl.NumberFormat('vi-VN').format(booking.totalPrice) + '₫'
                 : '0₫';
 
-            // Thời gian
             let timeDisplay = '-';
             if (booking.timeRange) {
                 timeDisplay = booking.timeRange;
@@ -79,7 +96,6 @@ async function loadBookingHistory(page = 1) {
         `;
         }).join('');
 
-        // Gắn sự kiện cho nút QR
         document.querySelectorAll('.btn-qr').forEach(btn => {
             btn.addEventListener('click', function () {
                 const code = this.dataset.code;
@@ -95,7 +111,6 @@ async function loadBookingHistory(page = 1) {
     }
 }
 
-// Hiển thị QR cho booking
 function showBookingQR(checkInCode) {
     fetch(`/UserProfile/GenerateBookingQr?checkInCode=${checkInCode}`)
         .then(res => res.json())
@@ -122,9 +137,6 @@ function showBookingQR(checkInCode) {
         })
         .catch(err => console.error('❌ Lỗi tạo QR:', err));
 }
-
-
-// load lịch sử giao dịch 
 
 async function loadTransactionHistory(page = 1) {
     try {
@@ -178,7 +190,6 @@ async function loadTransactionHistory(page = 1) {
     }
 }
 
-// load lịch sử chuyển tiền
 async function loadTransferHistory(page = 1) {
     try {
         const response = await fetch(`/api/transaction/transfers?page=${page}&pageSize=${pageSize}`);
@@ -227,9 +238,6 @@ async function loadTransferHistory(page = 1) {
     }
 }
 
-// ============================================
-// RENDER PHÂN TRANG
-// ============================================
 function renderPagination(containerId, currentPage, totalPages, loadFunction) {
     const container = document.getElementById(containerId);
 
@@ -269,9 +277,6 @@ function renderPagination(containerId, currentPage, totalPages, loadFunction) {
     container.innerHTML = html;
 }
 
-// ============================================
-// CHUYỂN TAB
-// ============================================
 function openTab(evt, tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -284,9 +289,6 @@ function openTab(evt, tabName) {
     else if (tabName === 'transfer-history') loadTransferHistory(currentTransferPage);
 }
 
-// ============================================
-// HELPER FUNCTIONS
-// ============================================
 function formatDate(dateString) {
     return new Date(dateString).toLocaleDateString('vi-VN');
 }
@@ -296,13 +298,9 @@ function formatDateTime(dateString) {
     return date.toLocaleDateString('vi-VN') + ' ' + date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 }
 
-// ============================================
-// KHỞI TẠO - MẶC ĐỊNH LOAD TAB ĐẶT SÂN
-// ============================================
 document.addEventListener('DOMContentLoaded', function () {
     console.log('✅ History.js loaded');
 
-    // Mặc định hiển thị tab Đặt sân
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('booking-history').classList.add('active');
 
@@ -310,4 +308,18 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.tab-btn')[0].classList.add('active');
 
     loadBookingHistory(1);
+
+    // ✅ THÊM EVENT LISTENER ĐỂ RELOAD KHI BOOKING MỚI ĐƯỢC TẠO
+    window.addEventListener('bookingCreated', function () {
+        console.log('🔔 Nhận được event bookingCreated từ booking.js');
+
+        // Kiểm tra xem có đang ở tab booking history không
+        const bookingTab = document.getElementById('booking-history');
+        if (bookingTab && bookingTab.classList.contains('active')) {
+            console.log('🔄 Đang ở tab Booking History, reloading...');
+            loadBookingHistory(1);
+        } else {
+            console.log('ℹ️ Không ở tab Booking History, sẽ reload khi chuyển sang tab');
+        }
+    });
 });

@@ -6,7 +6,7 @@ const bookingModalElement = document.getElementById('bookingModal');
 const bookingModal = bookingModalElement ? new bootstrap.Modal(bookingModalElement) : null;
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log(' booking.js loaded');
+    console.log('✅ booking.js loaded');
 
     const modalDateInput = document.getElementById('modalBookingDate');
     if (modalDateInput) {
@@ -169,20 +169,16 @@ function renderModalSlots(slots, pitchId, pitchName) {
     }
 
     const html = slots.map(slot => {
-        // 1. Kiểm tra các trạng thái từ Server trả về
         const isBooked = slot.status === 'booked';
-        const isExpired = slot.status === 'expired'; 
+        const isExpired = slot.status === 'expired';
 
-        //  Xác định class CSS
-        let btnClass = 'slot-modal available'; // Mặc định là xanh
+        let btnClass = 'slot-modal available';
         if (isBooked) {
-            btnClass = 'slot-modal booked';    // Màu xám đậm / đỏ
+            btnClass = 'slot-modal booked';
         } else if (isExpired) {
-            btnClass = 'slot-modal expired';   // Màu xám nhạt (Mới)
+            btnClass = 'slot-modal expired';
         }
 
-        //  Xác định trạng thái Disable 
-        
         const isDisabled = isBooked || isExpired;
 
         const price = new Intl.NumberFormat('vi-VN').format(slot.fullPrice);
@@ -200,7 +196,6 @@ function renderModalSlots(slots, pitchId, pitchName) {
     container.innerHTML = html;
 }
 
-//hàm dặt sân
 window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPrice, depositPrice) {
     const dateSelected = document.getElementById('modalBookingDate').value;
     const fullPriceFmt = new Intl.NumberFormat('vi-VN').format(fullPrice);
@@ -215,14 +210,13 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
     Swal.fire({
         title: 'Xác nhận đặt sân',
         html: `
-       <div style="text-align: left; font-size: 15px;">
-    <p><i class="fa fa-futbol"></i> <b>${pitchName}</b></p>
-    <p><i class="fa fa-calendar"></i> <b>${dateSelected}</b> | <i class="fa fa-clock"></i> <b>${timeRange}</b></p>
-    <hr>
-    <p><i class="fa fa-money-bill"></i> Tổng tiền: <b class="text-success">${fullPriceFmt}đ</b></p>
-    <p class="text-muted small"><i>Tiền sẽ được trừ trực tiếp vào ví của bạn.</i></p>
-</div>
-
+            <div style="text-align: left; font-size: 15px;">
+                <p><i class="fa fa-futbol"></i> <b>${pitchName}</b></p>
+                <p><i class="fa fa-calendar"></i> <b>${dateSelected}</b> | <i class="fa fa-clock"></i> <b>${timeRange}</b></p>
+                <hr>
+                <p><i class="fa fa-money-bill"></i> Tổng tiền: <b class="text-success">${fullPriceFmt}đ</b></p>
+                <p class="text-muted small"><i>Tiền sẽ được trừ trực tiếp vào ví của bạn.</i></p>
+            </div>
         `,
         icon: 'question',
         showCancelButton: true,
@@ -245,7 +239,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                 formData.append('slotId', slotId);
                 formData.append('date', dateSelected);
 
-                console.log(' Đang gửi request đặt sân...');
+                console.log('📤 Đang gửi request đặt sân...');
 
                 const response = await fetch('/Booking/BookPitch', { method: 'POST', body: formData });
                 const data = await response.json();
@@ -255,12 +249,11 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                 if (data.success) {
                     console.log(' Số dư mới:', data.newBalance);
 
-                    // cap nhật số dư 
                     if (data.newBalance !== undefined) {
                         console.log(' Đang cập nhật số dư ví...');
                         updateWalletBalance(data.newBalance);
                     } else {
-                        console.warn(' Server không trả về newBalance!');
+                        console.warn('⚠️ Server không trả về newBalance!');
                     }
 
                     await Swal.fire({
@@ -286,6 +279,10 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                         allowOutsideClick: false
                     });
 
+                  
+                    console.log('🔔 Dispatching bookingCreated event...');
+                    window.dispatchEvent(new Event('bookingCreated'));
+
                     if (bookingModal) {
                         bookingModal.show();
                         loadSlotsForModal(pitchId, dateSelected);
@@ -301,7 +298,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                     });
                 }
             } catch (e) {
-                console.error(' Lỗi:', e);
+                console.error('❌ Lỗi:', e);
                 Swal.fire('Lỗi', 'Lỗi hệ thống.', 'error');
                 if (bookingModal) bookingModal.show();
             }
@@ -311,20 +308,15 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
     });
 }
 
-//hàm cập nhật số dư
-
 function updateWalletBalance(newBalance) {
-    console.log(' updateWalletBalance được gọi với số dư:', newBalance);
+    console.log('💵 updateWalletBalance được gọi với số dư:', newBalance);
 
-   
     const walletElements = document.querySelectorAll('.wallet-balance');
-    // --------------------------------
 
     if (walletElements.length > 0) {
         walletElements.forEach((el) => {
             el.textContent = new Intl.NumberFormat('vi-VN').format(newBalance) + '₫';
 
-            // Hiệu ứng nhấp nháy
             el.style.transition = 'all 0.3s ease';
             el.style.color = '#10b981';
             el.style.fontWeight = 'bold';
@@ -334,7 +326,6 @@ function updateWalletBalance(newBalance) {
             }, 1500);
         });
     }
-
 
     const headerWallet = document.querySelector('.wallet-balances');
     if (headerWallet) {

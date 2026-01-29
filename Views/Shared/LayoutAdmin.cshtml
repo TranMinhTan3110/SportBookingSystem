@@ -201,44 +201,49 @@
                 }, 300);
             }
 
-           
-            function processQrCode(decodedText) {
-                console.log("QR Scanned:", decodedText);
 
-                if (decodedText.startsWith("BOOKING:")) {
-                    const bookingCode = decodedText.replace("BOOKING:", "").trim();
-                    if (typeof window.handleBookingScan === 'function') {
-                        window.handleBookingScan(bookingCode);
-                    } else {
-                        Swal.fire('Lỗi', 'Chức năng quét booking chưa được tải.', 'error');
-                    }
-                }
-                else if (decodedText.startsWith("PURCHASE:")) {
-                    const parts = decodedText.split(":");
-                    const orderId = parts[1];
-                    const orderCode = parts[2] || orderId;
+                   function processQrCode(decodedText) {
+            console.log("QR Scanned:", decodedText);
 
-                    Swal.fire({
-                        title: ' Đã tìm thấy đơn hàng!',
-                        html: `<p class="mb-0">Mã đơn: <b>${orderCode}</b></p>`,
-                        icon: 'success',
-                        showCancelButton: true,
-                        confirmButtonText: '✅ Xử lý ngay',
-                        cancelButtonText: '❌ Hủy'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            if (typeof window.showFulfillmentModal === 'function') {
-                                window.showFulfillmentModal(parseInt(orderId));
-                            } else {
-                                Swal.fire('Lỗi', 'Chức năng xử lý đơn hàng chưa được tải.', 'error');
-                            }
-                        }
-                    });
-                }
-                else {
-                    Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
+            if (decodedText.startsWith("BOOKING:")) {
+                const bookingCode = decodedText.replace("BOOKING:", "").trim();
+                if (typeof window.handleBookingScan === 'function') {
+                    window.handleBookingScan(bookingCode);
+                } else {
+                    Swal.fire('Lỗi', 'Chức năng quét booking chưa được tải.', 'error');
                 }
             }
+            else if (decodedText.startsWith("PURCHASE:")) {
+                const parts = decodedText.split(":");
+                const orderId = parts[1];
+                const orderCode = parts[2] || orderId;
+
+                // ✅ THÊM: Đóng loading trước khi show Swal
+                Swal.close();
+
+                Swal.fire({
+                    title: '📦 Đã tìm thấy đơn hàng!',
+                    html: `<p class="mb-0">Mã đơn: <b>${orderCode}</b></p>`,
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: '✅ Xử lý ngay',
+                    cancelButtonText: '❌ Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (typeof window.showFulfillmentModal === 'function') {
+                            window.showFulfillmentModal(parseInt(orderId));
+                        } else {
+                            Swal.fire('Lỗi', 'Chức năng xử lý đơn hàng chưa được tải.', 'error');
+                        }
+                    }
+                });
+            }
+            else {
+                
+                Swal.close();
+                Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
+            }
+        }
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
