@@ -49,4 +49,38 @@
         public decimal Price { get; set; }
         public int Stock { get; set; }
     }
+
+    // DTO cho chi tiết giao dịch
+    public class TransactionDetailDTO
+    {
+        public string? Code { get; set; }
+        public string? User { get; set; }
+        public string? Phone { get; set; }
+        public decimal Amount { get; set; }
+        public decimal? BalanceAfter { get; set; }
+        public DateTime Date { get; set; }
+        public string? Type { get; set; }
+        public string? Status { get; set; }
+        public string? Source { get; set; }
+        public string? Message { get; set; }
+
+        public List<OrderItemDetailDTO> Items { get; set; } = new();
+        public BookingInfoDetailDTO? Booking { get; set; }
+    }
+
+    public class OrderItemDetailDTO
+    {
+        public string? ProductName { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+        public decimal Total => Quantity * Price;
+    }
+
+    public class BookingInfoDetailDTO
+    {
+        public string? PitchName { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public decimal TotalPrice { get; set; }
+    }
 }

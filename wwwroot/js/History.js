@@ -1,21 +1,21 @@
-﻿// ============================================
+﻿
 // BIẾN TOÀN CỤC
-// ============================================
+
 let currentBookingPage = 1;
 let currentTransactionPage = 1;
 let currentTransferPage = 1;
 const pageSize = 10;
 
-// ============================================
+
 // LOAD LỊCH SỬ ĐẶT SÂN (TAB 1) 
-// ============================================
+
 async function loadBookingHistory(page = 1) {
     try {
         const response = await fetch(`/api/transaction/bookings?page=${page}&pageSize=${pageSize}`);
         if (!response.ok) throw new Error('Không thể tải dữ liệu');
 
         const result = await response.json();
-        console.log('📦 Booking API Response:', result);
+        console.log(' Booking API Response:', result);
 
         const tbody = document.querySelector('#booking-tbody');
 
@@ -36,22 +36,22 @@ async function loadBookingHistory(page = 1) {
            
             let statusClass, statusText;
 
-            // Tìm đoạn này trong History.js và thay thế
+           
             switch (booking.status) {
-                case 1: // PendingConfirm (Chờ xác nhận)
+                case 1: // PendingConfirm 
                     statusClass = 'warning';
                     statusText = 'Chờ xác nhận';
                     break;
-                case 2: // CheckedIn (Đã check-in / Đã nhận sân)
-                    statusClass = 'success'; // Đổi từ secondary sang success để có màu xanh
+                case 2: 
+                    statusClass = 'success'; 
                     statusText = 'Đã nhận sân';
                     break;
-                case 3: // Completed (Hoàn thành)
-                    statusClass = 'success'; // Màu xanh lá
+                case 3: // Completed 
+                    statusClass = 'success';
                     statusText = 'Hoàn thành';
                     break;
-                case -1: // Cancelled (Đã hủy)
-                    statusClass = 'danger'; // Màu đỏ
+                case -1: 
+                    statusClass = 'danger';
                     statusText = 'Đã hủy';
                     break;
                 default:
@@ -107,7 +107,7 @@ async function loadBookingHistory(page = 1) {
         currentBookingPage = page;
 
     } catch (error) {
-        console.error('❌ Lỗi load booking:', error);
+        console.error(' Lỗi load booking:', error);
     }
 }
 
@@ -186,7 +186,7 @@ async function loadTransactionHistory(page = 1) {
         currentTransactionPage = page;
 
     } catch (error) {
-        console.error('❌ Lỗi load transaction:', error);
+        console.error(' Lỗi load transaction:', error);
     }
 }
 
@@ -234,7 +234,7 @@ async function loadTransferHistory(page = 1) {
         currentTransferPage = page;
 
     } catch (error) {
-        console.error('❌ Lỗi load transfer:', error);
+        console.error(' Lỗi load transfer:', error);
     }
 }
 
@@ -299,7 +299,7 @@ function formatDateTime(dateString) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('✅ History.js loaded');
+    console.log(' History.js loaded');
 
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById('booking-history').classList.add('active');
@@ -309,17 +309,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadBookingHistory(1);
 
-    // ✅ THÊM EVENT LISTENER ĐỂ RELOAD KHI BOOKING MỚI ĐƯỢC TẠO
+    
     window.addEventListener('bookingCreated', function () {
-        console.log('🔔 Nhận được event bookingCreated từ booking.js');
+        console.log(' Nhận được event bookingCreated từ booking.js');
 
         // Kiểm tra xem có đang ở tab booking history không
         const bookingTab = document.getElementById('booking-history');
         if (bookingTab && bookingTab.classList.contains('active')) {
-            console.log('🔄 Đang ở tab Booking History, reloading...');
+            console.log(' Đang ở tab Booking History, reloading...');
             loadBookingHistory(1);
         } else {
-            console.log('ℹ️ Không ở tab Booking History, sẽ reload khi chuyển sang tab');
+            console.log('ℹ Không ở tab Booking History, sẽ reload khi chuyển sang tab');
         }
     });
 });

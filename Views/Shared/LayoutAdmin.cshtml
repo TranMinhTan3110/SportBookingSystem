@@ -116,7 +116,7 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             let html5QrCode = null;
-            let isScanning = false; // ← Thêm flag để track trạng thái
+            let isScanning = false; 
 
             const qrScannerModalEl = document.getElementById('qrScannerModal');
             if (!qrScannerModalEl) return;
@@ -218,16 +218,16 @@
                 const orderId = parts[1];
                 const orderCode = parts[2] || orderId;
 
-                // ✅ THÊM: Đóng loading trước khi show Swal
+                //Đóng loading trước khi show Swal
                 Swal.close();
 
                 Swal.fire({
-                    title: '📦 Đã tìm thấy đơn hàng!',
+                    title: ' Đã tìm thấy đơn hàng!',
                     html: `<p class="mb-0">Mã đơn: <b>${orderCode}</b></p>`,
                     icon: 'success',
                     showCancelButton: true,
-                    confirmButtonText: '✅ Xử lý ngay',
-                    cancelButtonText: '❌ Hủy'
+                    confirmButtonText: ' Xử lý ngay',
+                    cancelButtonText: ' Hủy'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         if (typeof window.showFulfillmentModal === 'function') {

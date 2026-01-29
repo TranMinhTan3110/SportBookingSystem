@@ -106,7 +106,7 @@
                     </td>
                     <td>${statusHTML}</td>
                     <td class="text-right">
-                        <button class="btn-icon" title="Chi tiết">
+                     <button class="btn-icon btn-view-details" title="Chi tiết" data-code="${item.code || ''}">
                             <i class="bi bi-eye"></i>
                         </button>
                     </td>
@@ -190,7 +190,7 @@
     }
 
     function getStatusHTML(status) {
-  
+
         const s = (status || '').trim();
 
         switch (s) {
@@ -198,14 +198,14 @@
                 return `<span class="status-indicator"><span class="status-dot status-success"></span><span class="status-text status-success-text">Thành công</span></span>`;
 
             case 'Chờ xử lý':
-            case 'Chờ xác nhận': 
+            case 'Chờ xác nhận':
                 return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xác nhận</span></span>`;
 
             case 'Đã hủy':
                 return `<span class="status-indicator"><span class="status-dot status-danger"></span><span class="status-text status-danger-text">Đã hủy</span></span>`;
 
             default:
-               
+
                 return `<span class="status-text">${s}</span>`;
         }
     }
@@ -373,7 +373,7 @@
     const fulfillmentModal = fulfillmentModalEl ? new bootstrap.Modal(fulfillmentModalEl) : null;
 
     window.showFulfillmentModal = async function (orderId) {
-      
+
         Swal.fire({
             title: 'Đang kiểm tra...',
             text: 'Vui lòng đợi',
@@ -387,7 +387,7 @@
             const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
             const data = await res.json();
 
-           
+
             if (data.error) {
                 Swal.close(); // Đóng loading
 
@@ -403,10 +403,10 @@
                 return;
             }
 
-          
+
             Swal.close();
 
-            
+
             const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
             if (!fulfillmentModalEl) {
                 Swal.fire('Lỗi', 'Giao diện xử lý chưa sẵn sàng.', 'error');
@@ -425,7 +425,7 @@
             document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
             document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
 
-            
+
             if (loading) loading.classList.add('d-none');
             if (content) content.classList.remove('d-none');
 
@@ -516,6 +516,104 @@
             }
         } catch (e) { Swal.fire('Lỗi', e.message || 'Lỗi kết nối server', 'error'); }
     });
+
+
+    // logic Chi tiết giao dịch
+    const detModal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
+
+    document.getElementById('paymentTableBody')?.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn-view-details');
+        if (btn) {
+            const code = btn.dataset.code;
+            if (code) showTransactionDetails(code);
+        }
+    });
+
+
+    async function showTransactionDetails(code) {
+        const loading = document.getElementById('detailsLoading');
+        const content = document.getElementById('detailsContent');
+
+        loading.classList.remove('d-none');
+        content.classList.add('d-none');
+        detModal.show();
+
+        try {
+            const res = await fetch(`/AdminPayment/GetTransactionDetails?code=${code}`);
+            if (res.ok) {
+                const data = await res.json();
+
+                // Fill basic info
+                document.getElementById('detCode').textContent = data.code;
+                document.getElementById('detDate').textContent = `${formatDate(data.date)} ${formatTime(data.date)}`;
+                document.getElementById('detType').textContent = data.type;
+                document.getElementById('detSource').textContent = data.source;
+                document.getElementById('detUser').textContent = data.user || 'N/A';
+                document.getElementById('detPhone').textContent = data.phone || '-';
+                document.getElementById('detAvatar').textContent = data.user ? data.user.substring(0, 1).toUpperCase() : '?';
+
+                const amountEl = document.getElementById('detAmount');
+                amountEl.textContent = formatCurrency(data.amount);
+                amountEl.className = data.type === 'Hoàn tiền' ? 'fs-3 fw-bold text-danger' : 'fs-3 fw-bold text-success';
+                if (data.type === 'Hoàn tiền') amountEl.textContent = '-' + amountEl.textContent;
+                else amountEl.textContent = '+' + amountEl.textContent;
+
+                document.getElementById('detBalanceAfter').textContent = data.balanceAfter ? formatCurrency(data.balanceAfter) : 'N/A';
+
+                // Status Badge
+                const statusBadge = document.getElementById('detStatusBadge');
+                statusBadge.innerHTML = getStatusHTML(data.status);
+
+                // Message
+                const msgSec = document.getElementById('detMessageSection');
+                if (data.message) {
+                    msgSec.classList.remove('d-none');
+                    document.getElementById('detMessage').textContent = data.message;
+                } else {
+                    msgSec.classList.add('d-none');
+                }
+
+                // Order Section
+                const orderSec = document.getElementById('detOrderSection');
+                if (data.items && data.items.length > 0) {
+                    orderSec.classList.remove('d-none');
+                    const tbody = document.getElementById('detItemsTableBody');
+                    tbody.innerHTML = data.items.map(item => `
+                        <tr>
+                            <td>${item.productName}</td>
+                            <td class="text-center">${item.quantity}</td>
+                            <td class="text-end">${formatCurrency(item.price)}</td>
+                            <td class="text-end fw-bold">${formatCurrency(item.total)}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    orderSec.classList.add('d-none');
+                }
+
+                // Booking Section
+                const bookingSec = document.getElementById('detBookingSection');
+                if (data.booking) {
+                    bookingSec.classList.remove('d-none');
+                    document.getElementById('detPitchName').textContent = data.booking.pitchName;
+                    document.getElementById('detBookingTime').textContent =
+                        `${formatDate(data.booking.startTime)} ${formatTime(data.booking.startTime)} - ${formatTime(data.booking.endTime)}`;
+                } else {
+                    bookingSec.classList.add('d-none');
+                }
+
+                loading.classList.add('d-none');
+                content.classList.remove('d-none');
+            } else {
+                detModal.hide();
+                Toast.fire({ icon: 'error', title: 'Không tìm thấy chi tiết giao dịch' });
+            }
+        } catch (e) {
+            console.error(e);
+            detModal.hide();
+            Toast.fire({ icon: 'error', title: 'Lỗi tải chi tiết' });
+        }
+    }
+
 
     window.handleBookingScan = async function (bookingCode) {
         try {

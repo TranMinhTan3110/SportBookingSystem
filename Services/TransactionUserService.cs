@@ -49,20 +49,20 @@ namespace SportBookingSystem.Services
 
         public async Task<(List<UserBookingDTO> Data, int TotalRecords)> LoadUserBookingsAsync(int userId, int page, int pageSize)
         {
-            // ✅ FIX 1: Dùng constant TransactionTypes.Booking thay vì hard-code string
+       
             var transactionCodes = await _context.Transactions
                 .Where(t => t.UserId == userId && t.TransactionType == TransactionTypes.Booking)
-                //                                                          ↑ THAY ĐỔI TẠI ĐÂY
+                                                                   
                 .Select(t => t.TransactionCode)
                 .ToListAsync();
 
-            // ✅ FIX 2: Dùng constant BookingStatus.PendingConfirm (= 1) để rõ ràng
+     
             var query = _context.PitchSlots
                 .Include(ps => ps.Pitch)
                 .Include(ps => ps.TimeSlot)
                 .Where(ps => transactionCodes.Contains(ps.BookingCode)
                           && ps.Status >= BookingStatus.PendingConfirm)
-                //                  ↑ THAY ĐỔI TẠI ĐÂY (thay vì ps.Status >= 1)
+            
                 .OrderByDescending(ps => ps.PlayDate);
 
             var totalRecords = await query.CountAsync();

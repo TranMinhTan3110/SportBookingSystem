@@ -219,5 +219,13 @@ namespace SportBookingSystem.Controllers
             var result = await _transactionService.UpdateOrderStatusAsync(request.OrderId, request.NewStatus);
             return Json(new { success = result.Success, message = result.Message });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetTransactionDetails(string code)
+        {
+            var details = await _transactionService.GetTransactionDetailsAsync(code);
+            if (details == null) return NotFound();
+            return Json(details);
+        }
     }
 }
