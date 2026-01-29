@@ -179,33 +179,39 @@
                                 </div>
                             </td>
                             <td>
-                                @switch (item.Status)
+                                @if (item.Status != null)
                                 {
-                                    case "Thành công":
+                                    var statusTrim = item.Status.Trim(); // Cắt khoảng trắng để so sánh chính xác
+
+                                    @if (statusTrim == "Thành công")
+                                    {
                                         <span class="status-indicator">
                                             <span class="status-dot status-success"></span>
                                             <span class="status-text status-success-text">Thành công</span>
                                         </span>
-                                        break;
-                                    case "Chờ xử lý":
+                                    }
+                                    else if (statusTrim == "Chờ xử lý" || statusTrim == "Chờ xác nhận")
+                                    {
                                         <span class="status-indicator">
                                             <span class="status-dot status-warning"></span>
-                                            <span class="status-text status-warning-text">Chờ xử lý</span>
+                                            <span class="status-text status-warning-text">Chờ xác nhận</span>
                                         </span>
-                                        break;
-                                    case "Đã hủy":
+                                    }
+                                    else if (statusTrim == "Đã hủy")
+                                    {
                                         <span class="status-indicator">
                                             <span class="status-dot status-danger"></span>
                                             <span class="status-text status-danger-text">Đã hủy</span>
                                         </span>
-                                        break;
-                                    default:
-                                        <span>@item.Status</span>
-                                        break;
+                                    }
+                                    else
+                                    {
+                                        <span class="status-text">@item.Status</span>
+                                    }
                                 }
                             </td>
                             <td class="text-right">
-                                <button class="btn-icon" title="Chi tiết"><i class="bi bi-eye"></i></button>
+                                <button class="btn-icon btn-view-details" title="Chi tiết" data-code="@item.Code"><i class="bi bi-eye"></i></button>
                             </td>
                         </tr>
                     }
@@ -487,6 +493,110 @@
                 <button type="button" id="btnFulfillSuccess" class="btn btn-success px-4">
                     <i class="bi bi-check-circle me-2"></i>Xác nhận nhận đồ
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Chi tiết giao dịch -->
+<div class="modal fade" id="transactionDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white border-secondary shadow-lg">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title d-flex align-items-center">
+                    <i class="bi bi-info-circle me-2 text-primary"></i>
+                    Chi tiết giao dịch
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div id="detailsLoading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Đang tải chi tiết...</p>
+                </div>
+                <div id="detailsContent" class="d-none">
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <div class="p-3 bg-secondary bg-opacity-10 rounded-3 h-100">
+                                <label class="text-muted small d-block mb-1">Mã giao dịch</label>
+                                <div id="detCode" class="fw-bold text-primary fs-5">-</div>
+                                <hr class="my-2 border-secondary opacity-25">
+                                <label class="text-muted small d-block mb-1">Thời gian</label>
+                                <div id="detDate" class="fw-semibold">-</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-secondary bg-opacity-10 rounded-3 h-100">
+                                <label class="text-muted small d-block mb-1">Trạng thái</label>
+                                <div id="detStatusBadge">-</div>
+                                <hr class="my-2 border-secondary opacity-25">
+                                <label class="text-muted small d-block mb-1">Loại & Nguồn</label>
+                                <div><span id="detType" class="fw-semibold">-</span> | <span id="detSource" class="text-muted small">-</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="text-muted small d-block mb-2">Thông tin khách hàng</label>
+                            <div class="d-flex align-items-center">
+                                <div id="detAvatar" class="avatar-circle me-3">U</div>
+                                <div>
+                                    <div id="detUser" class="fw-bold fs-6">-</div>
+                                    <div id="detPhone" class="text-muted small">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <label class="text-muted small d-block mb-1">Số tiền giao dịch</label>
+                            <div id="detAmount" class="fs-3 fw-bold text-success">-</div>
+                            <div class="text-muted small">Số dư sau GD: <span id="detBalanceAfter">-</span></div>
+                        </div>
+                    </div>
+
+                    <div id="detOrderSection" class="d-none mt-4">
+                        <label class="text-muted small d-block mb-2">Chi tiết sản phẩm</label>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-hover border-secondary">
+                                <thead class="table-secondary text-dark">
+                                    <tr>
+                                        <th>Sản phẩm</th>
+                                        <th class="text-center">Số lượng</th>
+                                        <th class="text-end">Đơn giá</th>
+                                        <th class="text-end">Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detItemsTableBody">
+                                    <!-- Items dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="detBookingSection" class="d-none mt-4">
+                        <div class="p-3 border border-primary border-opacity-25 rounded-3 bg-primary bg-opacity-10">
+                            <label class="text-primary small d-block mb-2 fw-bold">Thông tin thuê sân</label>
+                            <div class="row">
+                                <div class="col-sm-6 mb-3 mb-sm-0">
+                                    <div class="text-muted small">Sân</div>
+                                    <div id="detPitchName" class="fw-bold">-</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="text-muted small">Thời gian</div>
+                                    <div id="detBookingTime" class="fw-bold">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="detMessageSection" class="d-none mt-4">
+                        <label class="text-muted small d-block mb-1">Ghi chú</label>
+                        <div id="detMessage" class="p-3 bg-secondary bg-opacity-10 rounded-3 font-italic">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-outline-light px-4" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>

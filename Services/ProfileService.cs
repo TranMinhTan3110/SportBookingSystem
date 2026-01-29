@@ -105,11 +105,36 @@ namespace SportBookingSystem.Services
                 .FirstOrDefaultAsync();
         }
 
+        public async Task<List<Orders>> GetPendingOrdersAsync(int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(od => od.Product)
+                .Where(o => o.UserId == userId && o.Status == 0)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
+        }
+
         public async Task<Orders?> GetOrderByIdAsync(int orderId, int userId)
         {
             return await _context.Orders
                 .Include(o => o.OrderDetails)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
         }
+        // ...
+        public async Task<List<Bookings>> GetActiveBookingsAsync(int userId)
+        {
+            return await _context.Bookings
+                .Include(b => b.Pitch)
+                .Include(b => b.TimeSlot)
+                .Where(b => b.UserId == userId
+                         && (b.Status == 0 || b.Status == 1) // 0: Chờ nhận, 1: Đã nhận
+                         && b.BookingDate >= DateTime.Today)
+                .OrderBy(b => b.BookingDate)
+                .ThenBy(b => b.TimeSlot.StartTime) // Sắp xếp theo giờ đá
+                .ToListAsync();
+        }
+     
+
     }
 }

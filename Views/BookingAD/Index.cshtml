@@ -16,9 +16,15 @@
             <h2>Quản Lý Sân</h2>
             <p class="subtitle">Quản lý thông tin và trạng thái các sân thể thao</p>
         </div>
-        <button class="btn-add-field" data-bs-toggle="modal" data-bs-target="#addFieldModal">
-            <i class="fas fa-plus"></i> Thêm Sân Mới
-        </button>
+
+        <div class="header-actions d-flex gap-2">
+            <button class="btn btn-info text-white" onclick="openTimeSlotModal()">
+                <i class="fas fa-clock"></i> Quản Lý Khung Giờ
+            </button>
+            <button class="btn-add-field" data-bs-toggle="modal" data-bs-target="#addFieldModal">
+                <i class="fas fa-plus"></i> Thêm Sân Mới
+            </button>
+        </div>
     </div>
 
     <!-- Filters -->
@@ -109,6 +115,14 @@
                                 </button>
                                 <button class="btn-icon btn-delete" data-pitch-id="@pitch.PitchId">
                                     <i class="fas fa-trash"></i>
+                                </button>
+                                <button class="btn-icon btn-price"
+                                        data-pitch-id="@pitch.PitchId"
+                                        data-pitch-name="@pitch.PitchName"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#priceConfigModal"
+                                        title="Cấu hình bảng giá">
+                                    <i class="fas fa-dollar-sign"></i>
                                 </button>
                             </div>
                         </div>
@@ -330,7 +344,109 @@
         </div>
     </div>
 </div>
+@* modal cấu hình giá cho sân  *@
+<div class="modal fade" id="priceConfigModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cấu hình giá: <span id="priceConfigPitchName" class="text-primary"></span></h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="add-price-section mb-4 p-3 bg-light rounded border">
+                    <h5 class="mb-3"><i class="fas fa-plus-circle"></i> Thêm khung giờ mới</h5>
+                    <form id="addPriceForm" class="row g-3">
+                        <input type="hidden" name="PitchId" id="pricePitchId">
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Từ giờ</label>
+                            <input type="text" name="StartTime" class="form-control time-picker" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Đến giờ</label>
+                            <input type="text" name="EndTime" class="form-control time-picker" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Giá (VNĐ)</label>
+                            <input type="number" name="Price" class="form-control" placeholder="300000" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-bold">Ghi chú</label>
+                            <input type="text" name="Note" class="form-control" placeholder="Giờ vàng...">
+                        </div>
+                        <div class="col-12 text-end mt-3">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="fas fa-save"></i> Thêm ngay
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
+                <h5 class="mb-3"><i class="fas fa-list"></i> Danh sách khung giờ áp dụng</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover border">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Giá tiền</th>
+                                <th>Ghi chú</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="priceTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-info small mt-2">
+                    <i class="fas fa-info-circle"></i> Các khung giờ không được cấu hình ở đây sẽ lấy <strong>Giá mặc định</strong> của sân.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@* modal quan lý khung giờ *@
+<div class="modal fade" id="manageTimeSlotModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold">⚙️ Cấu Hình Khung Giờ Hệ Thống</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="p-3 mb-3 bg-light border rounded">
+                    <h6 class="fw-bold text-primary mb-2">Thêm Khung Giờ Mới</h6>
+                    <form id="formAddTimeSlot" class="row g-2 align-items-end">
+                        <div class="col-5">
+                            <label class="small fw-bold">Bắt đầu</label>
+                            <input type="text" id="slotStart" class="form-control time-picker" required>
+                        </div>
+                        <div class="col-5">
+                            <label class="small fw-bold">Kết thúc</label>
+                            <input type="text" id="slotEnd" class="form-control time-picker" required>
+                        </div>
+                        <div class="col-2">
+                            <button type="submit" class="btn btn-primary w-100"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </form>
+                </div>
+
+                <h6 class="fw-bold mt-3">Danh Sách Khung Giờ Hiện Có</h6>
+                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-sm table-hover align-middle">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th>Tên Ca</th>
+                                <th>Thời gian</th>
+                                <th class="text-center">Xóa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timeSlotTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

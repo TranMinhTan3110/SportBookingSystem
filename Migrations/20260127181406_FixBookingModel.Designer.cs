@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SportBookingSystem.Models.EF;
 
@@ -11,9 +12,11 @@ using SportBookingSystem.Models.EF;
 namespace SportBookingSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260127181406_FixBookingModel")]
+    partial class FixBookingModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,12 +257,6 @@ namespace SportBookingSystem.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PitchSlotId");
 
                     b.HasIndex("BookingId");
@@ -267,8 +264,6 @@ namespace SportBookingSystem.Migrations
                     b.HasIndex("PitchId");
 
                     b.HasIndex("SlotId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("PitchSlots");
                 });
@@ -772,17 +767,11 @@ namespace SportBookingSystem.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SportBookingSystem.Models.Entities.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Booking");
 
                     b.Navigation("Pitch");
 
                     b.Navigation("TimeSlot");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SportBookingSystem.Models.Entities.Pitches", b =>

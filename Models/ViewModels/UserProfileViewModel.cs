@@ -7,5 +7,6 @@ namespace SportBookingSystem.Models.ViewModels
         public Users User { get; set; }
         public Bookings? UpcomingBooking { get; set; }
         public Orders? LatestOrder { get; set; }
+        public List<Orders>? PendingOrders { get; set; }
     }
 }

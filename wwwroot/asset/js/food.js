@@ -1,4 +1,4 @@
-// Global variables
+﻿// Global variables
 let selectedProduct = null;
 let purchaseModal = null;
 let qrModal = null;
@@ -64,21 +64,26 @@ function renderProducts(products) {
     var html = '';
     products.forEach(p => {
         const safeName = p.productName.replace(/'/g, "\\'");
+        const imageUrl = p.imageUrl || '/asset/img/default-product.jpg';
 
         html += `
-            <div class="product-card">
-                <div class="product-image"><img src="${p.imageUrl}" alt=""></div>
-                <div class="product-info">
-                    <div class="product-typeName">${p.categoryName}</div>
-                    <div class="product-name">${p.productName}</div>
-                    <div class="product-price">${p.formattedPrice}</div>
-                    <div class="btn-contain d-flex justify-content-end align-items-center gap-2">
-                    <button class="btn btn-primary py-2 fw-semibold flex-fill"  onclick="openPurchaseModal(${p.productId}, '${safeName}', ${p.price}, '${p.imageUrl}')">
-                        <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
-                    </button>
-                    <button class="btn btn-outline-primary py-2 fw-semibold flex-fill"onclick="addToCart(${p.productId}, '${safeName}', ${p.price})">
-                        <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
-                    </button>
+            <div class="product-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
+                <div class="product-image position-relative">
+                    <img src="${imageUrl}" alt="${p.productName}" style="height: 200px; width: 100%; object-fit: cover;">
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm fs-6 px-2 py-1">${p.categoryName}</span>
+                </div>
+                <div class="product-info p-3">
+                    <div class="product-name fw-bold mb-1" style="font-size: 1.1rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.productName}</div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="product-price text-primary fw-bold fs-5">${p.formattedPrice}</div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                        <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(${p.productId}, '${safeName}', ${p.price}, '${imageUrl}')" style="border-radius: 10px;">
+                            <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
+                        </button>
+                        <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="addToCart(${p.productId}, '${safeName}', ${p.price})" style="border-radius: 10px;">
+                            <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
+                        </button>
                     </div>
                 </div>
             </div>`;

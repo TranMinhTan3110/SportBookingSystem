@@ -39,11 +39,14 @@ namespace SportBookingSystem.Controllers
 
             string qrContent = $"PURCHASE:{order.OrderId}:{userId}:{detail.ProductId}:{detail.Quantity}";
             string qrBase64 = _qrService.GenerateQrCode(qrContent);
-            
+
             var remainingSeconds = (int)(order.OrderDate.AddMinutes(15) - DateTime.Now).TotalSeconds;
             if (remainingSeconds < 0) remainingSeconds = 0;
 
-            return Json(new { success = true, qrCode = qrBase64, remainingSeconds = remainingSeconds });
+            var transaction = await _qrService.GetTransactionByOrderIdAsync(orderId);
+            string orderCode = transaction?.TransactionCode ?? (string.IsNullOrEmpty(order.OrderCode) ? $"ORD-{order.OrderId}" : order.OrderCode);
+
+            return Json(new { success = true, qrCode = qrBase64, remainingSeconds = remainingSeconds, orderCode = orderCode });
         }
 
         public async Task<IActionResult> Index()
@@ -62,13 +65,13 @@ namespace SportBookingSystem.Controllers
             }
 
             var upcomingBooking = await _profileService.GetUpcomingBookingAsync(userId);
-            var latestOrder = await _profileService.GetLatestPendingOrderAsync(userId);
+            var pendingOrders = await _profileService.GetPendingOrdersAsync(userId);
 
             var viewModel = new UserProfileViewModel
             {
                 User = user,
                 UpcomingBooking = upcomingBooking,
-                LatestOrder = latestOrder
+                PendingOrders = pendingOrders
             };
 
             return View(viewModel);

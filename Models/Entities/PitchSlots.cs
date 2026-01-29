@@ -11,22 +11,30 @@ namespace SportBookingSystem.Models.Entities
         [Required]
         public DateTime PlayDate { get; set; }
 
-        // Liên kết tới sân
         public int PitchId { get; set; }
         [ForeignKey("PitchId")]
-        public Pitches Pitch { get; set; }
+        public virtual Pitches Pitch { get; set; }
 
-        // Liên kết tới khung giờ
         public int SlotId { get; set; }
         [ForeignKey("SlotId")]
-        public TimeSlots TimeSlot { get; set; }
+        public virtual TimeSlots TimeSlot { get; set; }
 
-        // Trạng thái: 0: Trống, 1: Đã đặt, 2: Đang giữ chỗ
+        public string? BookingCode { get; set; }
+
+    
         public int Status { get; set; } = 0;
 
-        // Cho phép null: Khi có người đặt thì gắn ID hóa đơn vào đây
         public int? BookingId { get; set; }
         [ForeignKey("BookingId")]
-        public Bookings? Booking { get; set; }
+        public virtual Bookings? Booking { get; set; }
+
+    
+
+        
+        public int? UserId { get; set; }
+        [ForeignKey("UserId")]
+        public virtual Users? User { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
     }
 }
