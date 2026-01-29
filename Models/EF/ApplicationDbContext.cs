@@ -24,6 +24,7 @@ namespace SportBookingSystem.Models.EF
         public DbSet<PitchSlots> PitchSlots { get; set; }
 
         public DbSet<SystemSetting> SystemSetting { get; set; }
+        public DbSet<PitchPriceSetting> PitchPriceSettings { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -99,15 +100,34 @@ namespace SportBookingSystem.Models.EF
                 .WithMany()
                 .HasForeignKey(od => od.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<PitchPriceSetting>()
+    .HasOne(p => p.Pitch)
+    .WithMany()
+    .HasForeignKey(p => p.PitchId)
+    .OnDelete(DeleteBehavior.Cascade);
 
             // Cấu hình Seed Data cho TimeSlots
             modelBuilder.Entity<TimeSlots>().HasData(
-                new TimeSlots { SlotId = 1, SlotName = "Ca 1", StartTime = new TimeSpan(6, 0, 0), EndTime = new TimeSpan(7, 30, 0) },
-                new TimeSlots { SlotId = 2, SlotName = "Ca 2", StartTime = new TimeSpan(7, 30, 0), EndTime = new TimeSpan(9, 0, 0) },
-                new TimeSlots { SlotId = 3, SlotName = "Ca 3", StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(17, 30, 0) },
-                new TimeSlots { SlotId = 4, SlotName = "Ca 4 (Vàng)", StartTime = new TimeSpan(17, 30, 0), EndTime = new TimeSpan(19, 0, 0) },
-                new TimeSlots { SlotId = 5, SlotName = "Ca 5 (Vàng)", StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 30, 0) }
-            );
+         
+          new TimeSlots { SlotId = 1, SlotName = "Ca Sáng 1 (1.5h)", StartTime = new TimeSpan(6, 0, 0), EndTime = new TimeSpan(7, 30, 0), IsActive = true },
+          new TimeSlots { SlotId = 2, SlotName = "Ca Sáng 2 (1.5h)", StartTime = new TimeSpan(7, 30, 0), EndTime = new TimeSpan(9, 0, 0), IsActive = true },
+          new TimeSlots { SlotId = 3, SlotName = "Ca Sáng 3 (1.5h)", StartTime = new TimeSpan(9, 0, 0), EndTime = new TimeSpan(10, 30, 0), IsActive = true },
+
+     
+          new TimeSlots { SlotId = 4, SlotName = "Ca Trưa 1 (1h)", StartTime = new TimeSpan(10, 30, 0), EndTime = new TimeSpan(11, 30, 0), IsActive = true },
+          new TimeSlots { SlotId = 5, SlotName = "Ca Trưa 2 (1h)", StartTime = new TimeSpan(11, 30, 0), EndTime = new TimeSpan(12, 30, 0), IsActive = true }, // ID 5 cũ là 19:00 -> Giờ sửa thành 11:30
+          new TimeSlots { SlotId = 6, SlotName = "Ca Chiều 1 (1h)", StartTime = new TimeSpan(14, 0, 0), EndTime = new TimeSpan(15, 0, 0), IsActive = true },
+          new TimeSlots { SlotId = 7, SlotName = "Ca Chiều 2 (1h)", StartTime = new TimeSpan(15, 0, 0), EndTime = new TimeSpan(16, 0, 0), IsActive = true },
+          new TimeSlots { SlotId = 8, SlotName = "Ca Chiều 3 (1.5h)", StartTime = new TimeSpan(16, 0, 0), EndTime = new TimeSpan(17, 30, 0), IsActive = true },
+
+      
+          new TimeSlots { SlotId = 9, SlotName = "Giờ Vàng 1 (1.5h)", StartTime = new TimeSpan(17, 30, 0), EndTime = new TimeSpan(19, 0, 0), IsActive = true },
+          new TimeSlots { SlotId = 10, SlotName = "Giờ Vàng 2 (1.5h)", StartTime = new TimeSpan(19, 0, 0), EndTime = new TimeSpan(20, 30, 0), IsActive = true },
+
+         
+          new TimeSlots { SlotId = 11, SlotName = "Ca Đêm 1 (1.5h)", StartTime = new TimeSpan(20, 30, 0), EndTime = new TimeSpan(22, 0, 0), IsActive = true },
+          new TimeSlots { SlotId = 12, SlotName = "Ca Vét (1h)", StartTime = new TimeSpan(22, 0, 0), EndTime = new TimeSpan(23, 0, 0), IsActive = true }
+      );
             //dữ liệu bảng SystemSetting
             modelBuilder.Entity<SystemSetting>().HasData(
     new SystemSetting { SettingKey = "RewardAmountStep", SettingValue = "10000" },

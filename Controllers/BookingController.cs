@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.ViewModels;
 using SportBookingSystem.Services;
+using System.Security.Claims;
 
 namespace SportBookingSystem.Controllers
 {
@@ -17,106 +18,117 @@ namespace SportBookingSystem.Controllers
             _context = context;
         }
 
-        // GET: /Booking/Index
+        // GET: Hiển thị trang đặt sân
         public async Task<IActionResult> Index()
         {
-            // Truyền Categories cho bộ lọc
             ViewBag.Categories = await _context.Categories
                 .Where(c => c.Type == "Pitch")
                 .Select(c => new { c.CategoryId, c.CategoryName })
                 .ToListAsync();
-
-            // Truyền TimeSlots cho bộ lọc
-            ViewBag.TimeSlots = await _context.TimeSlots
-                .Where(ts => ts.IsActive)
-                .OrderBy(ts => ts.StartTime)
-                .Select(ts => new
-                {
-                    ts.SlotId,
-                    ts.SlotName,
-                    ts.StartTime,
-                    ts.EndTime,
-                    TimeRange = ts.StartTime.ToString(@"hh\:mm") + " - " + ts.EndTime.ToString(@"hh\:mm")
-                })
-                .ToListAsync();
-
             return View();
         }
 
-        // POST: /Booking/GetFilteredPitches
+        // API: Lấy danh sách sân theo bộ lọc (Filter)
         [HttpPost]
         public async Task<IActionResult> GetFilteredPitches([FromBody] FilterPitchesRequest request)
         {
             try
             {
-                var result = await _bookingService.GetFilteredPitchesAsync(
+                var result = await _bookingService.GetFilteredPitchesWithPaginationAsync(
                     request.Date,
-                    request.SlotId,
+                    request.SlotIds,
                     request.CategoryIds,
-                    request.MinPrice,
-                    request.MaxPrice,
-                    request.StatusFilter
+                    request.SpecificPitchIds,
+                    request.Capacities,
+                    request.StatusFilter,
+                    request.Page,
+                    request.PageSize
                 );
-
-                return Json(new
-                {
-                    success = true,
-                    data = result
-                });
+                return Json(new { success = true, data = result });
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Có lỗi xảy ra: " + ex.Message
-                });
+                return Json(new { success = false, message = "Lỗi: " + ex.Message });
             }
         }
 
-        // GET: /Booking/GetFilteredPitches (hỗ trợ GET request)
-        [HttpGet]
-        public async Task<IActionResult> GetFilteredPitches(
-            DateTime? date,
-            int? slotId,
-            string? categoryIds,
-            decimal? minPrice,
-            decimal? maxPrice)
+       
+        // APi ĐẶT SÂN 
+        
+        [HttpPost]
+        public async Task<IActionResult> BookPitch(int pitchId, int slotId, DateTime date)
         {
             try
             {
-                var filterDate = date ?? DateTime.Today;
-                List<int>? categoryIdList = null;
+                // Lấy userId từ Claims (hoặc dùng userId = 1 để test)
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                int userId;
 
-                if (!string.IsNullOrEmpty(categoryIds))
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out userId))
                 {
-                    categoryIdList = categoryIds.Split(',')
-                        .Select(id => int.TryParse(id, out var result) ? result : 0)
-                        .Where(id => id > 0)
-                        .ToList();
+                    
+                }
+                else
+                {
+                    userId = 1; 
                 }
 
-                var result = await _bookingService.GetAvailablePitchesAsync(
-                    filterDate,
-                    slotId,
-                    categoryIdList,
-                    minPrice,
-                    maxPrice
-                );
+                // Gọi Service xử lý (Trừ tiền -> Lưu DB -> Tạo QR)
+                var result = await _bookingService.BookPitchAsync(userId, pitchId, slotId, date);
 
-                return Json(new
+                if (result.Success)
                 {
-                    success = true,
-                    data = result
-                });
+                    // LẤY SỐ DƯ MỚI SAU KHI ĐẶT SÂN
+                    var user = await _context.Users.FindAsync(userId);
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = result.Message,
+                        qrCode = result.QrBase64,
+                        bookingCode = result.BookingCode,
+                        newBalance = user.WalletBalance  // ← TRẢ VỀ SỐ DƯ MỚI
+                    });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result.Message });
+                }
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Có lỗi xảy ra: " + ex.Message
-                });
+                return Json(new { success = false, message = "Lỗi Controller: " + ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ScanBookingQr([FromBody] string code)
+        {
+            // API này dùng để: Quét mã -> Kiểm tra giờ -> Trả về thông tin sân để hiện Popup
+            try
+            {
+                var result = await _bookingService.CheckInBookingAsync(code);
+                return Json(new { success = result.Success, message = result.Message, data = result.Data });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi server: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmBookingCheckIn([FromBody] string code)
+        {
+            // API này dùng để: Bấm nút "Xác nhận" trên Popup -> Lưu vào DB -> Chốt doanh thu
+            try
+            {
+                var result = await _bookingService.ConfirmCheckInAsync(code);
+                return Json(new { success = result.Success, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
     }

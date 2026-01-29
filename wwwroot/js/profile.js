@@ -3,6 +3,10 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     const rechargeBtn = document.querySelector('.btn-recharge');
+
+   
+    const checkinBtn = document.querySelector('.btn-checkin');
+
     if (rechargeBtn) {
         rechargeBtn.addEventListener('click', function () {
 
@@ -10,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
     const checkinBtns = document.querySelectorAll('.btn-checkin:not(.btn-order-qr)');
+
     const checkInQrModal = document.getElementById('checkInQrModal');
 
     if (checkinBtns.length > 0) {

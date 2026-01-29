@@ -157,20 +157,61 @@ namespace SportBookingSystem.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOrderForFulfillment(int orderId)
         {
-            var order = await _transactionService.GetOrderDetailsByIdAsync(orderId);
-            if (order == null) return NotFound();
-
-            if (order.Status == "0" && DateTime.Now > order.OrderDate.AddMinutes(15))
+            try
             {
-                 return Json(new { 
-                     error = true, 
-                     message = "Mã QR đã hết hạn (quá 15 phút). Vui lòng yêu cầu khách hàng đặt lại." 
-                 });
+                var order = await _transactionService.GetOrderDetailsByIdAsync(orderId);
+
+                if (order == null)
+                {
+                    return Json(new { error = true, message = "Không tìm thấy đơn hàng" });
+                }
+
+                // ✅ Kiểm tra nếu đơn đã xử lý rồi (QUAN TRỌNG)
+                if (order.StatusCode == 1) // Đã thành công
+                {
+                    return Json(new
+                    {
+                        error = true,
+                        message = "Đơn hàng này đã được xác nhận và giao thành công trước đó."
+                    });
+                }
+
+                if (order.StatusCode == -1) // Đã hủy
+                {
+                    return Json(new
+                    {
+                        error = true,
+                        message = "Đơn hàng đã bị hủy."
+                    });
+                }
+
+                // ✅ Kiểm tra thời gian hết hạn (15 phút)
+                if (order.StatusCode == 0 && DateTime.Now > order.OrderDate.AddMinutes(15))
+                {
+                    return Json(new
+                    {
+                        error = true,
+                        message = "Mã QR đã hết hạn (quá 15 phút). Đơn hàng sẽ được tự động hủy."
+                    });
+                }
+
+                // ✅ Trả về thông tin đơn hàng hợp lệ
+                return Json(new
+                {
+                    orderId = order.OrderId,
+                    orderCode = order.OrderCode,
+                    customerName = order.CustomerName,
+                    productName = order.ProductName,
+                    quantity = order.Quantity,
+                    totalAmount = order.TotalAmount,
+                    status = order.Status
+                });
             }
-
-            return Json(order);
+            catch (Exception ex)
+            {
+                return Json(new { error = true, message = $"Lỗi hệ thống: {ex.Message}" });
+            }
         }
-
         [HttpPost]
         public async Task<IActionResult> UpdateOrderStatus([FromBody] FulfillmentRequestDTO request)
         {

@@ -117,7 +117,7 @@ async function executeToggleStatus(userId) {
     
 }
 
-// Gọi hàm ngay khi file JS được tải
+
 document.addEventListener("DOMContentLoaded", () => {
     loadAllUser();
 
@@ -170,6 +170,6 @@ function applyFilters() {
 }
 
 
-//Load bảng lich sử giao dịch
+
 
 

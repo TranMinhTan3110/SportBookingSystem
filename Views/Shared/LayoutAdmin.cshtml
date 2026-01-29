@@ -2,116 +2,65 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"] - SportHub Admin</title>
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/AdminLayout.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <div class="admin-layout">
-        <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <a asp-controller="Dashboard" asp-action="Index" class="logo">
-                    <img src="~/asset/img/logo.png" alt="SportHub Logo" class="logo-icon" />
-
-                    <div class="logo-text">
-                        <span class="logo-title">TQTSport</span>
-                    </div>
+                    <img src="~/asset/img/logo.png" alt="Logo" class="logo-icon" />
+                    <div class="logo-text"><span class="logo-title">TQTSport</span></div>
                 </a>
             </div>
-
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <div class="nav-section-title">Menu Chính</div>
                     <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a asp-controller="Dashboard" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-speedometer2"></i></span>
-                                <span class="nav-text">Dashboard</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="BookingAD" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-calendar-event-fill"></i></span>
-                                <span class="nav-text">Quản lý Sân</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="UserAD" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
-                                <span class="nav-text">Người Dùng</span>
-                            </a>
-                        </li>
+                        <li class="nav-item"><a asp-controller="Dashboard" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-speedometer2"></i></span><span class="nav-text">Dashboard</span></a></li>
+                        <li class="nav-item"><a asp-controller="BookingAD" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-calendar-event-fill"></i></span><span class="nav-text">Quản lý Sân</span></a></li>
+                        <li class="nav-item"><a asp-controller="UserAD" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-people-fill"></i></span><span class="nav-text">Người Dùng</span></a></li>
                     </ul>
                 </div>
-
                 <div class="nav-section">
                     <div class="nav-section-title">Dịch Vụ</div>
                     <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a asp-controller="SportProduct" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-bag-fill"></i></span>
-                                <span class="nav-text">Đồ Dùng Thể Thao</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="FoodAD" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-cup-hot-fill"></i></span>
-                                <span class="nav-text">Đồ Ăn & Thức Uống</span>
-                            </a>
-                        </li>
+                        <li class="nav-item"><a asp-controller="SportProduct" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-bag-fill"></i></span><span class="nav-text">Đồ Dùng Thể Thao</span></a></li>
+                        <li class="nav-item"><a asp-controller="FoodAD" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-cup-hot-fill"></i></span><span class="nav-text">Đồ Ăn & Thức Uống</span></a></li>
                     </ul>
                 </div>
-
                 <div class="nav-section">
                     <div class="nav-section-title">Tài Chính</div>
                     <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a asp-controller="AdminPayment" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
-                                <span class="nav-text">Giao Dịch & Thanh Toán</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a asp-controller="ReportAD" asp-action="Index" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span>
-                                <span class="nav-text">Báo Cáo</span>
-                            </a>
-                        </li>
+                        <li class="nav-item"><a asp-controller="AdminPayment" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-cash-coin"></i></span><span class="nav-text">Giao Dịch & Thanh Toán</span></a></li>
+                        <li class="nav-item"><a asp-controller="ReportAD" asp-action="Index" class="nav-link"><span class="nav-icon"><i class="bi bi-graph-up-arrow"></i></span><span class="nav-text">Báo Cáo</span></a></li>
                     </ul>
                 </div>
-
-                <div class="nav-section">   
+                <div class="nav-section">
                     <div class="nav-section-title">Hệ Thống</div>
                     <ul class="nav-menu">
-                        <li class="nav-item">
-                            <a asp-controller="Login" asp-action="Signout" class="nav-link">
-                                <span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span>
-                                <span class="nav-text">Đăng Xuất</span>
-                            </a>
-                        </li>
+                        <li class="nav-item"><a asp-controller="Login" asp-action="Signout" class="nav-link"><span class="nav-icon"><i class="bi bi-box-arrow-right"></i></span><span class="nav-text">Đăng Xuất</span></a></li>
                     </ul>
                 </div>
             </nav>
         </aside>
-
-        <!-- Main Content -->
         <div class="main-content">
-            <!-- Header -->
             <header class="header">
                 <div class="header-left">
                     <button class="menu-toggle" id="menuToggle">☰</button>
                     <h1>Chào mừng trở lại, Admin</h1>
-                    <p class="header-subtitle">21 /12/2024 14:30</p>
+                    <p class="header-subtitle">@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
                 </div>
                 <div class="header-right">
                     <button class="btn btn-primary d-flex align-items-center gap-2 me-3" id="startScannerBtn" style="border-radius: 10px; padding: 8px 16px;">
@@ -121,29 +70,21 @@
                     <a asp-controller="AdminProfile" asp-action="Index" class="nav-link header-user-link"><i class="bi bi-person-circle"></i></a>
                 </div>
             </header>
-
-            <!-- Content Area - RenderBody() HERE -->
-            <main class="content-wrapper">
-                @RenderBody()
-            </main>
+            <main class="content-wrapper">@RenderBody()</main>
         </div>
     </div>
-
-    <!-- Sidebar Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-    <!-- QR Scanner Modal -->
-    <div class="modal fade" id="qrScannerModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal fade" id="qrScannerModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
                 <div class="modal-header bg-primary text-white py-3">
-                    <h5 class="modal-title fw-bold"><i class="bi bi-qr-code-scan me-2"></i>Quét mã QR sản phẩm</h5>
-                    <button type="button" class="btn-close btn-close-white" id="stopScannerBtn" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title fw-bold"><i class="bi bi-qr-code-scan me-2"></i>Quét mã QR</h5>
+                    <button type="button" class="btn-close btn-close-white" id="stopScannerBtn" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div id="reader" style="width: 100%; border-radius: 15px; overflow: hidden; border: none;"></div>
+                    <div id="reader" style="width: 100%; border-radius: 15px;"></div>
                     <div class="text-center mt-3">
-                        <p class="text-muted small mb-3">Vui lòng đưa mã QR vào khung hình để quét hoặc tải ảnh lên</p>
+                        <p class="text-muted small mb-3">Vui lòng đưa mã QR vào khung hình</p>
                         <div class="d-grid">
                             <label class="btn btn-outline-primary" style="border-radius: 10px; cursor: pointer;">
                                 <i class="bi bi-image me-2"></i>Chọn ảnh từ thiết bị
@@ -155,31 +96,16 @@
             </div>
         </div>
     </div>
-
     <script>
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        if (menuToggle) menuToggle.addEventListener('click', () => { sidebar.classList.toggle('active'); sidebarOverlay.classList.toggle('active'); });
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', () => { sidebar.classList.remove('active'); sidebarOverlay.classList.remove('active'); });
 
-        if (menuToggle) {
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-                sidebarOverlay.classList.toggle('active');
-            });
-        }
-
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                sidebarOverlay.classList.remove('active');
-            });
-        }
-
-        // Active nav link
         const navLinks = document.querySelectorAll('.nav-link');
         const normalizePath = (path) => path.replace(/\/+$/, "").toLowerCase();
         const currentPath = normalizePath(window.location.pathname);
-
         navLinks.forEach(link => {
             const linkPath = normalizePath(new URL(link.href).pathname);
             if (linkPath === currentPath || (currentPath.startsWith(linkPath) && linkPath !== '/' && linkPath.length > 1)) {
@@ -188,100 +114,138 @@
             }
         });
 
-        // QR Scanner Logic - Wrapped in event listener
         document.addEventListener('DOMContentLoaded', function() {
             let html5QrCode = null;
+            let isScanning = false; 
+
             const qrScannerModalEl = document.getElementById('qrScannerModal');
             if (!qrScannerModalEl) return;
-            
             const qrModal = new bootstrap.Modal(qrScannerModalEl);
 
-            const startBtn = document.getElementById('startScannerBtn');
-            if (startBtn) {
-                startBtn.addEventListener('click', function() {
-                    qrModal.show();
-                    setTimeout(() => {
-                        html5QrCode = new Html5Qrcode("reader");
-                        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                        
-                        html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess)
-                        .catch(err => {
-                            console.error("Lỗi khởi động camera:", err);
-                            Swal.fire('Lỗi', 'Không thể truy cập camera. Vui lòng kiểm tra quyền truy cập.', 'error');
-                        });
-                    }, 500);
-                });
+            
+            async function stopScanner() {
+                if (!html5QrCode || !isScanning) return;
+
+                try {
+                    await html5QrCode.stop();
+                    isScanning = false;
+                    
+                } catch (err) {
+                    console.error("Stop scanner error:", err);
+                    isScanning = false;
+                }
             }
 
-            document.getElementById('stopScannerBtn')?.addEventListener('click', stopScanner);
-            qrScannerModalEl.addEventListener('hidden.bs.modal', stopScanner);
+          
+            document.getElementById('startScannerBtn')?.addEventListener('click', function() {
+                qrModal.show();
 
-            // File input handling
-            const fileInput = document.getElementById('qr-input-file');
-            fileInput.addEventListener('change', e => {
-                if (e.target.files.length == 0) return;
-                
-                const imageFile = e.target.files[0];
-                const tmpQrCode = new Html5Qrcode("reader"); // Use a separate instance or the main one
-                
-                // Show loading
-                Swal.fire({ title: 'Đang đọc mã...', didOpen: () => Swal.showLoading() });
+                setTimeout(() => {
+                    if (html5QrCode) {
+                        html5QrCode = null; 
+                    }
 
-                tmpQrCode.scanFile(imageFile, true)
-                .then(decodedText => {
-                    Swal.close();
-                    onScanSuccess(decodedText);
-                })
-                .catch(err => {
-                    Swal.close();
-                    console.error("Lỗi đọc file QR:", err);
-                    Swal.fire('Thất bại', 'Không tìm thấy mã QR trong ảnh này.', 'error');
-                });
+                    html5QrCode = new Html5Qrcode("reader");
+                    isScanning = true;
+
+                    html5QrCode.start(
+                        { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 250, height: 250 } },
+                        onScanSuccess
+                    ).catch(err => {
+                        isScanning = false;
+                        Swal.fire('Lỗi', 'Không thể truy cập camera.', 'error');
+                    });
+                }, 500);
             });
 
-            function stopScanner() {
-                if (html5QrCode && html5QrCode.isScanning) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                    }).catch(err => console.error("Lỗi dừng scanner:", err));
-                }
-            }
+         
+            document.getElementById('stopScannerBtn')?.addEventListener('click', async function() {
+                await stopScanner();
+            });
 
-            function onScanSuccess(decodedText, decodedResult) {
-                stopScanner();
+          
+            qrScannerModalEl.addEventListener('hidden.bs.modal', async function() {
+                await stopScanner();
+            });
+
+        
+            document.getElementById('qr-input-file')?.addEventListener('change', async function(e) {
+                if (e.target.files.length == 0) return;
+
+                await stopScanner();
+
+                const fileQrCode = new Html5Qrcode("reader");
+                Swal.fire({ title: 'Đang đọc mã...', didOpen: () => Swal.showLoading() });
+
+                try {
+                    const decodedText = await fileQrCode.scanFile(e.target.files[0], true);
+                    Swal.close();
+                    qrModal.hide();
+                    processQrCode(decodedText);
+                } catch (err) {
+                    Swal.close();
+                    Swal.fire('Thất bại', 'Không tìm thấy mã QR.', 'error');
+                }
+            });
+
+  
+            async function onScanSuccess(decodedText) {
+                // Dừng scanner ngay lập tức
+                await stopScanner();
                 qrModal.hide();
-                
-                if (decodedText.startsWith("PURCHASE:")) {
-                    const parts = decodedText.split(":");
-                    const orderId = parts[1];
-                    const userId = parts[2];
-                    const productId = parts[3];
-                    const quantity = parts[4];
 
-                    Swal.fire({
-                        title: 'Đã tìm thấy đơn hàng!',
-                        html: `Mã đơn: <b>${orderId}</b><br>Người dùng ID: ${userId}<br>Sản phẩm ID: ${productId}<br>Số lượng: ${quantity}`,
-                        icon: 'success',
-                        showCancelButton: true,
-                        confirmButtonText: 'Xử lý ngay',
-                        cancelButtonText: 'Đóng'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            if (typeof window.handleQrDetails === 'function') {
-                                window.handleQrDetails(orderId, userId, productId, quantity);
-                            } else {
-                                window.location.href = `/AdminPayment/Index?qrOrder=${orderId}&qrUser=${userId}&qrProduct=${productId}&qrQty=${quantity}`;
-                            }
-                        }
-                    });
+                // Đợi modal đóng hoàn toàn rồi mới xử lý
+                setTimeout(() => {
+                    processQrCode(decodedText);
+                }, 300);
+            }
+
+
+                   function processQrCode(decodedText) {
+            console.log("QR Scanned:", decodedText);
+
+            if (decodedText.startsWith("BOOKING:")) {
+                const bookingCode = decodedText.replace("BOOKING:", "").trim();
+                if (typeof window.handleBookingScan === 'function') {
+                    window.handleBookingScan(bookingCode);
                 } else {
-                    Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
+                    Swal.fire('Lỗi', 'Chức năng quét booking chưa được tải.', 'error');
                 }
             }
+            else if (decodedText.startsWith("PURCHASE:")) {
+                const parts = decodedText.split(":");
+                const orderId = parts[1];
+                const orderCode = parts[2] || orderId;
+
+                //Đóng loading trước khi show Swal
+                Swal.close();
+
+                Swal.fire({
+                    title: ' Đã tìm thấy đơn hàng!',
+                    html: `<p class="mb-0">Mã đơn: <b>${orderCode}</b></p>`,
+                    icon: 'success',
+                    showCancelButton: true,
+                    confirmButtonText: ' Xử lý ngay',
+                    cancelButtonText: ' Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        if (typeof window.showFulfillmentModal === 'function') {
+                            window.showFulfillmentModal(parseInt(orderId));
+                        } else {
+                            Swal.fire('Lỗi', 'Chức năng xử lý đơn hàng chưa được tải.', 'error');
+                        }
+                    }
+                });
+            }
+            else {
+                
+                Swal.close();
+                Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
+            }
+        }
         });
     </script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </html>

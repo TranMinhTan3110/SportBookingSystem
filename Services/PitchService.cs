@@ -236,6 +236,57 @@ namespace SportBookingSystem.Services
             }
         }
 
+        //hàm mới 
+        // Trong PitchService.cs
+
+        public async Task<List<PitchPriceSetting>> GetPitchPricesAsync(int pitchId)
+        {
+            return await _context.PitchPriceSettings
+                .Where(p => p.PitchId == pitchId)
+                .OrderBy(p => p.StartTime)
+                .ToListAsync();
+        }
+
+        public async Task<(bool Success, string Message)> AddPitchPriceAsync(PitchPriceViewModel model)
+        {
+            try
+            {
+                // Validate logic: Giờ kết thúc phải sau giờ bắt đầu
+                if (model.EndTime <= model.StartTime)
+                    return (false, "Giờ kết thúc phải lớn hơn giờ bắt đầu");
+
+                // Validate logic: Kiểm tra trùng giờ (Nâng cao - có thể làm sau, tạm thời cho phép chèn)
+
+                var setting = new PitchPriceSetting
+                {
+                    PitchId = model.PitchId,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime,
+                    Price = model.Price,
+                    Note = model.Note
+                };
+
+                _context.PitchPriceSettings.Add(setting);
+                await _context.SaveChangesAsync();
+                return (true, "Thêm khung giờ giá thành công");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi thêm giá");
+                return (false, "Lỗi hệ thống");
+            }
+        }
+
+        public async Task<(bool Success, string Message)> DeletePitchPriceAsync(int id)
+        {
+            var item = await _context.PitchPriceSettings.FindAsync(id);
+            if (item == null) return (false, "Không tìm thấy dữ liệu");
+
+            _context.PitchPriceSettings.Remove(item);
+            await _context.SaveChangesAsync();
+            return (true, "Đã xóa");
+        }
+
         #region Private Methods - Xử lý ảnh
 
         /// Lưu ảnh vào thư mục wwwroot/asset/img/

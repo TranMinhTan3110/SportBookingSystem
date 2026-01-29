@@ -13,5 +13,6 @@ namespace SportBookingSystem.Services
         Task<Orders?> GetLatestPendingOrderAsync(int userId);
         Task<List<Orders>> GetPendingOrdersAsync(int userId);
         Task<Orders?> GetOrderByIdAsync(int orderId, int userId);
+        Task<List<Bookings>> GetActiveBookingsAsync(int userId);
     }
 }

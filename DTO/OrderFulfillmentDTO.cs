@@ -9,6 +9,7 @@ namespace SportBookingSystem.DTO
         public int Quantity { get; set; }
         public decimal TotalAmount { get; set; }
         public string? Status { get; set; }
+        public int StatusCode { get; set; }
         public DateTime OrderDate { get; set; }
     }
 

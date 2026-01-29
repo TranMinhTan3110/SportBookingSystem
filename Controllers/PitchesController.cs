@@ -229,5 +229,29 @@ namespace SportBookingSystem.Controllers
                 });
             }
         }
+
+        //hàm mới
+        // Trong PitchController 
+
+        [HttpGet]
+        public async Task<IActionResult> GetPrices(int pitchId)
+        {
+            var prices = await _pitchService.GetPitchPricesAsync(pitchId);
+            return Json(new { success = true, data = prices });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPrice(PitchPriceViewModel model)
+        {
+            var result = await _pitchService.AddPitchPriceAsync(model);
+            return Json(new { success = result.Success, message = result.Message });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeletePrice(int id)
+        {
+            var result = await _pitchService.DeletePitchPriceAsync(id);
+            return Json(new { success = result.Success, message = result.Message });
+        }
     }
 }

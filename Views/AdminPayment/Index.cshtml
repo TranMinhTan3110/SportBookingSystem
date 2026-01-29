@@ -179,29 +179,35 @@
                                 </div>
                             </td>
                             <td>
-                                @switch (item.Status)
+                                @if (item.Status != null)
                                 {
-                                    case "Thành công":
+                                    var statusTrim = item.Status.Trim(); // Cắt khoảng trắng để so sánh chính xác
+
+                                    @if (statusTrim == "Thành công")
+                                    {
                                         <span class="status-indicator">
                                             <span class="status-dot status-success"></span>
                                             <span class="status-text status-success-text">Thành công</span>
                                         </span>
-                                        break;
-                                    case "Chờ xử lý":
+                                    }
+                                    else if (statusTrim == "Chờ xử lý" || statusTrim == "Chờ xác nhận")
+                                    {
                                         <span class="status-indicator">
                                             <span class="status-dot status-warning"></span>
-                                            <span class="status-text status-warning-text">Chờ xử lý</span>
+                                            <span class="status-text status-warning-text">Chờ xác nhận</span>
                                         </span>
-                                        break;
-                                    case "Đã hủy":
+                                    }
+                                    else if (statusTrim == "Đã hủy")
+                                    {
                                         <span class="status-indicator">
                                             <span class="status-dot status-danger"></span>
                                             <span class="status-text status-danger-text">Đã hủy</span>
                                         </span>
-                                        break;
-                                    default:
-                                        <span>@item.Status</span>
-                                        break;
+                                    }
+                                    else
+                                    {
+                                        <span class="status-text">@item.Status</span>
+                                    }
                                 }
                             </td>
                             <td class="text-right">

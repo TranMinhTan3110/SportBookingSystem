@@ -121,5 +121,20 @@ namespace SportBookingSystem.Services
                 .Include(o => o.OrderDetails)
                 .FirstOrDefaultAsync(o => o.OrderId == orderId && o.UserId == userId);
         }
+        // ...
+        public async Task<List<Bookings>> GetActiveBookingsAsync(int userId)
+        {
+            return await _context.Bookings
+                .Include(b => b.Pitch)
+                .Include(b => b.TimeSlot)
+                .Where(b => b.UserId == userId
+                         && (b.Status == 0 || b.Status == 1) // 0: Chờ nhận, 1: Đã nhận
+                         && b.BookingDate >= DateTime.Today)
+                .OrderBy(b => b.BookingDate)
+                .ThenBy(b => b.TimeSlot.StartTime) // Sắp xếp theo giờ đá
+                .ToListAsync();
+        }
+     
+
     }
 }

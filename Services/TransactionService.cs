@@ -17,17 +17,14 @@ namespace SportBookingSystem.Services
                 .Include(t => t.Sender)
                 .OrderByDescending(t => t.TransactionDate);
 
-            // Tổng số bản ghi
             var totalRecords = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
 
-            // Lấy dữ liệu phân trang
             var transactions = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            
             var allTransactions = await _context.Transactions.ToListAsync();
 
             return new PaymentDashboardDTO
@@ -36,27 +33,118 @@ namespace SportBookingSystem.Services
                 {
                     Code = t.TransactionCode,
                     User = t.Sender?.FullName ?? t.Sender?.Username,
-                    Amount = t.Amount,
+                    Amount = Math.Abs(t.Amount), // FIXED: Luôn lấy giá trị tuyệt đối
                     Date = t.TransactionDate,
                     Type = t.TransactionType,
                     Status = t.Status,
                     Source = t.Source
                 }).ToList(),
+
                 TotalDeposits = allTransactions
-                    .Where(t => t.TransactionType == TransactionTypes.Recharge
-                             && t.Status == TransactionStatus.Success)
+                    .Where(t => t.TransactionType == TransactionTypes.Recharge && t.Status == TransactionStatus.Success)
                     .Sum(t => t.Amount),
+
                 Revenue = allTransactions
-                    .Where(t => (t.TransactionType == TransactionTypes.Booking
-                              || t.TransactionType == TransactionTypes.Order)
+                    .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
                              && t.Status == TransactionStatus.Success)
-                    .Sum(t => t.Amount),
+                    .Sum(t => Math.Abs(t.Amount)), // FIXED: Cộng giá trị tuyệt đối
+
                 TransactionCount = totalRecords,
                 CurrentPage = page,
                 PageSize = pageSize,
                 TotalPages = totalPages
             };
         }
+
+        public async Task<PaymentDashboardDTO> GetFilteredPaymentsAsync(
+            int page, int pageSize, string? searchTerm = null, string? type = null, string? status = null, DateTime? date = null)
+        {
+            var query = _context.Transactions
+                .Include(t => t.Sender)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.Trim().ToLower();
+                query = query.Where(t =>
+                    t.TransactionCode.ToLower().Contains(searchTerm) ||
+                    (t.Sender != null && (
+                        t.Sender.FullName.ToLower().Contains(searchTerm) ||
+                        t.Sender.Username.ToLower().Contains(searchTerm)
+                    ))
+                );
+            }
+
+            if (!string.IsNullOrWhiteSpace(type) && type != "all")
+            {
+                if (type == "Thanh toán")
+                {
+                    query = query.Where(t => t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order);
+                }
+                else
+                {
+                    query = query.Where(t => t.TransactionType == type);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(status) && status != "all")
+            {
+                var mappedStatus = status switch
+                {
+                    "Completed" => TransactionStatus.Success,
+                    "Pending" => TransactionStatus.Pending,
+                    "Cancelled" => TransactionStatus.Canceled,
+                    _ => status
+                };
+                query = query.Where(t => t.Status == mappedStatus);
+            }
+
+            if (date.HasValue)
+            {
+                var filterDate = date.Value.Date;
+                query = query.Where(t => t.TransactionDate.Date == filterDate);
+            }
+
+            query = query.OrderByDescending(t => t.TransactionDate);
+
+            var allTransactions = await _context.Transactions.ToListAsync();
+            var totalRecords = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            var transactions = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PaymentDashboardDTO
+            {
+                Payments = transactions.Select(t => new TransactionItemDTO
+                {
+                    Code = t.TransactionCode,
+                    User = t.Sender?.FullName ?? t.Sender?.Username,
+                    Amount = Math.Abs(t.Amount), // FIXED
+                    Date = t.TransactionDate,
+                    Type = t.TransactionType,
+                    Status = t.Status,
+                    Source = t.Source
+                }).ToList(),
+
+                TotalDeposits = allTransactions
+                    .Where(t => t.TransactionType == TransactionTypes.Recharge && t.Status == TransactionStatus.Success)
+                    .Sum(t => t.Amount),
+
+                Revenue = allTransactions
+                    .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
+                             && t.Status == TransactionStatus.Success)
+                    .Sum(t => Math.Abs(t.Amount)), // FIXED
+
+                TransactionCount = totalRecords,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalPages = totalPages
+            };
+        }
+
         public async Task<UserDepositInfoDTO?> GetUserByPhoneAsync(string phone)
         {
             if (string.IsNullOrEmpty(phone)) return null;
@@ -98,7 +186,6 @@ namespace SportBookingSystem.Services
 
                 user.WalletBalance += dto.Amount;
 
-                // Xác định prefix dựa trên phương thức thanh toán
                 string prefix = GetTransactionPrefix(dto.PaymentMethod);
 
                 var trans = new Transactions
@@ -116,7 +203,6 @@ namespace SportBookingSystem.Services
                 _context.Transactions.Add(trans);
                 await _context.SaveChangesAsync();
 
-                // Tạo mã giao dịch theo prefix
                 trans.TransactionCode = $"{prefix}-{trans.TransactionId:D4}";
 
                 await _context.SaveChangesAsync();
@@ -130,7 +216,6 @@ namespace SportBookingSystem.Services
             }
         }
 
-        // Helper method để xác định prefix
         private string GetTransactionPrefix(string paymentMethod)
         {
             return paymentMethod switch
@@ -140,107 +225,6 @@ namespace SportBookingSystem.Services
                 "Momo" => TransactionPrefixes.Deposit,
                 "VNPay" => TransactionPrefixes.Deposit,
                 _ => TransactionPrefixes.Recharge
-            };
-        }
-        public async Task<PaymentDashboardDTO> GetFilteredPaymentsAsync(
-       int page,
-       int pageSize,
-       string? searchTerm = null,
-       string? type = null,
-       string? status = null,
-       DateTime? date = null)
-        {
-            var query = _context.Transactions
-                .Include(t => t.Sender)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                searchTerm = searchTerm.Trim().ToLower();
-                query = query.Where(t =>
-                    t.TransactionCode.ToLower().Contains(searchTerm) ||
-                    (t.Sender != null && (
-                        t.Sender.FullName.ToLower().Contains(searchTerm) ||
-                        t.Sender.Username.ToLower().Contains(searchTerm)
-                    ))
-                );
-            }
-
-            if (!string.IsNullOrWhiteSpace(type) && type != "all")
-            {
-                if (type == "Thanh toán")
-                {
-                    query = query.Where(t =>
-                        t.TransactionType == TransactionTypes.Booking ||
-                        t.TransactionType == TransactionTypes.Order
-                    );
-                }
-                else
-                {
-                    query = query.Where(t => t.TransactionType == type);
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(status) && status != "all")
-            {
-                var mappedStatus = status switch
-                {
-                    "Completed" => TransactionStatus.Success,
-                    "Pending" => TransactionStatus.Pending,
-                    "Cancelled" => TransactionStatus.Canceled,
-                    _ => status
-                };
-                query = query.Where(t => t.Status == mappedStatus);
-            }
-
-            //Bộ lọc ngày
-            if (date.HasValue)
-            {
-                var filterDate = date.Value.Date;
-                query = query.Where(t => t.TransactionDate.Date == filterDate);
-            }
-
-            //Sắp xếp theo ngày giảm dần
-            query = query.OrderByDescending(t => t.TransactionDate);
-
-            //Tổng tiền nạp
-            var allTransactions = await _context.Transactions.ToListAsync();
-
-            //Tổng số giao dịch
-            var totalRecords = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
-
-            //Áp dụng phân trang
-            var transactions = await query
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new PaymentDashboardDTO
-            {
-                Payments = transactions.Select(t => new TransactionItemDTO
-                {
-                    Code = t.TransactionCode,
-                    User = t.Sender?.FullName ?? t.Sender?.Username,
-                    Amount = t.Amount,
-                    Date = t.TransactionDate,
-                    Type = t.TransactionType,
-                    Status = t.Status,
-                    Source = t.Source
-                }).ToList(),
-                TotalDeposits = allTransactions
-                    .Where(t => t.TransactionType == TransactionTypes.Recharge
-                             && t.Status == TransactionStatus.Success)
-                    .Sum(t => t.Amount),
-                Revenue = allTransactions
-                    .Where(t => (t.TransactionType == TransactionTypes.Booking
-                              || t.TransactionType == TransactionTypes.Order)
-                             && t.Status == TransactionStatus.Success)
-                    .Sum(t => t.Amount),
-                TransactionCount = totalRecords,
-                CurrentPage = page,
-                PageSize = pageSize,
-                TotalPages = totalPages
             };
         }
 
@@ -257,6 +241,7 @@ namespace SportBookingSystem.Services
                 })
                 .ToListAsync();
         }
+
         public async Task<RewardSettingDTO> GetCurrentRewardSettingsAsync()
         {
             var settings = await _context.SystemSetting.ToListAsync();
@@ -267,9 +252,9 @@ namespace SportBookingSystem.Services
                 IsActive = bool.TryParse(settings.FirstOrDefault(s => s.SettingKey == "IsRewardActive")?.SettingValue, out var i) ? i : true
             };
         }
+
         public async Task SaveRewardSettingsAsync(RewardSettingDTO dto)
         {
-            
             var settings = new Dictionary<string, string>
             {
                 { "RewardAmountStep", dto.AmountStep.ToString() },
@@ -286,11 +271,7 @@ namespace SportBookingSystem.Services
                 }
                 else
                 {
-                    _context.SystemSetting.Add(new SystemSetting
-                    {
-                        SettingKey = item.Key,
-                        SettingValue = item.Value
-                    });
+                    _context.SystemSetting.Add(new SystemSetting { SettingKey = item.Key, SettingValue = item.Value });
                 }
             }
             await _context.SaveChangesAsync();
@@ -307,16 +288,24 @@ namespace SportBookingSystem.Services
             if (order == null) return null;
 
             var firstDetail = order.OrderDetails.FirstOrDefault();
+            string statusText = order.Status switch
+            {
+                1 => "Thành công",
+                0 => "Chờ xử lý",
+                -1 => "Đã hủy",
+                _ => "Không xác định"
+            };
 
             return new OrderFulfillmentDTO
             {
                 OrderId = order.OrderId,
                 OrderCode = order.OrderCode,
-                CustomerName = order.User?.FullName ?? order.User?.Username,
-                ProductName = firstDetail?.Product?.ProductName,
+                CustomerName = order.User?.FullName ?? order.User?.Username ?? "Khách vãng lai",
+                ProductName = firstDetail?.Product?.ProductName ?? "N/A",
                 Quantity = firstDetail?.Quantity ?? 0,
                 TotalAmount = order.TotalAmount ?? 0,
-                Status = order.Status.ToString(),
+                Status = statusText,
+                StatusCode = order.Status, 
                 OrderDate = order.OrderDate
             };
         }
@@ -333,31 +322,43 @@ namespace SportBookingSystem.Services
 
                 if (order == null) return (false, "Không tìm thấy đơn hàng");
 
-                var dbTransaction = await _context.Transactions.FirstOrDefaultAsync(t => t.OrderId == orderId);
-                if (dbTransaction == null) return (false, "Không tìm thấy giao dịch liên quan");
+                
+                if (order.Status == 1)
+                {
+                    return (false, "Đơn hàng này đã được xác nhận trước đó.");
+                }
 
-                if (newStatus == TransactionStatus.Success)
+                if (order.Status == -1)
+                {
+                    return (false, "Đơn hàng đã bị hủy, không thể xử lý.");
+                }
+
+                var dbTransaction = await _context.Transactions
+                    .FirstOrDefaultAsync(t => t.OrderId == orderId);
+
+                if (dbTransaction == null)
+                    return (false, "Không tìm thấy giao dịch liên quan");
+
+                if (newStatus == "Thành công")
                 {
                     order.Status = 1;
                     dbTransaction.Status = TransactionStatus.Success;
-                }
-                else if (newStatus == TransactionStatus.Canceled)
-                {
-                    if (dbTransaction.Status == TransactionStatus.Success || dbTransaction.Status == TransactionStatus.Canceled)
-                    {
-                        return (false, "Đơn hàng đã được xử lý trước đó");
-                    }
 
-                    order.Status = -1; // Đã hủy
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return (true, "Xác nhận giao hàng thành công!");
+                }
+                else if (newStatus == "Đã hủy")
+                {
+                    order.Status = -1;
                     dbTransaction.Status = TransactionStatus.Canceled;
 
-                    // Hoàn tiền
                     var user = await _context.Users.FindAsync(order.UserId);
                     if (user != null)
                     {
                         user.WalletBalance += order.TotalAmount ?? 0;
-                        
-                        // Tạo giao dịch hoàn tiền mới
+
                         var refundTrans = new Transactions
                         {
                             UserId = user.UserId,
@@ -371,12 +372,12 @@ namespace SportBookingSystem.Services
                             OrderId = order.OrderId
                         };
                         _context.Transactions.Add(refundTrans);
-                        await _context.SaveChangesAsync(); 
+                        await _context.SaveChangesAsync();
 
                         refundTrans.TransactionCode = $"{TransactionPrefixes.Refund}-{refundTrans.TransactionId:D4}";
                     }
 
-                    // Trả lại kho
+                
                     foreach (var detail in order.OrderDetails)
                     {
                         var product = await _context.Products.FindAsync(detail.ProductId);
@@ -385,18 +386,22 @@ namespace SportBookingSystem.Services
                             product.StockQuantity += detail.Quantity;
                         }
                     }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return (true, "Đã hủy đơn và hoàn tiền thành công!");
                 }
 
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-                return (true, "Cập nhật thành công");
+                return (false, "Trạng thái không hợp lệ");
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return (false, ex.Message);
+                return (false, $"Lỗi: {ex.Message}");
             }
         }
+
         public async Task CancelExpiredOrdersAsync()
         {
             try
