@@ -9,33 +9,45 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Chức năng nạp tiền đang được phát triển');
         });
     }
-    const checkinBtn = document.querySelector('.btn-checkin');
+    const checkinBtns = document.querySelectorAll('.btn-checkin:not(.btn-order-qr)');
     const checkInQrModal = document.getElementById('checkInQrModal');
 
-    if (checkinBtn) {
-        checkinBtn.addEventListener('click', function () {
-            const code = this.dataset.code;
-            if (!code) return showNotification('Không tìm thấy mã check-in', 'error');
+    if (checkinBtns.length > 0) {
+        checkinBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const code = this.dataset.code;
+                if (!code) return showNotification('Không tìm thấy mã check-in', 'error');
 
-            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
-            this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
+                this.disabled = true;
 
-            fetch(`/UserProfile/GenerateBookingQr?checkInCode=${code}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
-                        document.getElementById('checkInCodeDisplay').textContent = code;
-                        openModal(checkInQrModal);
-                    } else {
-                        showNotification('Lỗi tạo mã QR', 'error');
-                    }
-                })
-                .catch(err => showNotification('Lỗi kết nối', 'error'))
-                .finally(() => {
-                    this.innerHTML = '<i class="fas fa-qrcode"></i> Lấy mã Check-in';
-                    this.disabled = false;
-                });
+                // Reset modal content for Booking
+                const modalTitle = document.getElementById('qrModalTitle');
+                const modalAlert = document.getElementById('qrModalAlert');
+                if (modalTitle) modalTitle.textContent = "Mã Check-in Đặt Sân";
+                if (modalAlert) modalAlert.innerHTML = '<i class="fas fa-info-circle"></i> Vui lòng đưa mã này cho nhân viên tại sân để nhận sân.';
+
+                fetch(`/UserProfile/GenerateBookingQr?checkInCode=${code}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
+                            document.getElementById('checkInCodeDisplay').textContent = code;
+
+                            // Hide countdown for bookings if not applicable (or reset if needed)
+                            document.getElementById('qrCountdown').style.display = 'none';
+
+                            openModal(checkInQrModal);
+                        } else {
+                            showNotification('Lỗi tạo mã QR', 'error');
+                        }
+                    })
+                    .catch(err => showNotification('Lỗi kết nối', 'error'))
+                    .finally(() => {
+                        this.innerHTML = '<i class="fas fa-qrcode"></i> Lấy mã Check-in';
+                        this.disabled = false;
+                    });
+            });
         });
     }
 
@@ -47,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const fieldName = card.querySelector('.booking-field-info span').textContent;
 
             if (confirm(`Xác nhận thanh toán cho ${fieldName}?`)) {
-                // TODO: Process payment
                 alert('Đang xử lý thanh toán...');
             }
         });
@@ -93,7 +104,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const avatar = document.querySelector('.profile-avatar');
     if (avatar) {
         avatar.addEventListener('click', function () {
-            // TODO: Open file upload dialog
             console.log('Avatar clicked - open upload dialog');
         });
     }
@@ -310,12 +320,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
                 this.classList.add('disabled');
 
+                // Update modal content for Order
+                const modalTitle = document.getElementById('qrModalTitle');
+                const modalAlert = document.getElementById('qrModalAlert');
+                if (modalTitle) modalTitle.textContent = "Mã QR Đơn Hàng";
+                if (modalAlert) modalAlert.innerHTML = '<i class="fas fa-info-circle"></i> Vui lòng đưa mã này cho nhân viên tại Canteen để nhận món.';
+
                 fetch(`/UserProfile/GenerateOrderQr?orderId=${orderId}`)
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
                             document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
-                            document.getElementById('checkInCodeDisplay').textContent = 'Order #' + orderId;
+                            document.getElementById('checkInCodeDisplay').textContent = 'Mã đơn hàng #' + data.orderCode;
 
                             const countdownDiv = document.getElementById('qrCountdown');
                             const timerSpan = document.getElementById('countdownTimer');
