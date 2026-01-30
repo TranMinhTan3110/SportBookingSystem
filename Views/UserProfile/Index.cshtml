@@ -91,41 +91,29 @@
                 </div>
             }
         }
-        else if (Model.UpcomingBooking != null)
+        
+        @if (Model.UpcomingBooking != null)
         {
-            <div class="reminder-card">
-                <div class="reminder-icon">
-                    <i class="fas fa-calendar-check"></i>
+            <div class="important-reminder-banner" style="margin-top: 15px;">
+                <div class="reminder-banner-icon">
+                    <i class="fas fa-bell"></i>
                 </div>
-                <div class="reminder-content">
-                    <h3 class="reminder-title">@Model.UpcomingBooking.Pitch.PitchName</h3>
-                    <p class="reminder-time">
-                        <i class="far fa-clock"></i>
-                        @Model.UpcomingBooking.StartTime.ToString("HH:mm") - @Model.UpcomingBooking.EndTime.ToString("HH:mm") | @Model.UpcomingBooking.StartTime.ToString("dd/MM")
-                    </p>
-                    <p class="reminder-warning">
-                        @if (Model.UpcomingBooking.TotalPrice > Model.UpcomingBooking.PaidAmount)
-                        {
-                            <i class="fas fa-exclamation-triangle"></i>
-                             <span>Chưa thanh toán đủ: Thiếu @((Model.UpcomingBooking.TotalPrice - Model.UpcomingBooking.PaidAmount)?.ToString("N0"))₫</span>
-                        }
-                        else
-                        {
-                            <i class="fas fa-check-circle"></i>
-                            <span>Đã thanh toán đủ</span>
-                        }
-                    </p>
+                <div class="reminder-banner-content">
+                    <span class="reminder-banner-label">Đặt sân sắp tới - Vui lòng check-in</span>
+                    <h2 class="reminder-banner-title">@Model.UpcomingBooking.Pitch.PitchName</h2>
+                    <div class="reminder-banner-info">
+                        <span><i class="far fa-clock"></i> @Model.UpcomingBooking.StartTime.ToString("HH:mm")</span>
+                        <span><i class="far fa-calendar-alt"></i> @Model.UpcomingBooking.StartTime.ToString("dd/MM/yyyy")</span>
+                    </div>
                 </div>
-                 @if (!string.IsNullOrEmpty(Model.UpcomingBooking.CheckInCode))
-                 {
-                    <button class="btn-checkin" data-code="@Model.UpcomingBooking.CheckInCode">
-                        <i class="fas fa-qrcode"></i>
-                        Lấy mã Check-in
-                    </button>
-                 }
+                <button class="btn-banner-qr btn-checkin" data-code="@Model.UpcomingBooking.CheckInCode">
+                    <i class="fas fa-qrcode"></i>
+                    Lấy mã Check-in
+                </button>
             </div>
         }
-        else
+
+        @if ((Model.PendingOrders == null || !Model.PendingOrders.Any()) && Model.UpcomingBooking == null)
         {
              <div class="reminder-card">
                  <div class="reminder-content">

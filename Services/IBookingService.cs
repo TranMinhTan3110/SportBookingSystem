@@ -4,7 +4,7 @@ namespace SportBookingSystem.Services
 {
     public interface IBookingService
     {
-        // Các hàm lọc sân cũ (giữ nguyên)
+        // Các hàm lọc sân cũ
         Task<FilterPitchesResponse> GetAvailablePitchesAsync(
             DateTime date,
             List<int>? slotIds,
@@ -33,5 +33,6 @@ namespace SportBookingSystem.Services
         Task<(bool Success, string Message)> ConfirmCheckInAsync(string bookingCode);
 
         Task<(bool Success, string Message, string? QrBase64, string? BookingCode)> BookPitchAsync(int userId, int pitchId, int slotId, DateTime date);
+        Task<(bool Success, string Message, decimal RefundAmount)> CancelBookingAsync(string bookingCode, bool isAutoCancel = false);
     }
 }

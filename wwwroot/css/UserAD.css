@@ -194,11 +194,13 @@ body {
     -webkit-overflow-scrolling: touch;
     width: 100%;
 }
+
 #userTableBody td {
     color: black;
     padding: 14px 16px;
     font-size: 1.1em;
 }
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -348,7 +350,7 @@ tbody tr.hidden {
     display: none;
 }
 
-.modal {
+.user-ad-modal {
     display: none;
     position: fixed;
     top: 0;
@@ -361,11 +363,11 @@ tbody tr.hidden {
     justify-content: center;
 }
 
-.modal.active {
+.user-ad-modal.active {
     display: flex;
 }
 
-.modal-content {
+.user-ad-modal-content {
     background: white;
     border-radius: 16px;
     max-width: 600px;
@@ -374,7 +376,7 @@ tbody tr.hidden {
     overflow-y: auto;
 }
 
-.modal-header {
+.user-ad-modal-header {
     padding: 20px;
     border-bottom: 1px solid #e2e8f0;
     display: flex;
@@ -382,7 +384,7 @@ tbody tr.hidden {
     align-items: center;
 }
 
-.modal-header h2 {
+.user-ad-modal-header h2 {
     font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
@@ -409,7 +411,7 @@ tbody tr.hidden {
     background: #f1f5f9;
 }
 
-.modal-body {
+.user-ad-modal-body {
     padding: 20px;
 }
 
@@ -484,7 +486,7 @@ tbody tr.hidden {
     color: #dc2626;
 }
 
-.modal-footer {
+.user-ad-modal-footer {
     padding: 14px 20px;
     border-top: 1px solid #e2e8f0;
     display: flex;
