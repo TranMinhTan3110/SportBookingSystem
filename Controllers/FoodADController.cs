@@ -142,7 +142,7 @@ namespace SportBookingSystem.Controllers
                 {
                     return Json(new { success = false, message = "Không có file được chọn!" });
                 }
-e
+
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 var extension = Path.GetExtension(imageFile.FileName).ToLower();
 
