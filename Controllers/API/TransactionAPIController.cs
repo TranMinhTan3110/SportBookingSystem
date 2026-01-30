@@ -114,7 +114,7 @@ namespace SportBookingSystem.Controllers.API
         public async Task<IActionResult> GetBookingStatus([FromQuery] string code)
         {
             if (string.IsNullOrEmpty(code)) return BadRequest();
-            
+
             var status = await _transactionUserService.GetBookingStatusByCheckInCodeAsync(code);
             return Ok(new { status = status });
         }
