@@ -133,7 +133,19 @@ namespace SportBookingSystem.Services
                 var pitch = await _context.Pitches.FindAsync(pitchId);
                 var timeSlot = await _context.TimeSlots.FindAsync(slotId);
                 var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
-                decimal amount = pitch.PricePerHour * (decimal)duration;
+
+                // ✅ FIX: TÍNH GIÁ ĐÚNG THEO KHUNG GIỜ ĐẶC BIỆT TỪ BẢNG PitchPriceSettings
+                decimal currentPricePerHour = pitch.PricePerHour;
+                var specialPrice = await _context.PitchPriceSettings
+                    .FirstOrDefaultAsync(s => s.PitchId == pitchId
+                                           && timeSlot.StartTime >= s.StartTime
+                                           && timeSlot.StartTime < s.EndTime);
+                if (specialPrice != null)
+                {
+                    currentPricePerHour = specialPrice.Price;
+                }
+
+                decimal amount = currentPricePerHour * (decimal)duration;
 
                 var user = await _context.Users.FindAsync(userId);
                 if (user.WalletBalance < amount) return (false, "Số dư không đủ. Vui lòng nạp thêm!", null, null);

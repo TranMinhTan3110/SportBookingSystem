@@ -1,7 +1,4 @@
-/**
- * AdminQRHandler.js
- * Quản lý logic quét mã QR dùng chung cho hệ quản trị (Sân & Đồ)
- */
+
 
 const AdminQR = (function () {
     const toast = Swal.mixin({
