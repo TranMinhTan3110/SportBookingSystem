@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(' Đang ở tab Booking History, reloading...');
             loadBookingHistory(1);
         } else {
-            console.log('ℹ Không ở tab Booking History, sẽ reload khi chuyển sang tab');
+            console.log(' Không ở tab Booking History, sẽ reload khi chuyển sang tab');
         }
     });
 });
@@ -383,7 +383,7 @@ async function handleCancelBooking(bookingCode) {
 
             if (data.success) {
                 Swal.fire('Thành công!', data.message, 'success');
-                loadBookingHistory(currentBookingPage); // Reload data
+                loadBookingHistory(currentBookingPage); ``
             } else {
                 Swal.fire('Lỗi!', data.message, 'error');
             }
