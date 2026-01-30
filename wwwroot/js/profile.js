@@ -4,18 +4,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const rechargeBtn = document.querySelector('.btn-recharge');
 
-   
-    const checkinBtn = document.querySelector('.btn-checkin');
 
-    if (rechargeBtn) {
-        rechargeBtn.addEventListener('click', function () {
-
-            alert('Chức năng nạp tiền đang được phát triển');
-        });
-    }
-    const checkinBtns = document.querySelectorAll('.btn-checkin:not(.btn-order-qr)');
-
-    const checkInQrModal = document.getElementById('checkInQrModal');
+    const checkinBtns = document.querySelectorAll('.btn-checkin');
 
     if (checkinBtns.length > 0) {
         checkinBtns.forEach(btn => {
@@ -23,7 +13,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const code = this.dataset.code;
                 if (!code) return showNotification('Không tìm thấy mã check-in', 'error');
 
+                const originalContent = this.innerHTML;
+
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo...';
+                this.classList.add('disabled');
                 this.disabled = true;
 
                 // Reset modal content for Booking
@@ -38,22 +31,42 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (data.success) {
                             document.getElementById('checkInQrImage').src = 'data:image/png;base64,' + data.qrCode;
                             document.getElementById('checkInCodeDisplay').textContent = code;
-
-                            // Hide countdown for bookings if not applicable (or reset if needed)
                             document.getElementById('qrCountdown').style.display = 'none';
 
                             openModal(checkInQrModal);
+
+                            // Lắng nghe sự kiện check-in thành công
+                            startCheckInPolling(code);
                         } else {
                             showNotification('Lỗi tạo mã QR', 'error');
                         }
                     })
                     .catch(err => showNotification('Lỗi kết nối', 'error'))
                     .finally(() => {
-                        this.innerHTML = '<i class="fas fa-qrcode"></i> Lấy mã Check-in';
+                        this.innerHTML = originalContent;
+                        this.classList.remove('disabled');
                         this.disabled = false;
                     });
             });
         });
+    }
+
+
+    let checkInPoller;
+    function startCheckInPolling(code) {
+        if (checkInPoller) clearInterval(checkInPoller);
+        checkInPoller = setInterval(() => {
+            // API kiểm tra trạng thái booking
+            fetch(`/api/transaction/booking-status?code=${code}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 2 || data.status === 3) { // CheckedIn or Completed
+                        clearInterval(checkInPoller);
+                        showNotification('Check-in thành công! Đang cập nhật lịch tiếp theo...', 'success');
+                        setTimeout(() => location.reload(), 2000);
+                    }
+                });
+        }, 3000);
     }
 
 
@@ -114,6 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
+    const checkInQrModal = document.getElementById('checkInQrModal');
     const emailModal = document.getElementById('emailModal');
     const phoneModal = document.getElementById('phoneModal');
     const passwordModal = document.getElementById('passwordModal');
@@ -325,7 +339,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tải...';
                 this.classList.add('disabled');
 
-                // Update modal content for Order
                 const modalTitle = document.getElementById('qrModalTitle');
                 const modalAlert = document.getElementById('qrModalAlert');
                 if (modalTitle) modalTitle.textContent = "Mã QR Đơn Hàng";

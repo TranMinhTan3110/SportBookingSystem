@@ -10,6 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/AdminQR.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -76,13 +77,13 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="modal fade" id="qrScannerModal" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-                <div class="modal-header bg-primary text-white py-3">
+            <div class="modal-content">
+                <div class="modal-header">
                     <h5 class="modal-title fw-bold"><i class="bi bi-qr-code-scan me-2"></i>Quét mã QR</h5>
                     <button type="button" class="btn-close btn-close-white" id="stopScannerBtn" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <div id="reader" style="width: 100%; border-radius: 15px;"></div>
+                    <div id="reader"></div>
                     <div class="text-center mt-3">
                         <p class="text-muted small mb-3">Vui lòng đưa mã QR vào khung hình</p>
                         <div class="d-grid">
@@ -96,6 +97,8 @@
             </div>
         </div>
     </div>
+    @await Html.PartialAsync("_AdminQRModals")
+    <script src="~/js/AdminQRHandler.js"></script>
     <script>
         const menuToggle = document.getElementById('menuToggle');
         const sidebar = document.getElementById('sidebar');
@@ -115,6 +118,15 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Khởi tạo AdminQR
+            AdminQR.init({
+                onSuccess: function(code, type) {
+                    // Nếu trang hiện tại có định nghĩa applyFilters (như AdminPayment), hãy dùng nó
+                    if (typeof applyFilters === 'function') applyFilters();
+                    else location.reload();
+                }
+            });
+
             let html5QrCode = null;
             let isScanning = false; 
 
@@ -137,26 +149,31 @@
             }
 
           
-            document.getElementById('startScannerBtn')?.addEventListener('click', function() {
+            document.getElementById('startScannerBtn')?.addEventListener('click', async function() {
+                // Đảm bảo scanner cũ đã dừng trước khi mở modal mới
+                await stopScanner();
+                
                 qrModal.show();
 
-                setTimeout(() => {
-                    if (html5QrCode) {
-                        html5QrCode = null; 
-                    }
-
-                    html5QrCode = new Html5Qrcode("reader");
-                    isScanning = true;
-
-                    html5QrCode.start(
-                        { facingMode: "environment" },
-                        { fps: 10, qrbox: { width: 250, height: 250 } },
-                        onScanSuccess
-                    ).catch(err => {
+                setTimeout(async () => {
+                    try {
+                        if (!html5QrCode) {
+                            html5QrCode = new Html5Qrcode("reader");
+                        }
+                        
+                        isScanning = true;
+                        await html5QrCode.start(
+                            { facingMode: "environment" },
+                            { fps: 10, qrbox: { width: 250, height: 250 } },
+                            onScanSuccess
+                        );
+                    } catch (err) {
+                        console.error("Start scanner error:", err);
                         isScanning = false;
-                        Swal.fire('Lỗi', 'Không thể truy cập camera.', 'error');
-                    });
-                }, 500);
+                        qrModal.hide();
+                        Swal.fire('Lỗi', 'Không thể khởi động camera. Vui lòng kiểm tra quyền truy cập.', 'error');
+                    }
+                }, 400);
             });
 
          
@@ -185,7 +202,10 @@
                     processQrCode(decodedText);
                 } catch (err) {
                     Swal.close();
-                    Swal.fire('Thất bại', 'Không tìm thấy mã QR.', 'error');
+                    qrModal.hide(); // Đóng modal quét trước
+                    setTimeout(() => {
+                        Swal.fire('Thất bại', 'Không tìm thấy mã QR.', 'error');
+                    }, 200);
                 }
             });
 
@@ -202,48 +222,38 @@
             }
 
 
-                   function processQrCode(decodedText) {
-            console.log("QR Scanned:", decodedText);
+            function processQrCode(decodedText) {
+                console.log("QR Scanned:", decodedText);
 
-            if (decodedText.startsWith("BOOKING:")) {
-                const bookingCode = decodedText.replace("BOOKING:", "").trim();
-                if (typeof window.handleBookingScan === 'function') {
-                    window.handleBookingScan(bookingCode);
-                } else {
-                    Swal.fire('Lỗi', 'Chức năng quét booking chưa được tải.', 'error');
+                if (decodedText.startsWith("BOOKING:")) {
+                    const bookingCode = decodedText.replace("BOOKING:", "").trim();
+                    AdminQR.handleBookingScan(bookingCode);
+                }
+                else if (decodedText.startsWith("PURCHASE:")) {
+                    const parts = decodedText.split(":");
+                    const orderId = parts[1];
+                    const orderCode = parts[2] || orderId;
+
+                    Swal.close(); // Đóng loading nếu có
+
+                    Swal.fire({
+                        title: 'Đã tìm thấy đơn hàng!',
+                        html: `<p class="mb-0">Mã đơn: <b>${orderCode}</b></p>`,
+                        icon: 'success',
+                        showCancelButton: true,
+                        confirmButtonText: 'Xử lý ngay',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            AdminQR.showFulfillmentModal(parseInt(orderId));
+                        }
+                    });
+                }
+                else {
+                    Swal.close();
+                    Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
                 }
             }
-            else if (decodedText.startsWith("PURCHASE:")) {
-                const parts = decodedText.split(":");
-                const orderId = parts[1];
-                const orderCode = parts[2] || orderId;
-
-                //Đóng loading trước khi show Swal
-                Swal.close();
-
-                Swal.fire({
-                    title: ' Đã tìm thấy đơn hàng!',
-                    html: `<p class="mb-0">Mã đơn: <b>${orderCode}</b></p>`,
-                    icon: 'success',
-                    showCancelButton: true,
-                    confirmButtonText: ' Xử lý ngay',
-                    cancelButtonText: ' Hủy'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        if (typeof window.showFulfillmentModal === 'function') {
-                            window.showFulfillmentModal(parseInt(orderId));
-                        } else {
-                            Swal.fire('Lỗi', 'Chức năng xử lý đơn hàng chưa được tải.', 'error');
-                        }
-                    }
-                });
-            }
-            else {
-                
-                Swal.close();
-                Swal.fire('Thông báo', 'Mã QR không hợp lệ hoặc không được hỗ trợ.', 'warning');
-            }
-        }
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

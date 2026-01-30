@@ -49,39 +49,30 @@ namespace SportBookingSystem.Services
 
         public async Task<(List<UserBookingDTO> Data, int TotalRecords)> LoadUserBookingsAsync(int userId, int page, int pageSize)
         {
-       
-            var transactionCodes = await _context.Transactions
-                .Where(t => t.UserId == userId && t.TransactionType == TransactionTypes.Booking)
-                                                                   
-                .Select(t => t.TransactionCode)
-                .ToListAsync();
-
-     
-            var query = _context.PitchSlots
-                .Include(ps => ps.Pitch)
-                .Include(ps => ps.TimeSlot)
-                .Where(ps => transactionCodes.Contains(ps.BookingCode)
-                          && ps.Status >= BookingStatus.PendingConfirm)
-            
-                .OrderByDescending(ps => ps.PlayDate);
+            var query = from ps in _context.PitchSlots
+                        join t in _context.Transactions on ps.BookingCode equals t.TransactionCode
+                        where ps.UserId == userId 
+                              && t.TransactionType == TransactionTypes.Booking
+                              && ps.Status != 0
+                        orderby ps.PitchSlotId descending
+                        select new UserBookingDTO
+                        {
+                            BookingCode = ps.BookingCode ?? "N/A",
+                            PitchName = ps.Pitch.PitchName,
+                            BookingDate = ps.PlayDate,
+                            StartTime = ps.PlayDate.Date.Add(ps.TimeSlot.StartTime),
+                            EndTime = ps.PlayDate.Date.Add(ps.TimeSlot.EndTime),
+                            TimeRange = ps.TimeSlot.StartTime.ToString(@"hh\:mm") + " - " + ps.TimeSlot.EndTime.ToString(@"hh\:mm"),
+                            TotalPrice = t.Amount,
+                            Status = ps.Status,
+                            CheckInCode = ps.BookingCode
+                        };
 
             var totalRecords = await query.CountAsync();
 
             var data = await query
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(ps => new UserBookingDTO
-                {
-                    BookingCode = ps.BookingCode ?? "N/A",
-                    PitchName = ps.Pitch.PitchName,
-                    BookingDate = ps.PlayDate,
-                    StartTime = ps.PlayDate.Add(ps.TimeSlot.StartTime),
-                    EndTime = ps.PlayDate.Add(ps.TimeSlot.EndTime),
-                    TimeRange = ps.TimeSlot.StartTime.ToString(@"hh\:mm") + " - " + ps.TimeSlot.EndTime.ToString(@"hh\:mm"),
-                    TotalPrice = ps.Pitch.PricePerHour * 1.5m,
-                    Status = ps.Status,
-                    CheckInCode = ps.BookingCode
-                })
                 .ToListAsync();
 
             return (data, totalRecords);
@@ -183,6 +174,15 @@ namespace SportBookingSystem.Services
                 Console.WriteLine($"Error: {ex.InnerException?.Message ?? ex.Message}");
                 return $"Lỗi: {ex.InnerException?.Message ?? ex.Message}";
             }
+        }
+
+        public async Task<int> GetBookingStatusByCheckInCodeAsync(string checkInCode)
+        {
+            var slot = await _context.PitchSlots.FirstOrDefaultAsync(ps => ps.BookingCode == checkInCode);
+            if (slot != null) return slot.Status;
+            
+            var booking = await _context.Bookings.FirstOrDefaultAsync(b => b.CheckInCode == checkInCode);
+            return booking?.Status ?? -99;
         }
 
         public async Task<(List<UserTransferDTO> Data, int TotalRecords)> LoadUserTransfersAsync(int userId, int page, int pageSize)

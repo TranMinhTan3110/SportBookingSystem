@@ -23,6 +23,7 @@ namespace SportBookingSystem.Services
         Task<OrderFulfillmentDTO?> GetOrderDetailsByIdAsync(int orderId);
         Task<(bool Success, string Message)> UpdateOrderStatusAsync(int orderId, string newStatus);
         Task CancelExpiredOrdersAsync();
+        Task AutoCancelExpiredBookingsAsync();
         Task<TransactionDetailDTO?> GetTransactionDetailsAsync(string code);
     }
 }

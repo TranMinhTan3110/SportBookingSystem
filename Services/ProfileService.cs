@@ -87,11 +87,33 @@ namespace SportBookingSystem.Services
 
         public async Task<Bookings?> GetUpcomingBookingAsync(int userId)
         {
-            return await _context.Bookings
-                .Include(b => b.Pitch)
-                .Where(b => b.UserId == userId && b.StartTime > DateTime.Now && b.Status != 2)
-                .OrderBy(b => b.StartTime)
+            var threshold = DateTime.Now.AddMinutes(-30);
+            var thresholdDate = threshold.Date;
+            var thresholdTime = threshold.TimeOfDay;
+
+            var slot = await _context.PitchSlots
+                .Include(ps => ps.Pitch)
+                .Include(ps => ps.TimeSlot)
+                .Where(ps => ps.UserId == userId 
+                         && ps.Status == 1 // Chỉ lấy đơn Chờ xác nhận (PendingConfirm)
+                         && (ps.PlayDate > thresholdDate || (ps.PlayDate == thresholdDate && ps.TimeSlot.StartTime > thresholdTime)))
+                .OrderBy(ps => ps.PlayDate)
+                .ThenBy(ps => ps.TimeSlot.StartTime)
                 .FirstOrDefaultAsync();
+
+            if (slot == null) return null;
+
+            // Ánh xạ sang Bookings để tương thích với View
+            return new Bookings
+            {
+                Pitch = slot.Pitch,
+                StartTime = slot.PlayDate.Date.Add(slot.TimeSlot.StartTime),
+                EndTime = slot.PlayDate.Date.Add(slot.TimeSlot.EndTime),
+                CheckInCode = slot.BookingCode,
+                Status = slot.Status,
+                PitchId = slot.PitchId,
+                UserId = slot.UserId
+            };
         }
 
         public async Task<Orders?> GetLatestPendingOrderAsync(int userId)
@@ -124,15 +146,27 @@ namespace SportBookingSystem.Services
         // ...
         public async Task<List<Bookings>> GetActiveBookingsAsync(int userId)
         {
-            return await _context.Bookings
-                .Include(b => b.Pitch)
-                .Include(b => b.TimeSlot)
-                .Where(b => b.UserId == userId
-                         && (b.Status == 0 || b.Status == 1) // 0: Chờ nhận, 1: Đã nhận
-                         && b.BookingDate >= DateTime.Today)
-                .OrderBy(b => b.BookingDate)
-                .ThenBy(b => b.TimeSlot.StartTime) // Sắp xếp theo giờ đá
+            var slots = await _context.PitchSlots
+                .Include(ps => ps.Pitch)
+                .Include(ps => ps.TimeSlot)
+                .Where(ps => ps.UserId == userId
+                          && (ps.Status == 0 || ps.Status == 1) // 0: Chờ nhận, 1: Đã nhận
+                          && ps.PlayDate >= DateTime.Today)
+                .OrderBy(ps => ps.PlayDate)
+                .ThenBy(ps => ps.TimeSlot.StartTime)
                 .ToListAsync();
+
+            return slots.Select(slot => new Bookings
+            {
+                Pitch = slot.Pitch,
+                TimeSlot = slot.TimeSlot,
+                StartTime = slot.PlayDate.Date.Add(slot.TimeSlot.StartTime),
+                EndTime = slot.PlayDate.Date.Add(slot.TimeSlot.EndTime),
+                CheckInCode = slot.BookingCode,
+                Status = slot.Status,
+                PitchId = slot.PitchId,
+                UserId = slot.UserId
+            }).ToList();
         }
      
 

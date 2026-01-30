@@ -142,13 +142,13 @@
                             </td>
                             <td>
                                 @{ var type = (item.Type ?? "").Trim(); }
-                                @if (type == "Nạp tiền" || type == "Hoàn tiền")
+                                @if (type == "Nạp tiền" || type == "Hoàn tiền" || type == "Hoàn tiền đặt sân")
                                 {
                                     <span class="badge badge-success">@item.Type</span>
                                 }
-                                else if (type == "Thanh toán sân" || type == "Thanh toán đồ")
+                                else if (type == "Thanh toán Booking" || type == "Thanh toán Order")
                                 {
-                                    <span class="badge badge-default">@item.Type</span>
+                                    <span class="badge badge-secondary">@item.Type</span>
                                 }
                                 else if (type == "Chuyển tiền")
                                 {
@@ -160,13 +160,13 @@
                                 }
                             </td>
                             <td class="text-right">
-                                @if (type != "Hoàn tiền")
+                                @if (type == "Hoàn tiền" || type == "Hoàn tiền đặt sân")
                                 {
-                                    <span class="amount-positive">+@item.Amount.ToString("N0")đ</span>
+                                    <span class="amount-negative">-@item.Amount.ToString("N0")đ</span>
                                 }
                                 else
                                 {
-                                    <span class="amount-negative">-@item.Amount.ToString("N0")đ</span>
+                                    <span class="amount-positive">+@item.Amount.ToString("N0")đ</span>
                                 }
                             </td>
                             <td>
@@ -197,7 +197,7 @@
                                             <span class="status-text status-warning-text">Chờ xác nhận</span>
                                         </span>
                                     }
-                                    else if (statusTrim == "Đã hủy")
+                                    else if (statusTrim == "Đã hủy" || statusTrim == "Đã hủy đặt sân")
                                     {
                                         <span class="status-indicator">
                                             <span class="status-dot status-danger"></span>
@@ -445,58 +445,6 @@
 </div>
 
 
-<div class="modal fade" id="qrFulfillmentModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white border-secondary shadow-lg">
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title d-flex align-items-center">
-                    <i class="bi bi-qr-code-scan me-2 text-primary"></i>
-                    Xác nhận đơn hàng QR
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4">
-                <div id="fulfillmentLoading" class="text-center py-3 d-none">
-                    <div class="spinner-border text-primary" role="status"></div>
-                    <p class="mt-2 text-muted">Đang tải thông tin đơn hàng...</p>
-                </div>
-                <div id="fulfillmentContent">
-                    <div class="d-flex justify-content-between mb-3 pb-3 border-bottom border-secondary">
-                        <span class="text-muted">Mã đơn hàng:</span>
-                        <span id="fOrderCode" class="fw-bold text-primary">-</span>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block mb-1">Khách hàng</label>
-                        <div id="fCustomerName" class="fs-5 fw-bold">-</div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small d-block mb-1">Sản phẩm & Số lượng</label>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span id="fProductName" class="fw-semibold">-</span>
-                            <span class="badge bg-secondary" id="fQuantity">x 0</span>
-                        </div>
-                    </div>
-                    <div class="p-3 bg-secondary bg-opacity-10 rounded-3 mb-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted">Tổng thanh toán:</span>
-                            <span id="fTotalAmount" class="fs-4 fw-bold text-success">-</span>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" id="fOrderId" value="">
-                </div>
-            </div>
-            <div class="modal-footer border-secondary justify-content-between">
-                <button type="button" id="btnFulfillCancel" class="btn btn-outline-danger px-4">
-                    <i class="bi bi-x-circle me-2"></i>Hủy đơn
-                </button>
-                <button type="button" id="btnFulfillSuccess" class="btn btn-success px-4">
-                    <i class="bi bi-check-circle me-2"></i>Xác nhận nhận đồ
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Modal Chi tiết giao dịch -->
 <div class="modal fade" id="transactionDetailsModal" tabindex="-1" aria-hidden="true">

@@ -131,5 +131,19 @@ namespace SportBookingSystem.Controllers
                 return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CancelBooking(string bookingCode)
+        {
+            try
+            {
+                var result = await _bookingService.CancelBookingAsync(bookingCode);
+                return Json(new { success = result.Success, message = result.Message, refundAmount = result.RefundAmount });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi Controller: " + ex.Message });
+            }
+        }
     }
 }

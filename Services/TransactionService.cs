@@ -33,7 +33,7 @@ namespace SportBookingSystem.Services
                 {
                     Code = t.TransactionCode,
                     User = t.Sender?.FullName ?? t.Sender?.Username,
-                    Amount = Math.Abs(t.Amount), // FIXED: Luôn lấy giá trị tuyệt đối
+                    Amount = Math.Abs(t.Amount), 
                     Date = t.TransactionDate,
                     Type = t.TransactionType,
                     Status = t.Status,
@@ -47,7 +47,7 @@ namespace SportBookingSystem.Services
                 Revenue = allTransactions
                     .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
                              && t.Status == TransactionStatus.Success)
-                    .Sum(t => Math.Abs(t.Amount)), // FIXED: Cộng giá trị tuyệt đối
+                    .Sum(t => Math.Abs(t.Amount)), 
 
                 TransactionCount = totalRecords,
                 CurrentPage = page,
@@ -81,6 +81,10 @@ namespace SportBookingSystem.Services
                 {
                     query = query.Where(t => t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order);
                 }
+                else if (type == "Hoàn tiền")
+                {
+                    query = query.Where(t => t.TransactionType == TransactionTypes.Refund || t.TransactionType == TransactionTypes.RefundBooking);
+                }
                 else
                 {
                     query = query.Where(t => t.TransactionType == type);
@@ -89,14 +93,22 @@ namespace SportBookingSystem.Services
 
             if (!string.IsNullOrWhiteSpace(status) && status != "all")
             {
-                var mappedStatus = status switch
+                if (status == "Completed")
                 {
-                    "Completed" => TransactionStatus.Success,
-                    "Pending" => TransactionStatus.Pending,
-                    "Cancelled" => TransactionStatus.Canceled,
-                    _ => status
-                };
-                query = query.Where(t => t.Status == mappedStatus);
+                    query = query.Where(t => t.Status == TransactionStatus.Success);
+                }
+                else if (status == "Pending")
+                {
+                    query = query.Where(t => t.Status == TransactionStatus.Pending || t.Status == TransactionStatus.PendingConfirm);
+                }
+                else if (status == "Cancelled")
+                {
+                    query = query.Where(t => t.Status == TransactionStatus.Canceled || t.Status == TransactionStatus.CancelBooking);
+                }
+                else
+                {
+                    query = query.Where(t => t.Status == status);
+                }
             }
 
             if (date.HasValue)
@@ -425,6 +437,35 @@ namespace SportBookingSystem.Services
             }
         }
 
+        public async Task AutoCancelExpiredBookingsAsync()
+        {
+            try
+            {
+                // Tìm các PitchSlots có trạng thái PendingConfirm (1)
+                // Và thời gian bắt đầu + 30 phút < Hiện tại
+                var now = DateTime.Now;
+                
+                var expiredBookings = await _context.PitchSlots
+                    .Include(ps => ps.TimeSlot)
+                    .Where(ps => ps.Status == BookingStatus.PendingConfirm)
+                    .ToListAsync();
+
+                var codesToCancel = expiredBookings
+                    .Where(ps => ps.PlayDate.Date.Add(ps.TimeSlot.StartTime).AddMinutes(30) < now)
+                    .Select(ps => ps.BookingCode)
+                    .Where(code => !string.IsNullOrEmpty(code))
+                    .ToList();
+
+                if (!codesToCancel.Any()) return;
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error auto-canceling bookings: {ex.Message}");
+            }
+        }
+
         public async Task<TransactionDetailDTO?> GetTransactionDetailsAsync(string code)
         {
             var trans = await _context.Transactions
@@ -471,6 +512,25 @@ namespace SportBookingSystem.Services
                     EndTime = trans.Booking.EndTime,
                     TotalPrice = trans.Booking.TotalPrice ?? 0
                 };
+            }
+            else if (trans.TransactionType == TransactionTypes.Booking || trans.TransactionType == TransactionTypes.Refund || trans.TransactionType == TransactionTypes.RefundBooking)
+            {
+                // Thử tìm trong PitchSlots nếu Booking null
+                var slot = await _context.PitchSlots
+                    .Include(ps => ps.Pitch)
+                    .Include(ps => ps.TimeSlot)
+                    .FirstOrDefaultAsync(ps => ps.BookingCode == trans.TransactionCode);
+
+                if (slot != null)
+                {
+                    result.Booking = new BookingInfoDetailDTO
+                    {
+                        PitchName = slot.Pitch?.PitchName,
+                        StartTime = slot.PlayDate.Date.Add(slot.TimeSlot.StartTime),
+                        EndTime = slot.PlayDate.Date.Add(slot.TimeSlot.EndTime),
+                        TotalPrice = trans.Amount // Lấy tạm Amount từ giao dịch
+                    };
+                }
             }
 
             return result;
