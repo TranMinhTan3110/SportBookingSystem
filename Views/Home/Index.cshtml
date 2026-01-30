@@ -47,8 +47,7 @@
                 </button>
                 <button class="wallet-btn " data-bs-toggle="modal" data-bs-target="#transferMoneyModal">
                     <i class="bi bi-cash-coin"></i> Chuyển khoản
-                </button>                 
-                <button class="wallet-btn" onclick="window.location.href='@Url.Action("Index", "Wallet")'"><i class="bi bi-graph-up-arrow"></i> Chi tiết</button>
+                </button>
             </div>
         </div>
 
@@ -62,7 +61,7 @@
                     <div class="action-icon"><i class="bi bi-calendar-event-fill"></i></div>
                     <div class="action-text">
                         <div class="action-title">Lịch đặt sân của tôi</div>
-                        <div class="action-desc">@Model.UpcomingBookingsCount lịch sắp tới</div>
+                        <div class="action-desc">@Model.PendingBookingsCount lịch chờ xác nhận</div>
                     </div>
                     <span>→</span>
                 </a>
@@ -95,148 +94,39 @@
                 <h2 class="section-title"><i class="bi bi-trophy-fill"></i> Chọn Sân Yêu Thích</h2>
                 <p class="section-subtitle">Đa dạng loại sân, giá cả hợp lý, đặt sân dễ dàng</p>
             </div>
-            <a href="@Url.Action("Index", "Fields")" class="view-all-btn">
+            <a href="@Url.Action("Index", "Booking")" class="view-all-btn">
                 Xem tất cả →
             </a>
         </div>
         <div class="fields-grid">
-            <!-- Field Card 1 -->
-            <div class="field-card">
-                <div class="field-image">
-                    <span class="field-badge"><i class="bi bi-star-fill"></i> Phổ biến</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <div>
-                            <div class="field-name">Sân A1 - Premium</div>
-                            <div class="field-type">Sân 5 người</div>
+            @if (Model.FeaturedPitches != null && Model.FeaturedPitches.Any())
+            {
+                foreach (var pitch in Model.FeaturedPitches.Take(3))
+                {
+                    <div class="product-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s; background: white;">
+                        <div class="product-image position-relative">
+                            <img src="@(string.IsNullOrEmpty(pitch.ImageUrl) ? "/asset/img/SanNamNguoi.webp" : pitch.ImageUrl)" alt="@pitch.PitchName" style="height: 200px; width: 100%; object-fit: cover;">
+                            <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm fs-6 px-2 py-1">@pitch.Category?.CategoryName</span>
+                        </div>
+                        <div class="product-info p-3">
+                            <div class="product-name fw-bold mb-1" style="font-size: 1.1rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #1f2937;">@pitch.PitchName</div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="product-price text-primary fw-bold fs-5">@pitch.PricePerHour.ToString("N0")₫/h</div>
+                                <div class="text-muted small"><i class="bi bi-people-fill me-1"></i>@pitch.Capacity người</div>
+                            </div>
+                            <div class="d-grid">
+                                <a href="@Url.Action("Index", "Booking")" class="btn btn-primary py-2 fw-semibold" style="border-radius: 10px;">
+                                    <i class="bi bi-calendar-check-fill me-2"></i>Đặt sân ngay
+                                </a>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="field-footer">
-                        <div class="field-price">
-                            <span class="price-label">Giá từ</span>
-                            <span class="price-value">300K/h</span>
-                        </div>
-                        <button class="btn-book">Đặt sân</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 2 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">
-                    <span class="field-badge"><i class="bi bi-fire"></i> Hot</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <div>
-                            <div class="field-name">Sân B3 - Standard</div>
-                            <div class="field-type">Sân 7 người</div>
-                        </div>
-                    </div>
-
-                    <div class="field-footer">
-                        <div class="field-price">
-                            <span class="price-label">Giá từ</span>
-                            <span class="price-value">450K/h</span>
-                        </div>
-                        <button class="btn-book">Đặt sân</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 3 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #8B5CF6, #EC4899);">
-                    <span class="field-badge"><i class="bi bi-gem"></i> VIP</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <div>
-                            <div class="field-name">Sân C2 - Deluxe</div>
-                            <div class="field-type">Sân 11 người</div>
-                        </div>
-                    </div>
-
-                    <div class="field-footer">
-                        <div class="field-price">
-                            <span class="price-label">Giá từ</span>
-                            <span class="price-value">800K/h</span>
-                        </div>
-                        <button class="btn-book">Đặt sân</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 4 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #06B6D4, #3B82F6);">
-                    <span class="field-badge"><i class="bi bi-cash-coin"></i> Giá tốt</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <div>
-                            <div class="field-name">Sân A3 - Economy</div>
-                            <div class="field-type">Sân 5 người</div>
-                        </div>
-                    </div>
-
-                    <div class="field-footer">
-                        <div class="field-price">
-                            <span class="price-label">Giá từ</span>
-                            <span class="price-value">250K/h</span>
-                        </div>
-                        <button class="btn-book">Đặt sân</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 5 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #14B8A6, #10B981);">
-                    <span class="field-badge"><i class="bi bi-newspaper"></i> Mới</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <div>
-                            <div class="field-name">Sân D1 - New</div>
-                            <div class="field-type">Sân 7 người</div>
-                        </div>
-                    </div>
-
-                    <div class="field-footer">
-                        <div class="field-price">
-                            <span class="price-label">Giá từ</span>
-                            <span class="price-value">400K/h</span>
-                        </div>
-                        <button class="btn-book">Đặt sân</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Field Card 6 -->
-            <div class="field-card">
-                <div class="field-image" style="background: linear-gradient(135deg, #F59E0B, #10B981);">
-                    <span class="field-badge"><i class="bi bi-star-fill"></i> Top rated</span>
-                </div>
-                <div class="field-content">
-                    <div class="field-header">
-                        <div>
-                            <div class="field-name">Sân B1 - Premium</div>
-                            <div class="field-type">Sân 5 người</div>
-                        </div>
-                    </div>
-
-                    <div class="field-footer">
-                        <div class="field-price">
-                            <span class="price-label">Giá từ</span>
-                            <span class="price-value">350K/h</span>
-                        </div>
-                        <button class="btn-book">Đặt sân</button>
-                    </div>
-                </div>
-            </div>
+                }
+            }
+            else
+            {
+                <p class="text-muted">Đang cập nhật danh sách sân...</p>
+            }
         </div>
     </section>
 
@@ -245,8 +135,8 @@
     <section id="food-drinks" class="products-section fade-in-up delay-2">
         <div class="section-header">
             <div class="section-header-content">
-                <h2 class="section-title"><i class="bi bi-cup-hot-fill"></i> Đồ Ăn và Thức UỐng Nổi Bật</h2>
-                <p class="section-subtitle">Gọi món giao tận sân, không lo gián đoạn trận đấu</p>
+                <h2 class="section-title"><i class="bi bi-cup-hot-fill"></i> Đồ Ăn & Thức Uống Bán Chạy</h2>
+                <p class="section-subtitle">Những món quà tuyệt vời tiếp thêm năng lượng sau trận đấu</p>
             </div>
             <a href="@Url.Action("Index", "Food")" class="view-all-btn">
                 Xem tất cả
@@ -260,7 +150,7 @@
                 {
                     <div class="product-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s; background: white;">
                         <div class="product-image position-relative">
-                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl)" alt="@p.ProductName" style="height: 200px; width: 100%; object-fit: cover;">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/bannerFood.jpg" : p.ImageUrl)" alt="@p.ProductName" style="height: 200px; width: 100%; object-fit: cover;">
                             <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm fs-6 px-2 py-1">@p.Category?.CategoryName</span>
                         </div>
                         <div class="product-info p-3">
@@ -292,8 +182,8 @@
     <section id="products" class="products-section fade-in-up delay-3">
         <div class="section-header">
             <div class="section-header-content">
-                <h2 class="section-title"><i class="bi bi-trophy-fill"></i> Đồ Dùng Thể Thao Nổi Bật</h2>
-                <p class="section-subtitle">Trang bị chuyên nghiệp cho người chơi</p>
+                <h2 class="section-title"><i class="bi bi-trophy-fill"></i> Đồ Dùng Thể Thao Phổ Biến</h2>
+                <p class="section-subtitle">Trang bị chất lượng cho những vận động viên thực thụ</p>
             </div>
             <a href="@Url.Action("Index", "Supplies")" class="view-all-btn">
                 Xem tất cả
@@ -307,7 +197,7 @@
                 {
                     <div class="product-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s; background: white;">
                         <div class="product-image position-relative">
-                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl)" alt="@p.ProductName" style="height: 200px; width: 100%; object-fit: cover;">
+                            <img src="@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/bannerFood.jpg" : p.ImageUrl)" alt="@p.ProductName" style="height: 200px; width: 100%; object-fit: cover;">
                             <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm fs-6 px-2 py-1">@p.Category?.CategoryName</span>
                         </div>
                         <div class="product-info p-3">

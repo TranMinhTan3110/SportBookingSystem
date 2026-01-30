@@ -110,5 +110,13 @@ namespace SportBookingSystem.Controllers.API
                 totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
             });
         }
+        [HttpGet("booking-status")]
+        public async Task<IActionResult> GetBookingStatus([FromQuery] string code)
+        {
+            if (string.IsNullOrEmpty(code)) return BadRequest();
+            
+            var status = await _transactionUserService.GetBookingStatusByCheckInCodeAsync(code);
+            return Ok(new { status = status });
+        }
     }
 }

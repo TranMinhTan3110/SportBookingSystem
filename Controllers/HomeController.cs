@@ -36,8 +36,12 @@ namespace SportBookingSystem.Controllers
                 return RedirectToAction("SignIn", "Login");
             }
 
-            var upcomingBookingsCount = await _context.Bookings
-                .Where(b => b.UserId == userId && b.StartTime > DateTime.Now && b.Status != 2)
+            var upcomingBookingsCount = await _context.PitchSlots
+                .Where(ps => ps.UserId == userId && ps.Status != -1 && ps.Status != -2)
+                .CountAsync();
+
+            var pendingBookingsCount = await _context.PitchSlots
+                .Where(ps => ps.UserId == userId && ps.Status == 1)
                 .CountAsync();
 
             var recentTransactions = await _context.Transactions
@@ -46,25 +50,95 @@ namespace SportBookingSystem.Controllers
                 .Take(5)
                 .ToListAsync();
 
+            // Top 3 Sân bóng được đặt thành công nhiều nhất
+            var topPitchIds = await _context.Bookings
+                .Where(b => b.Status == 2 || b.Status == 3) // Đã nhận sân hoặc Hoàn thành
+                .GroupBy(b => b.PitchId)
+                .OrderByDescending(g => g.Count())
+                .Select(g => g.Key)
+                .Take(3)
+                .ToListAsync();
+
+            var featuredPitches = await _context.Pitches
+                .Include(p => p.Category)
+                .Where(p => topPitchIds.Contains(p.PitchId))
+                .ToListAsync();
+
+            // Nếu không đủ 3 sân từ lịch sử, lấy thêm các sân mới nhất để đủ 3
+            if (featuredPitches.Count < 3)
+            {
+                var extraPitches = await _context.Pitches
+                    .Include(p => p.Category)
+                    .Where(p => !topPitchIds.Contains(p.PitchId))
+                    .OrderByDescending(p => p.PitchId)
+                    .Take(3 - featuredPitches.Count)
+                    .ToListAsync();
+                featuredPitches.AddRange(extraPitches);
+            }
+
+            // Top 3 Đồ ăn & Thức uống (Category Type: Product) bán chạy nhất
+            var topFoodIds = await _context.OrderDetails
+                .Include(od => od.Order)
+                .Include(od => od.Product)
+                .ThenInclude(p => p.Category)
+                .Where(od => od.Order.Status == 1 && od.Product.Category.Type == "Product")
+                .GroupBy(od => od.ProductId)
+                .OrderByDescending(g => g.Sum(x => x.Quantity))
+                .Select(g => g.Key)
+                .Take(3)
+                .ToListAsync();
+
             var featuredFood = await _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.Status == true && p.Category.Type == "Product" && p.StockQuantity > 0)
-                .OrderByDescending(p => p.ProductId)
-                .Take(4)
+                .Where(p => topFoodIds.Contains(p.ProductId) && p.Status == true)
+                .ToListAsync();
+
+            if (featuredFood.Count < 3)
+            {
+                var extraFood = await _context.Products
+                    .Include(p => p.Category)
+                    .Where(p => !topFoodIds.Contains(p.ProductId) && p.Status == true && p.Category.Type == "Product")
+                    .OrderByDescending(p => p.ProductId)
+                    .Take(3 - featuredFood.Count)
+                    .ToListAsync();
+                featuredFood.AddRange(extraFood);
+            }
+
+            // Top 3 Đồ dùng thể thao bán chạy nhất
+            var topSupplyIds = await _context.OrderDetails
+                .Include(od => od.Order)
+                .Include(od => od.Product)
+                .ThenInclude(p => p.Category)
+                .Where(od => od.Order.Status == 1 && od.Product.Category.Type == "Service")
+                .GroupBy(od => od.ProductId)
+                .OrderByDescending(g => g.Sum(x => x.Quantity))
+                .Select(g => g.Key)
+                .Take(3)
                 .ToListAsync();
 
             var featuredSupplies = await _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.Status == true && p.Category.Type == "Service" && p.StockQuantity > 0)
-                .OrderByDescending(p => p.ProductId)
-                .Take(4)
+                .Where(p => topSupplyIds.Contains(p.ProductId) && p.Status == true)
                 .ToListAsync();
+
+            if (featuredSupplies.Count < 3)
+            {
+                var extraSupplies = await _context.Products
+                    .Include(p => p.Category)
+                    .Where(p => !topSupplyIds.Contains(p.ProductId) && p.Status == true && p.Category.Type == "Service")
+                    .OrderByDescending(p => p.ProductId)
+                    .Take(3 - featuredSupplies.Count)
+                    .ToListAsync();
+                featuredSupplies.AddRange(extraSupplies);
+            }
 
             var viewModel = new HomeViewModel
             {
                 User = user,
                 UpcomingBookingsCount = upcomingBookingsCount,
+                PendingBookingsCount = pendingBookingsCount,
                 RecentTransactions = recentTransactions,
+                FeaturedPitches = featuredPitches,
                 FeaturedFoodItems = featuredFood,
                 FeaturedSupplies = featuredSupplies
             };

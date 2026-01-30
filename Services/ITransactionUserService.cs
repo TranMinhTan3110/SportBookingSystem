@@ -10,5 +10,6 @@ namespace SportBookingSystem.Services
         Task<(List<UserTransactionDTO> Data, int TotalRecords)> LoadUserTransactionAsync(int userId, int page, int pageSize);
         Task<(List<UserBookingDTO> Data, int TotalRecords)> LoadUserBookingsAsync(int userId, int page, int pageSize);
         Task<(List<UserTransferDTO> Data, int TotalRecords)> LoadUserTransfersAsync(int userId, int page, int pageSize);
+        Task<int> GetBookingStatusByCheckInCodeAsync(string checkInCode);
     }
 }

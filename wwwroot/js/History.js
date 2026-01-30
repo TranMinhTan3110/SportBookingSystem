@@ -27,26 +27,30 @@ async function loadBookingHistory(page = 1) {
         }
 
         tbody.innerHTML = result.data.map(booking => {
-           
+
             let statusClass, statusText;
 
-           
+
             switch (booking.status) {
                 case 1: // PendingConfirm 
                     statusClass = 'warning';
                     statusText = 'Chờ xác nhận';
                     break;
-                case 2: 
-                    statusClass = 'success'; 
+                case 2:
+                    statusClass = 'success';
                     statusText = 'Đã nhận sân';
                     break;
                 case 3: // Completed 
                     statusClass = 'success';
                     statusText = 'Hoàn thành';
                     break;
-                case -1: 
+                case -1:
                     statusClass = 'danger';
                     statusText = 'Đã hủy';
+                    break;
+                case -2: // CancelBooking 
+                    statusClass = 'danger';
+                    statusText = 'Đã hủy đặt sân';
                     break;
                 default:
                     statusClass = 'secondary';
@@ -85,6 +89,11 @@ async function loadBookingHistory(page = 1) {
                         </button>`
                     : '<span class="text-muted" style="font-size: 13px;">Không có mã</span>'
                 }
+                ${booking.status === 1 ?
+                    `<button class="btn-action btn-cancel" data-code="${booking.bookingCode}" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-left: 5px;">
+                        <i class="fas fa-times"></i> Hủy
+                    </button>` : ''
+                }
                 </td>
             </tr>
         `;
@@ -94,6 +103,13 @@ async function loadBookingHistory(page = 1) {
             btn.addEventListener('click', function () {
                 const code = this.dataset.code;
                 showBookingQR(code);
+            });
+        });
+
+        document.querySelectorAll('.btn-cancel').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const code = this.dataset.code;
+                handleCancelBooking(code);
             });
         });
 
@@ -158,6 +174,27 @@ async function loadTransactionHistory(page = 1) {
             const amountClass = trans.isPositive ? 'positive' : 'negative';
             const formattedAmount = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(trans.amount);
 
+            let displayContent = trans.message || '-';
+            switch (trans.transactionType) {
+                case 'Thanh toán Order':
+                    displayContent = 'Thanh toán đơn hàng';
+                    break;
+                case 'Hoàn tiền':
+                    // Kiểm tra message để phân biệt hoàn tiền đặt sân vs đơn hàng
+                    if (trans.message && trans.message.includes('hủy sân')) {
+                        displayContent = 'Hoàn tiền đặt sân';
+                    } else {
+                        displayContent = 'Hoàn tiền đơn hàng';
+                    }
+                    break;
+                case 'Hoàn tiền đặt sân':
+                    displayContent = 'Hoàn tiền đặt sân';
+                    break;
+                case 'Nạp tiền':
+                    displayContent = 'Nạp tiền vào tài khoản';
+                    break;
+            }
+
             return `
                 <tr>
                     <td>${trans.transactionCode}</td>
@@ -167,6 +204,7 @@ async function loadTransactionHistory(page = 1) {
                             <span class="trans-method text-muted small">${trans.transactionSource || 'System'}</span>
                         </div>
                     </td>
+                    <td>${displayContent}</td>
                     <td>${formatDateTime(trans.date)}</td>
                     <td class="amount ${amountClass}" style="font-weight: bold; color: ${trans.isPositive ? '#10b981' : '#ef4444'}">
                         ${trans.isPositive ? '+' : ''}${formattedAmount}
@@ -303,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadBookingHistory(1);
 
-    
+
     window.addEventListener('bookingCreated', function () {
         console.log(' Nhận được event bookingCreated từ booking.js');
 
@@ -316,3 +354,35 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+async function handleCancelBooking(bookingCode) {
+    const result = await Swal.fire({
+        title: 'Xác nhận hủy sân?',
+        text: 'Lưu ý: Bạn sẽ được hoàn 50% nếu hủy trước thời gian bắt đầu > 24h.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Đồng ý hủy',
+        cancelButtonText: 'Quay lại'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await fetch(`/Booking/CancelBooking?bookingCode=${bookingCode}`, {
+                method: 'POST'
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire('Thành công!', data.message, 'success');
+                loadBookingHistory(currentBookingPage); // Reload data
+            } else {
+                Swal.fire('Lỗi!', data.message, 'error');
+            }
+        } catch (error) {
+            console.error('Error canceling booking:', error);
+            Swal.fire('Lỗi!', 'Không thể kết nối đến máy chủ.', 'error');
+        }
+    }
+}

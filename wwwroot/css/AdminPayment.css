@@ -1096,3 +1096,13 @@ select.form-input option {
         font-size: 1rem;
     }
 }
+/* Row Highlight Animation */
+@keyframes highlightUpdate {
+    0% { background-color: rgba(16, 185, 129, 0.4); }
+    100% { background-color: transparent; }
+}
+
+.row-updated-highlight {
+    animation: highlightUpdate 3s ease-out;
+    border-left: 4px solid #10B981 !important;
+}

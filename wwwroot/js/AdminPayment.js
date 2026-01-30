@@ -1,4 +1,4 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const balanceSpan = document.getElementById('depositUserBalance');
     const phoneInput = document.getElementById('depositUser');
 
@@ -16,6 +16,7 @@
     const dateFilter = document.getElementById('dateFilter');
     const resetButton = document.getElementById('resetFilters');
     let debounceTimer;
+    let lastUpdatedCode = null;
 
     function debounceSearch() {
         clearTimeout(debounceTimer);
@@ -78,7 +79,7 @@
             if (type === 'Thanh toán Booking' || type === 'Thanh toán Order' || type === 'Nạp tiền') {
                 displaySign = '+';
                 displayClass = 'text-success fw-bold';
-            } else if (type === 'Hoàn tiền') {
+            } else if (type === 'Hoàn tiền' || type === 'Hoàn tiền đặt sân') {
                 displaySign = '-';
                 displayClass = 'text-danger fw-bold';
             } else {
@@ -113,6 +114,20 @@
                 </tr>
             `;
         }).join('');
+
+        if (lastUpdatedCode) {
+            const row = Array.from(tbody.querySelectorAll('.payment-row')).find(r =>
+                r.querySelector('.transaction-code')?.textContent.trim() === lastUpdatedCode
+            );
+
+            if (row) {
+                row.classList.add('row-updated-highlight');
+                tbody.prepend(row);
+                lastUpdatedCode = null;
+
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
     }
 
     function updatePagination(data) {
@@ -183,14 +198,13 @@
 
     function getBadgeClass(type) {
         type = (type || '').trim();
-        if (type === 'Nạp tiền' || type === 'Hoàn tiền') return 'badge-success';
+        if (type === 'Nạp tiền' || type === 'Hoàn tiền' || type === 'Hoàn tiền đặt sân') return 'badge-success';
         if (type === 'Thanh toán Booking' || type === 'Thanh toán Order') return 'badge-secondary';
         if (type === 'Chuyển tiền') return 'badge-info';
         return 'badge-secondary';
     }
 
     function getStatusHTML(status) {
-
         const s = (status || '').trim();
 
         switch (s) {
@@ -202,14 +216,13 @@
                 return `<span class="status-indicator"><span class="status-dot status-warning"></span><span class="status-text status-warning-text">Chờ xác nhận</span></span>`;
 
             case 'Đã hủy':
+            case 'Đã hủy đặt sân':
                 return `<span class="status-indicator"><span class="status-dot status-danger"></span><span class="status-text status-danger-text">Đã hủy</span></span>`;
 
             default:
-
                 return `<span class="status-text">${s}</span>`;
         }
     }
-
 
     function formatCurrency(amount) {
         return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
@@ -369,118 +382,6 @@
         Swal.fire('Thông báo', 'Chức năng mua hàng đang được xử lý ở phía Backend!', 'info');
     });
 
-    const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
-    const fulfillmentModal = fulfillmentModalEl ? new bootstrap.Modal(fulfillmentModalEl) : null;
-
-    window.showFulfillmentModal = async function (orderId) {
-
-        Swal.fire({
-            title: 'Đang kiểm tra...',
-            text: 'Vui lòng đợi',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        try {
-            const res = await fetch(`/AdminPayment/GetOrderForFulfillment?orderId=${orderId}`);
-            const data = await res.json();
-
-
-            if (data.error) {
-                Swal.close(); // Đóng loading
-
-                // Hiện thông báo lỗi
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Thông báo',
-                    text: data.message,
-                    confirmButtonText: 'Đã hiểu',
-                    confirmButtonColor: '#dc3545'
-                });
-
-                return;
-            }
-
-
-            Swal.close();
-
-
-            const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
-            if (!fulfillmentModalEl) {
-                Swal.fire('Lỗi', 'Giao diện xử lý chưa sẵn sàng.', 'error');
-                return;
-            }
-
-            const fulfillmentModal = bootstrap.Modal.getInstance(fulfillmentModalEl) || new bootstrap.Modal(fulfillmentModalEl);
-            const loading = document.getElementById('fulfillmentLoading');
-            const content = document.getElementById('fulfillmentContent');
-
-            // Đổ dữ liệu vào modal
-            document.getElementById('fOrderId').value = data.orderId;
-            document.getElementById('fOrderCode').textContent = data.orderCode;
-            document.getElementById('fCustomerName').textContent = data.customerName;
-            document.getElementById('fProductName').textContent = data.productName;
-            document.getElementById('fQuantity').textContent = `x ${data.quantity}`;
-            document.getElementById('fTotalAmount').textContent = formatCurrency(data.totalAmount);
-
-
-            if (loading) loading.classList.add('d-none');
-            if (content) content.classList.remove('d-none');
-
-            // Mở modal
-            fulfillmentModal.show();
-
-        } catch (e) {
-            console.error('Lỗi kết nối:', e);
-
-            Swal.close(); // Đóng loading
-
-            Swal.fire({
-                icon: 'error',
-                title: 'Lỗi',
-                text: 'Không thể kết nối đến máy chủ',
-                confirmButtonColor: '#dc3545'
-            });
-        }
-    };
-
-    async function processFulfillment(status) {
-        const orderId = document.getElementById('fOrderId').value;
-        const confirm = await Swal.fire({
-            title: status === 'Thành công' ? 'Xác nhận đơn hàng?' : 'Hủy đơn hàng?',
-            text: status === 'Thành công' ? 'Xác nhận khách đã nhận đồ?' : 'Hủy đơn và hoàn tiền cho khách?',
-            icon: status === 'Thành công' ? 'question' : 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Đồng ý',
-            cancelButtonText: 'Không',
-            confirmButtonColor: status === 'Thành công' ? '#198754' : '#dc3545'
-        });
-
-        if (confirm.isConfirmed) {
-            try {
-                const res = await fetch('/AdminPayment/UpdateOrderStatus', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ orderId: parseInt(orderId), newStatus: status })
-                });
-                const result = await res.json();
-                if (result.success) {
-                    fulfillmentModal.hide();
-                    Swal.fire('Thành công', result.message, 'success').then(() => location.reload());
-                } else {
-                    Swal.fire('Lỗi', result.message, 'error');
-                }
-            } catch (e) {
-                Swal.fire('Lỗi', 'Lỗi kết nối máy chủ', 'error');
-            }
-        }
-    }
-
-    document.getElementById('btnFulfillSuccess')?.addEventListener('click', () => processFulfillment('Thành công'));
-    document.getElementById('btnFulfillCancel')?.addEventListener('click', () => processFulfillment('Đã hủy'));
-
     const modalElement = document.getElementById('rewardSettingsModal');
     modalElement?.addEventListener('show.bs.modal', async function () {
         try {
@@ -517,8 +418,6 @@
         } catch (e) { Swal.fire('Lỗi', e.message || 'Lỗi kết nối server', 'error'); }
     });
 
-
-    // logic Chi tiết giao dịch
     const detModal = new bootstrap.Modal(document.getElementById('transactionDetailsModal'));
 
     document.getElementById('paymentTableBody')?.addEventListener('click', function (e) {
@@ -528,7 +427,6 @@
             if (code) showTransactionDetails(code);
         }
     });
-
 
     async function showTransactionDetails(code) {
         const loading = document.getElementById('detailsLoading');
@@ -543,7 +441,6 @@
             if (res.ok) {
                 const data = await res.json();
 
-                // Fill basic info
                 document.getElementById('detCode').textContent = data.code;
                 document.getElementById('detDate').textContent = `${formatDate(data.date)} ${formatTime(data.date)}`;
                 document.getElementById('detType').textContent = data.type;
@@ -560,11 +457,9 @@
 
                 document.getElementById('detBalanceAfter').textContent = data.balanceAfter ? formatCurrency(data.balanceAfter) : 'N/A';
 
-                // Status Badge
                 const statusBadge = document.getElementById('detStatusBadge');
                 statusBadge.innerHTML = getStatusHTML(data.status);
 
-                // Message
                 const msgSec = document.getElementById('detMessageSection');
                 if (data.message) {
                     msgSec.classList.remove('d-none');
@@ -573,7 +468,7 @@
                     msgSec.classList.add('d-none');
                 }
 
-                // Order Section
+                // Order
                 const orderSec = document.getElementById('detOrderSection');
                 if (data.items && data.items.length > 0) {
                     orderSec.classList.remove('d-none');
@@ -590,7 +485,6 @@
                     orderSec.classList.add('d-none');
                 }
 
-                // Booking Section
                 const bookingSec = document.getElementById('detBookingSection');
                 if (data.booking) {
                     bookingSec.classList.remove('d-none');
@@ -613,93 +507,4 @@
             Toast.fire({ icon: 'error', title: 'Lỗi tải chi tiết' });
         }
     }
-
-
-    window.handleBookingScan = async function (bookingCode) {
-        try {
-            const res = await fetch('/Booking/ScanBookingQr', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bookingCode)
-            });
-            const response = await res.json();
-
-            if (response.success) {
-                const info = response.data;
-
-                Swal.fire({
-                    title: ' Thông tin đặt sân',
-                    html: `
-                        <div style="text-align:left; font-size:1.1em; line-height: 1.6;">
-                            <p> <b>Khách:</b> ${info.customerName}</p>
-                            <p> <b>Sân:</b> <span class="text-primary fw-bold">${info.pitchName}</span></p>
-                            <p> <b>Ngày:</b> ${info.date}</p>
-                            <p> <b>Giờ đá:</b> <span class="text-danger fw-bold">${info.time}</span></p>
-                            <hr>
-                            <p class="text-success text-center mb-0"><i class="fas fa-check-circle"></i> Đủ điều kiện nhận sân</p>
-                        </div>
-                    `,
-                    icon: 'info',
-                    showCancelButton: true,
-                    confirmButtonText: ' Xác nhận & Vào sân',
-                    cancelButtonText: 'Hủy',
-                    confirmButtonColor: '#198754',
-                    cancelButtonColor: '#6c757d'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        confirmBookingCheckIn(bookingCode);
-                    }
-                });
-
-            } else {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Không thể nhận sân',
-                    text: response.message,
-                    confirmButtonText: 'Đã hiểu'
-                });
-            }
-        } catch (e) {
-            Swal.fire('Lỗi', 'Không kết nối được server', 'error');
-        }
-    };
-
-    async function confirmBookingCheckIn(code) {
-        try {
-            const res = await fetch('/Booking/ConfirmBookingCheckIn', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(code)
-            });
-            const result = await res.json();
-
-            if (result.success) {
-                Swal.fire('Thành công', 'Check-in hoàn tất!', 'success')
-                    .then(() => {
-                        if (typeof applyFilters === 'function') {
-                            applyFilters();
-                        } else {
-                            location.reload();
-                        }
-                    });
-            } else {
-                Swal.fire('Lỗi', result.message, 'error');
-            }
-        } catch (e) {
-            Swal.fire('Lỗi', 'Lỗi hệ thống', 'error');
-        }
-    }
 });
-
-
-const fulfillmentModalEl = document.getElementById('qrFulfillmentModal');
-if (fulfillmentModalEl) {
-    fulfillmentModalEl.addEventListener('hidden.bs.modal', function () {
-        console.log(' Modal đã đóng hoàn toàn');
-        // Reset lại trạng thái
-        const loading = document.getElementById('fulfillmentLoading');
-        const content = document.getElementById('fulfillmentContent');
-        if (loading) loading.classList.remove('d-none');
-        if (content) content.classList.add('d-none');
-    });
-}
