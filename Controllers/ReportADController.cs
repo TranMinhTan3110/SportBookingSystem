@@ -14,14 +14,12 @@ namespace SportBookingSystem.Controllers
             _logger = logger;
         }
 
-        /// <summary>
         /// Hiển thị trang báo cáo với dữ liệu 30 ngày gần nhất
-        /// </summary>
         public async Task<IActionResult> Index()
         {
             try
             {
-                // Mặc định: 30 ngày gần nhất
+                // Mặc định 30 ngày gần nhất
                 var toDate = DateTime.Now;
                 var fromDate = toDate.AddDays(-30);
 
@@ -40,9 +38,7 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        /// <summary>
         /// API lấy dữ liệu báo cáo theo khoảng thời gian
-        /// </summary>
         [HttpGet]
         public async Task<JsonResult> GetReportData(DateTime fromDate, DateTime toDate)
         {
@@ -79,9 +75,7 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        /// <summary>
         /// API lấy dữ liệu cho biểu đồ
-        /// </summary>
         [HttpGet]
         public async Task<JsonResult> GetChartData(DateTime fromDate, DateTime toDate)
         {
@@ -104,15 +98,13 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        /// <summary>
         /// API lấy dữ liệu tổng kết theo tháng với bộ lọc
-        /// </summary>
         [HttpGet]
         public async Task<JsonResult> GetMonthlySummaries(int? fromMonth, int? fromYear, int? toMonth, int? toYear)
         {
             try
             {
-                // Mặc định: 3 tháng gần nhất
+                // Mặc định 3 tháng gần nhất
                 var currentDate = DateTime.Now;
 
                 DateTime startDate, endDate;
@@ -129,7 +121,7 @@ namespace SportBookingSystem.Controllers
                 }
                 else
                 {
-                    // Mặc định: từ 2 tháng trước đến tháng hiện tại
+                    // Mặc định từ 2 tháng trước đến tháng hiện tại
                     endDate = new DateTime(currentDate.Year, currentDate.Month, 1);
                     startDate = endDate.AddMonths(-2);
                 }
@@ -150,18 +142,13 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        /// <summary>
-        /// Export báo cáo ra Excel
-        /// </summary>
+        /// Export báo cáo ra Excel (chưa triển khai ở hiện tại)
         [HttpGet]
         public async Task<IActionResult> ExportExcel(DateTime fromDate, DateTime toDate)
         {
             try
             {
                 var reportData = await _reportService.GetReportDataAsync(fromDate, toDate);
-
-                // TODO: Implement Excel export logic using EPPlus or ClosedXML
-                // Return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"BaoCao_{fromDate:yyyyMMdd}_{toDate:yyyyMMdd}.xlsx");
 
                 TempData["Info"] = "Chức năng xuất Excel đang được phát triển";
                 return RedirectToAction(nameof(Index));
@@ -174,9 +161,7 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        /// <summary>
         /// Lấy báo cáo theo kỳ (tuần, tháng, quý, năm)
-        /// </summary>
         [HttpGet]
         public async Task<JsonResult> GetReportByPeriod(string period)
         {

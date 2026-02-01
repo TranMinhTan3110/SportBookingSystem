@@ -21,14 +21,12 @@ namespace SportBookingSystem.Services
                 .Where(p => p.Category.Type == "Product")
                 .AsQueryable();
 
-            // Tìm kiếm theo tên
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 searchTerm = searchTerm.ToLower();
                 query = query.Where(p => p.ProductName.ToLower().Contains(searchTerm));
             }
 
-            // Lọc theo danh mục
             if (categoryId.HasValue && categoryId.Value > 0)
             {
                 query = query.Where(p => p.CategoryId == categoryId.Value);
@@ -36,7 +34,6 @@ namespace SportBookingSystem.Services
 
             var products = await query.ToListAsync();
 
-            // Chuyển đổi sang ViewModel và tính toán trạng thái tồn kho
             var productViewModels = products.Select(p => new ProductViewModel
             {
                 ProductId = p.ProductId,
@@ -48,7 +45,8 @@ namespace SportBookingSystem.Services
                 ProductType = p.ProductType,
                 CategoryId = p.CategoryId,
                 CategoryName = p.Category.CategoryName,
-                StockStatus = GetStockStatus(p.StockQuantity)
+                StockStatus = GetStockStatus(p.StockQuantity),
+                Status = p.Status
             }).ToList();
 
             // Lọc theo tình trạng kho
@@ -82,7 +80,8 @@ namespace SportBookingSystem.Services
                 ProductType = product.ProductType,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category.CategoryName,
-                StockStatus = GetStockStatus(product.StockQuantity)
+                StockStatus = GetStockStatus(product.StockQuantity),
+                Status = product.Status
             };
         }
 
@@ -90,7 +89,6 @@ namespace SportBookingSystem.Services
         {
             try
             {
-                // Lấy thông tin Category để xác định ProductType
                 var category = await _context.Categories.FindAsync(model.CategoryId);
                 if (category == null || category.Type != "Product")
                     return false;
@@ -103,9 +101,10 @@ namespace SportBookingSystem.Services
                     StockQuantity = model.StockQuantity,
                     ImageUrl = model.ImageUrl,
                     CategoryId = model.CategoryId,
-                    ProductType = category.CategoryName, // Gán ProductType từ CategoryName
+                    ProductType = category.CategoryName,
                     Size = null,
-                    Brand = null
+                    Brand = null,
+                    Status = true 
                 };
 
                 _context.Products.Add(product);
@@ -126,7 +125,6 @@ namespace SportBookingSystem.Services
                 if (product == null)
                     return false;
 
-                // Lấy thông tin Category để cập nhật ProductType
                 var category = await _context.Categories.FindAsync(model.CategoryId);
                 if (category == null || category.Type != "Product")
                     return false;
@@ -149,7 +147,7 @@ namespace SportBookingSystem.Services
             }
         }
 
-        public async Task<bool> DeleteProductAsync(int id)
+        public async Task<bool> ToggleProductStatusAsync(int id)
         {
             try
             {
@@ -157,7 +155,9 @@ namespace SportBookingSystem.Services
                 if (product == null)
                     return false;
 
-                _context.Products.Remove(product);
+                product.Status = !product.Status;
+
+                _context.Products.Update(product);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -194,7 +194,6 @@ namespace SportBookingSystem.Services
                 .ToListAsync();
         }
 
-        // Helper method để xác định trạng thái tồn kho
         private string GetStockStatus(int stockQuantity)
         {
             if (stockQuantity == 0)

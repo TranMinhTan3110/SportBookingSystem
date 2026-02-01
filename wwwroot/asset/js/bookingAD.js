@@ -1,5 +1,4 @@
 ﻿document.addEventListener('DOMContentLoaded', function () {
-    // 1. Cấu hình Flatpickr (Chọn giờ 24h)
     flatpickr(".time-picker", {
         enableTime: true,
         noCalendar: true,
@@ -9,7 +8,6 @@
         minuteIncrement: 30
     });
 
-    // 2. Preview ảnh khi chọn file
     document.getElementById('fieldImageInput')?.addEventListener('change', function (e) {
         const container = document.getElementById('imagePreviewContainer');
         container.innerHTML = '';
@@ -27,7 +25,6 @@
         }
     });
 
-    // 3. Xử lý Thêm Sân Mới
     document.getElementById('addFieldForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -66,7 +63,6 @@
         }
     });
 
-    // 4. Xử lý Load dữ liệu để Edit
     document.querySelectorAll('.btn-edit').forEach(btn => {
         btn.addEventListener('click', async function () {
             const pitchId = this.getAttribute('data-pitch-id');
@@ -101,7 +97,6 @@
         });
     });
 
-    // 5. Xử lý Cập nhật Sân
     document.getElementById('editFieldForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -140,7 +135,6 @@
         }
     });
 
-    // 6. Xử lý Xóa Sân
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', async function () {
             const pitchId = this.getAttribute('data-pitch-id');
@@ -180,7 +174,6 @@
         });
     });
 
-    // 7. Quản lý Bảng Giá (Mở Modal & Load giá)
     document.querySelectorAll('.btn-price').forEach(btn => {
         btn.addEventListener('click', function () {
             const pitchId = this.getAttribute('data-pitch-id');
@@ -193,7 +186,6 @@
         });
     });
 
-    // 8. Xử lý Form Thêm Giá
     document.getElementById('addPriceForm')?.addEventListener('submit', async function (e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -229,8 +221,6 @@
         }
     });
 
-    // --- LOGIC QUẢN LÝ KHUNG GIỜ (TIME SLOT) ---
-    // Khởi tạo Modal khi DOM đã load
     const timeSlotModalElement = document.getElementById('manageTimeSlotModal');
     if (timeSlotModalElement) {
         window.timeSlotModal = new bootstrap.Modal(timeSlotModalElement);
@@ -256,7 +246,6 @@
                 });
                 Toast.fire({ icon: 'success', title: 'Đã thêm khung giờ' });
 
-                //reset
                 this.reset();
                 loadTimeSlots();
             } else {
@@ -346,7 +335,6 @@ window.deletePrice = async function (id) {
     }
 };
 
-// 1. Mở Modal & Load dữ liệu
 window.openTimeSlotModal = function () {
     if (window.timeSlotModal) {
         window.timeSlotModal.show();
@@ -364,7 +352,6 @@ window.openTimeSlotModal = function () {
     }
 }
 
-// 2. Load danh sách từ API 
 async function loadTimeSlots() {
     const tbody = document.getElementById('timeSlotTableBody');
     if (!tbody) return;
@@ -399,7 +386,6 @@ async function loadTimeSlots() {
     }
 }
 
-// 4. Xử lý Xóa Time Slot 
 window.deleteTimeSlot = async function (id) {
     if (!confirm('Bạn có chắc muốn xóa khung giờ này không?')) return;
 
@@ -411,7 +397,7 @@ window.deleteTimeSlot = async function (id) {
         const json = await res.json();
 
         if (json.success) {
-            loadTimeSlots(); // Reload lại bảng
+            loadTimeSlots(); 
         } else {
             alert(json.message);
         }

@@ -1,5 +1,4 @@
-﻿
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
     loadProducts();
     loadCategories();
     setupFilters();
@@ -58,7 +57,6 @@ function closeModal() {
     modal.classList.remove('active');
     document.body.style.overflow = '';
 }
-
 
 function handleFileSelect(input) {
     const file = input.files[0];

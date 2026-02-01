@@ -1,13 +1,7 @@
-﻿
-// BIẾN TOÀN CỤC
-
-let currentBookingPage = 1;
+﻿let currentBookingPage = 1;
 let currentTransactionPage = 1;
 let currentTransferPage = 1;
 const pageSize = 10;
-
-
-// LOAD LỊCH SỬ ĐẶT SÂN (TAB 1) 
 
 async function loadBookingHistory(page = 1) {
     try {
@@ -351,7 +345,6 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener('bookingCreated', function () {
         console.log(' Nhận được event bookingCreated từ booking.js');
 
-        // Kiểm tra xem có đang ở tab booking history không
         const bookingTab = document.getElementById('booking-history');
         if (bookingTab && bookingTab.classList.contains('active')) {
             console.log(' Đang ở tab Booking History, reloading...');

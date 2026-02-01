@@ -1,8 +1,10 @@
-﻿@{
+﻿@model SportBookingSystem.Models.ViewModels.DashboardViewModel
+@{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/LayoutAdmin.cshtml";
 }
 @section Styles {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="~/css/dashboard.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 }
@@ -11,52 +13,54 @@
 <div class="dashboard-container">
     <!-- Stats Cards -->
     <div class="stats-grid">
+        <!-- Doanh thu hôm nay -->
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-icon money"><i class="bi bi-cash-coin"></i></div>
-                <div class="stat-trend up">
-                    <span>↗</span>
-                    <span>+12.5%</span>
+                <div class="stat-trend @(Model.IsRevenueGrowthPositive ? "up" : "down")">
+                    <i class="fa-solid @(Model.IsRevenueGrowthPositive ? "fa-arrow-trend-up" : "fa-arrow-trend-down")"></i>
+
+                    <span>
+                        @(Model.IsRevenueGrowthPositive ? "+" : "-")@Model.RevenueGrowthPercent.ToString("0.0")%
+                    </span>
                 </div>
             </div>
-            <div class="stat-value">52,450,000₫</div>
+            <div class="stat-value">@Model.TodayRevenue.ToString("#,##0")₫</div>
             <div class="stat-label">Doanh thu hôm nay</div>
         </div>
 
+        <!-- Lượt đặt sân hôm nay -->
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-icon booking"><i class="bi bi-calendar-check-fill"></i></div>
-                <div class="stat-trend up">
-                    <span>↗</span>
-                    <span>+8.2%</span>
+                <div class="stat-trend @(Model.IsBookingGrowthPositive ? "up" : "down")">
+                    @if (Model.IsBookingGrowthPositive)
+                    {
+                        <i class="fa-solid fa-arrow-trend-up" style="color: #28a745;"></i>
+                        <span style="color: #28a745;">+@Model.BookingGrowthPercent.ToString("0.0")%</span>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-arrow-trend-down" style="color: #dc3545;"></i>
+                        <span style="color: #dc3545;">-@Model.BookingGrowthPercent.ToString("0.0")%</span>
+                    }
                 </div>
             </div>
-            <div class="stat-value">48</div>
+            <div class="stat-value">@Model.TodayBookingsCount</div>
             <div class="stat-label">Lượt đặt sân hôm nay</div>
         </div>
 
+        <!-- Sân đang hoạt động -->
         <div class="stat-card">
             <div class="stat-header">
                 <div class="stat-icon field"><i class="bi bi-calendar-event-fill"></i></div>
                 <div class="stat-trend up">
-                    <span>↗</span>
-                    <span>+15%</span>
+                    <span></span>
+                    <span>Hoạt động</span>
                 </div>
             </div>
-            <div class="stat-value">32/40</div>
+            <div class="stat-value">@Model.ActivePitchesCount/@Model.TotalPitchesCount</div>
             <div class="stat-label">Sân đang hoạt động</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-header">
-                <div class="stat-icon users"><i class="bi bi-people-fill"></i></div>
-                <div class="stat-trend up">
-                    <span>↗</span>
-                    <span>+5.7%</span>
-                </div>
-            </div>
-            <div class="stat-value">1,245</div>
-            <div class="stat-label">Khách hàng tích cực</div>
         </div>
     </div>
 
@@ -69,121 +73,42 @@
                     <span class="card-title-icon"><i class="bi bi-graph-up-arrow"></i></span>
                     Doanh thu 7 ngày qua
                 </h3>
-                <button class="card-action">Xem chi tiết</button>
             </div>
             <div class="chartjs-container">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
 
-        <!-- Recent Activity -->
+        <!-- Top Customers -->
         <div class="card activity-card">
             <div class="card-header">
                 <h3 class="card-title">
-                    <span class="card-title-icon"></span>
+                    <span class="card-title-icon"><i class="bi bi-person-badge-fill"></i></span>
+                    Top khách hàng đặt sân
                 </h3>
             </div>
             <div class="activity-list">
-                @* <div class="activity-item">
-                    <div class="activity-icon booking">📅</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Đặt sân mới - Sân 5A</div>
-                        <div class="activity-time">2 phút trước</div>
+                @if (Model.TopCustomers != null && Model.TopCustomers.Any())
+                {
+                    @foreach (var customer in Model.TopCustomers)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon booking">
+                                <i class="bi bi-person-circle"></i>
+                            </div>
+                            <div class="activity-content">
+                                <div class="activity-title">@customer.CustomerName</div>
+                                <div class="activity-time">@customer.BookingCount lượt - @customer.TotalAmount.ToString("#,##0")₫</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <p>Chưa có dữ liệu khách hàng trong tháng này</p>
                     </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon money">💳</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Thanh toán 1,200,000₫</div>
-                        <div class="activity-time">15 phút trước</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon users">👤</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Khách hàng mới đăng ký</div>
-                        <div class="activity-time">1 giờ trước</div>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <div class="activity-icon food">🍔</div>
-                    <div class="activity-content">
-                        <div class="activity-title">Đơn canteen #523</div>
-                        <div class="activity-time">2 giờ trước</div>
-                    </div>
-                </div> *@
-            </div>
-        </div>
-    </div>
-
-    <!-- Today's Bookings -->
-    <div class="card bookings-card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <span class="card-title-icon"><i class="bi bi-calendar-check-fill"></i></span>
-                Lịch đặt sân hôm nay
-            </h3>
-            <button class="card-action">Xem tất cả</button>
-        </div>
-        <div class="bookings-list">
-            <div class="booking-item">
-                <div class="booking-time">
-                    <div class="booking-hour">14:00</div>
-                    <div class="booking-date">Hôm nay</div>
-                </div>
-                <div class="booking-info">
-                    <div class="booking-field">Sân 5 người - Sân A1</div>
-                    <div class="booking-customer">
-                        <span><i class="bi bi-person-circle"></i></span>
-                        <span>Nguyễn Văn A</span>
-                    </div>
-                </div>
-                <span class="booking-status confirmed">Đã xác nhận</span>
-            </div>
-
-            <div class="booking-item">
-                <div class="booking-time">
-                    <div class="booking-hour">16:00</div>
-                    <div class="booking-date">Hôm nay</div>
-                </div>
-                <div class="booking-info">
-                    <div class="booking-field">Sân 7 người - Sân B3</div>
-                    <div class="booking-customer">
-                        <span><i class="bi bi-person-circle"></i></span>
-                        <span>Trần Thị B</span>
-                    </div>
-                </div>
-                <span class="booking-status pending">Chờ thanh toán</span>
-            </div>
-
-            <div class="booking-item">
-                <div class="booking-time">
-                    <div class="booking-hour">18:00</div>
-                    <div class="booking-date">Hôm nay</div>
-                </div>
-                <div class="booking-info">
-                    <div class="booking-field">Sân 11 người - Sân C2</div>
-                    <div class="booking-customer">
-                        <span><i class="bi bi-person-circle"></i></span>
-                        <span>Lê Văn C</span>
-                    </div>
-                </div>
-                <span class="booking-status confirmed">Đã xác nhận</span>
-            </div>
-
-            <div class="booking-item">
-                <div class="booking-time">
-                    <div class="booking-hour">20:00</div>
-                    <div class="booking-date">Hôm nay</div>
-                </div>
-                <div class="booking-info">
-                    <div class="booking-field">Sân 5 người - Sân A3</div>
-                    <div class="booking-customer">
-                        <span><i class="bi bi-person-circle"></i></span>
-                        <span>Phạm Thị D</span>
-                    </div>
-                </div>
-                <span class="booking-status completed">Hoàn thành</span>
+                }
             </div>
         </div>
     </div>
@@ -199,41 +124,34 @@
                 </h3>
             </div>
             <div class="top-fields-list">
-                <div class="field-item">
-                    <div class="field-rank gold">1</div>
-                    <div class="field-details">
-                        <div class="field-name">Sân 5 người - A1</div>
-                        <div class="field-bookings">248 lượt đặt tháng này</div>
-                    </div>
-                    <div class="field-revenue">24.8M₫</div>
-                </div>
+                @if (Model.TopPitches != null && Model.TopPitches.Any())
+                {
+                    @foreach (var pitch in Model.TopPitches)
+                    {
+                        var rankClass = pitch.Rank switch
+                        {
+                            1 => "gold",
+                            2 => "silver",
+                            3 => "bronze",
+                            _ => ""
+                        };
 
-                <div class="field-item">
-                    <div class="field-rank silver">2</div>
-                    <div class="field-details">
-                        <div class="field-name">Sân 7 người - B3</div>
-                        <div class="field-bookings">196 lượt đặt tháng này</div>
+                        <div class="field-item">
+                            <div class="field-rank @rankClass">@pitch.Rank</div>
+                            <div class="field-details">
+                                <div class="field-name">@pitch.PitchName</div>
+                                <div class="field-bookings">@pitch.BookingCount lượt đặt tháng này</div>
+                            </div>
+                            <div class="field-revenue">@((pitch.TotalRevenue / 1000000).ToString("0.0"))M₫</div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center text-muted py-3">
+                        <p>Chưa có dữ liệu đặt sân trong tháng này</p>
                     </div>
-                    <div class="field-revenue">21.6M₫</div>
-                </div>
-
-                <div class="field-item">
-                    <div class="field-rank bronze">3</div>
-                    <div class="field-details">
-                        <div class="field-name">Sân 11 người - C2</div>
-                        <div class="field-bookings">175 lượt đặt tháng này</div>
-                    </div>
-                    <div class="field-revenue">26.5M₫</div>
-                </div>
-
-                <div class="field-item">
-                    <div class="field-rank">4</div>
-                    <div class="field-details">
-                        <div class="field-name">Sân 5 người - A2</div>
-                        <div class="field-bookings">162 lượt đặt tháng này</div>
-                    </div>
-                    <div class="field-revenue">16.2M₫</div>
-                </div>
+                }
             </div>
         </div>
 
@@ -246,19 +164,19 @@
                 </h3>
             </div>
             <div class="quick-actions">
-                <a href="#" class="action-btn">
+                <a asp-controller="ManageBookingAD" asp-action="Index" class="action-btn">
                     <div class="action-icon add"><i class="bi bi-plus-circle-fill"></i></div>
                     <div class="action-label">Thêm đặt sân mới</div>
                 </a>
-                <a href="#" class="action-btn">
+                <a asp-controller="BookingAD" asp-action="Index" class="action-btn">
                     <div class="action-icon field"><i class="bi bi-calendar-event-fill"></i></div>
                     <div class="action-label">Quản lý sân</div>
                 </a>
-                <a href="#" class="action-btn">
+                <a asp-controller="UserAD" asp-action="Index" class="action-btn">
                     <div class="action-icon users"><i class="bi bi-people-fill"></i></div>
                     <div class="action-label">Danh sách khách hàng</div>
                 </a>
-                <a href="#" class="action-btn">
+                <a asp-controller="ReportAD" asp-action="Index" class="action-btn">
                     <div class="action-icon report"><i class="bi bi-pie-chart-fill"></i></div>
                     <div class="action-label">Báo cáo chi tiết</div>
                 </a>
@@ -266,6 +184,10 @@
         </div>
     </div>
 </div>
+
 @section Scripts {
+    <script>
+        var chartData = @Html.Raw(Json.Serialize(Model.RevenueChart));
+    </script>
     <script src="~/js/dashboard.js"></script>
 }

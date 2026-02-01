@@ -1,6 +1,4 @@
-﻿
-
-document.addEventListener('DOMContentLoaded', function () {
+﻿document.addEventListener('DOMContentLoaded', function () {
 
     const servicesDropdown = document.getElementById('servicesDropdown');
     const userDropdown = document.getElementById('userDropdown');
@@ -59,9 +57,6 @@ document.addEventListener('DOMContentLoaded', function () {
             closeAllDropdowns();
         }
     });
-
-
-
 
     if (mobileMenuToggle) {
         mobileMenuToggle.addEventListener('click', function (e) {
@@ -152,9 +147,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // ============================================
-    // CONSOLE LOG (Development)
-    // ============================================
     console.log(' SportHub Layout loaded successfully!');
     console.log(' Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
     console.log(' Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
@@ -202,12 +194,6 @@ function debounce(func, wait) {
     };
 }
 
-/**
-
- * @param {Function} func -
- * @param {number} limit 
- * @returns {Function} 
- */
 function throttle(func, limit) {
     let inThrottle;
     return function (...args) {

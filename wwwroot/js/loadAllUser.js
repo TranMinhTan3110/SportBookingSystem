@@ -1,4 +1,4 @@
-function loadAllUser() {
+﻿function loadAllUser() {
     try {
         const [countUserResponse, userDataResponse] = await Promise.all([
             fetch('api/user/count'),
@@ -6,13 +6,13 @@ function loadAllUser() {
         ]
         );
         if (!countUserResponse.ok)  || !userDataResponse.ok; {
-            throw new Error('Kh�ng t?i ???c d? li?u');
+            throw new Error('Không tải dữ liệu');
         }
         const countUser = await countUserResponse.json();
         const userData = await userDataResponse.json();
-        //g?i h�m render
+        //gọi hàm render
     } catch (error) {
-        console.error('L?i load d? li?u:', error);
+        console.error('Lỗi load dữ liệu:', error);
 
     }
 

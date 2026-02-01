@@ -14,7 +14,7 @@ namespace SportBookingSystem.Controllers
             _logger = logger;
         }
 
-        /// Trang danh sách sân (Admin)
+        /// Trang danh sách sân
         [HttpGet]
         public async Task<IActionResult> Index(int? categoryId, string? status, string? searchTerm)
         {
@@ -23,7 +23,6 @@ namespace SportBookingSystem.Controllers
                 // Lấy danh sách sân với các điều kiện lọc
                 var pitches = await _pitchService.GetAllPitchesAsync(categoryId, status, searchTerm);
 
-                // Lấy danh sách categories để hiển thị trong dropdown filter
                 var categories = await _pitchService.GetPitchCategoriesAsync();
 
                 ViewBag.Categories = categories;
@@ -229,9 +228,6 @@ namespace SportBookingSystem.Controllers
                 });
             }
         }
-
-        //hàm mới
-        // Trong PitchController 
 
         [HttpGet]
         public async Task<IActionResult> GetPrices(int pitchId)

@@ -1,5 +1,4 @@
-﻿// Global variables
-let selectedProduct = null;
+﻿let selectedProduct = null;
 let purchaseModal = null;
 let qrModal = null;
 let foodInterval;
@@ -9,34 +8,29 @@ $(document).ready(function () {
     qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
 
     $(".btn-apply-filter").click(function () {
-        // 1. Thu thập ID danh mục
         var selectedCats = [];
         $(".category-checkbox:checked").each(function () {
             selectedCats.push(parseInt($(this).val()));
         });
 
-        // 2. Thu thập Khoảng giá
         var minVal = $(".price-range input[placeholder='Từ']").val();
         var maxVal = $(".price-range input[placeholder='Đến']").val();
 
-        // 3. Thu thập kiểu sắp xếp
         var sortVal = $(".sort-dropdown select").val();
 
-        // Gửi dữ liệu qua AJAX
         $.ajax({
             url: '/Food/GetFilteredProducts',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
                 categoryIds: selectedCats,
-                minPrice: minVal ? parseFloat(minVal) : null, // Gửi giá tối thiểu
-                maxPrice: maxVal ? parseFloat(maxVal) : null, // Gửi giá tối đa
+                minPrice: minVal ? parseFloat(minVal) : null, 
+                maxPrice: maxVal ? parseFloat(maxVal) : null, 
                 sortBy: sortVal
             }),
             success: function (response) {
                 if (response.success) {
                     renderProducts(response.products);
-                    // Cập nhật số lượng hiển thị trên tiêu đề
                     $(".products-count strong").text(response.products.length);
                 }
             }
@@ -45,16 +39,12 @@ $(document).ready(function () {
 
     // xoa bo loc 
     $(".btn-reset-filter").click(function () {
-        // Bỏ tích tất cả checkbox danh mục
         $(".category-checkbox").prop("checked", false);
 
-        // Xóa trắng các ô nhập giá
         $(".price-range input").val("");
 
-        // Đưa dropdown sắp xếp về mặc định
         $(".sort-dropdown select").val("default");
 
-        // Tự động gọi lại hàm Áp dụng để tải lại toàn bộ sản phẩm
         $(".btn-apply-filter").click();
     });
 });

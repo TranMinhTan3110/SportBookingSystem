@@ -1,5 +1,4 @@
-﻿/* Reset toàn bộ */
-* {
+﻿* {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -11,7 +10,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Container chính */
 .page-container {
     padding: 20px;
     width: 100%;
@@ -57,7 +55,6 @@ body {
     box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
-/* --- Filter Section --- */
 .filter-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -112,7 +109,6 @@ body {
     box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
-/* --- Table Section --- */
 .table-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -304,7 +300,6 @@ body {
     color: white;
 }
 
-/* --- Modal --- */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -513,7 +508,6 @@ body {
 
     .filter-grid {
         grid-template-columns: 1fr;
-        /* CHỈ 1 CỘT DỌC */
         gap: 16px;
         width: 100%;
     }
@@ -572,7 +566,6 @@ body {
 
     .product-table {
         min-width: 700px;
-        /* Table vẫn rộng để scroll */
     }
 
     .product-table th,
@@ -820,7 +813,6 @@ body {
     }
 }
 
-/* Fix viewport để tránh zoom trên mobile */
 @media (max-width: 768px) {
     html {
         -webkit-text-size-adjust: 100%;
@@ -853,14 +845,11 @@ body {
         max-width: 100%;
     }
 
-    /* Riêng table thì cho phép nó rộng nhưng scroll trong wrapper */
     .product-table {
         max-width: none;
-        /* Table được phép rộng hơn */
     }
 }
 
-/* --- Image Upload UI --- */
 .image-upload-wrapper {
     display: flex;
     flex-direction: column;
@@ -870,7 +859,6 @@ body {
 
 .btn-browse {
     background: #1e293b;
-    /* Darker slate for contrast */
     color: #e2e8f0;
     border: 2px dashed #334155;
     padding: 15px;

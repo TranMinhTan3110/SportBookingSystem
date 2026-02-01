@@ -73,20 +73,15 @@ namespace SportBookingSystem.Services
         }
         public async Task<bool> SendOtpEmailAsync(string email)
         {
-            // 1. Kiểm tra user có tồn tại với email (Username) này không
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null) return false;
 
-            // 2. Lấy cấu hình MailSettings từ appsettings.json
             var mailSettings = _configuration.GetSection("MailSettings");
 
-            // 3. Tạo mã OTP thật
             string otp = new Random().Next(100000, 999999).ToString();
 
-            // 4. Lưu OTP vào Cache trong 5 phút để xác thực
             _cache.Set("OTP_" + email, otp, TimeSpan.FromMinutes(5));
 
-            // 5. Cấu hình nội dung Email
             var emailMessage = new MimeMessage();
             emailMessage.From.Add(new MailboxAddress(mailSettings["DisplayName"], mailSettings["Mail"]));
             emailMessage.To.Add(new MailboxAddress("", email));
@@ -100,7 +95,6 @@ namespace SportBookingSystem.Services
                       </div>"
             };
 
-            // 6. Gửi Mail thật qua SMTP Gmail
             using var client = new SmtpClient();
             try
             {
@@ -119,7 +113,6 @@ namespace SportBookingSystem.Services
 
         public async Task<bool> VerifyOtpAndResetPasswordAsync(string email, string otp, string newPassword)
         {
-            // 1. Lấy mã OTP đã lưu trong Cache ra để so khớp
             if (!_cache.TryGetValue("OTP_" + email, out string savedOtp))
             {
                 return false; // OTP đã hết hạn
@@ -130,7 +123,6 @@ namespace SportBookingSystem.Services
                 return false; // Sai mã OTP
             }
 
-            // 2. Tìm User và cập nhật mật khẩu thật
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null) return false;
 
@@ -138,7 +130,6 @@ namespace SportBookingSystem.Services
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
 
-            // 3. Xóa mã OTP sau khi dùng xong
             _cache.Remove("OTP_" + email);
 
             return true;

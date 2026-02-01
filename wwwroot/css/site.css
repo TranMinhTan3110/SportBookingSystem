@@ -677,7 +677,6 @@ body {
     display: none !important;
 }
 
-/* 1. Reset style nút bấm */
 .header .dropdown-toggle {
     background: transparent !important;
     border: none !important;
@@ -686,7 +685,6 @@ body {
     align-items: center;
 }
 
-/* 2. Xử lý Menu Dropdown trong Header */
 .header .dropdown-menu {
     display: block !important;
     opacity: 0;
@@ -717,7 +715,6 @@ body {
     transform: translateY(0) !important;
 }
 
-/* 3. Fix style cho item bên trong */
 .header .dropdown-item {
     display: flex !important;
     align-items: center;

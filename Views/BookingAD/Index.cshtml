@@ -73,13 +73,11 @@
         </div>
     </form>
 
-    <!-- Fields Grid - HIỂN THỊ ĐỘNG TỪ DATABASE -->
     <div class="fields-grid">
         @if (Model != null && Model.Any())
         {
             foreach (var pitch in Model)
             {
-                <!-- Xác định CSS class cho badge status -->
                 var badgeClass = pitch.Status switch
                 {
                     "Sẵn sàng" => "badge-active",
@@ -408,7 +406,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-info text-white">
-                <h5 class="modal-title fw-bold">⚙️ Cấu Hình Khung Giờ Hệ Thống</h5>
+                <h5 class="modal-title fw-bold">Cấu Hình Khung Giờ Hệ Thống</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">

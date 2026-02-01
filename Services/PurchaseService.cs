@@ -24,7 +24,6 @@ namespace SportBookingSystem.Services
             {
                 try
                 {
-                    // 1. Lấy thông tin User và Product
                     var user = await _context.Users.FindAsync(userId);
                     var product = await _context.Products.FindAsync(productId);
 
@@ -34,17 +33,14 @@ namespace SportBookingSystem.Services
 
                     decimal totalAmount = product.Price * quantity;
 
-                    // 2. Kiểm tra số dư
                     if (user.WalletBalance < totalAmount)
                     {
                         return (false, "Số dư tài khoản không đủ để thanh toán!", null);
                     }
 
-                    // 3. Trừ tiền và cập nhật kho
                     user.WalletBalance -= totalAmount;
                     product.StockQuantity -= quantity;
 
-                    // 4. Tạo đơn hàng (Order)
                     var order = new Orders
                     {
                         UserId = userId,
@@ -56,7 +52,6 @@ namespace SportBookingSystem.Services
                     _context.Orders.Add(order);
                     await _context.SaveChangesAsync();
 
-                    // 5. Tạo chi tiết đơn hàng (OrderDetail)
                     var orderDetail = new OrderDetails
                     {
                         OrderId = order.OrderId,
@@ -66,7 +61,6 @@ namespace SportBookingSystem.Services
                     };
                     _context.OrderDetails.Add(orderDetail);
 
-                    // 6. Tạo giao dịch (Transaction)
                     var trans = new Transactions
                     {
                         UserId = userId,
@@ -84,8 +78,6 @@ namespace SportBookingSystem.Services
 
                     await _context.SaveChangesAsync();
 
-                    // 7. Tạo mã QR
-                    // Định dạng: PURCHASE:[OrderID]:[UserID]:[ProductID]:[Quantity]
                     string qrData = $"PURCHASE:{order.OrderId}:{userId}:{productId}:{quantity}";
                     string qrBase64 = _qrService.GenerateQrCode(qrData);
 

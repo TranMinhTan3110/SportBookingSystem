@@ -9,7 +9,7 @@ namespace SportBookingSystem.Services
         Task<ProductViewModel> GetProductByIdAsync(int id);
         Task<bool> CreateProductAsync(ProductCreateEditViewModel model);
         Task<bool> UpdateProductAsync(int id, ProductCreateEditViewModel model);
-        Task<bool> DeleteProductAsync(int id);
+        Task<bool> ToggleProductStatusAsync(int id); 
         Task<bool> AddStockAsync(int id, int amount);
         Task<List<Categories>> GetProductCategoriesAsync();
     }

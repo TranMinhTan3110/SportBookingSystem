@@ -78,21 +78,18 @@
     margin-bottom: 2rem;
 }
 
-/* Large screens - 4 columns */
 @media (min-width: 1400px) {
     .stats-grid {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
-/* Medium-Large screens - 3 columns */
 @media (min-width: 1200px) and (max-width: 1399px) {
     .stats-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
 
-/* Medium screens - 2 columns */
 @media (min-width: 768px) and (max-width: 1199px) {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -160,7 +157,6 @@
     color: var(--warning);
 }
 
-/* Settings Card - Purple */
 .settings-card::before {
     background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
 }
@@ -434,14 +430,12 @@
     background: rgba(16, 185, 129, 0.04);
 }
 
-/* Transaction Code */
 .transaction-code {
     font-family: 'JetBrains Mono', 'Courier New', monospace;
     color: var(--primary);
     font-weight: 600;
 }
 
-/* User Cell */
 .user-cell {
     display: flex;
     align-items: center;
@@ -517,7 +511,6 @@
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
-/* Amount */
 .amount-positive {
     color: var(--success);
     font-weight: 600;
@@ -528,13 +521,11 @@
     font-weight: 600;
 }
 
-/* Payment Source */
 .payment-source {
     color: var(--text-secondary);
     font-size: 0.813rem;
 }
 
-/* Date Cell */
 .date-cell {
     display: flex;
     flex-direction: column;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.ViewModels;
+using SportBookingSystem.Constants;
 
 namespace SportBookingSystem.Services
 {
@@ -19,14 +20,21 @@ namespace SportBookingSystem.Services
         {
             try
             {
-                // Chuẩn hóa thời gian: fromDate 00:00:00, toDate 23:59:59
-                fromDate = fromDate.Date;
-                toDate = toDate.Date.AddDays(1).AddTicks(-1);
+                // QUAN TRỌNG: Normalize dates
+                // fromDate: Bắt đầu từ 00:00:00
+                // toDate: Kết thúc đến 23:59:59.9999999
+                fromDate = fromDate.Date; // 2025-12-31 00:00:00
+                toDate = toDate.Date.AddDays(1).AddTicks(-1); // 2026-01-30 23:59:59.9999999
+
+                _logger.LogInformation("=== BÁO CÁO TỪ {FromDate} ĐẾN {ToDate} ===", fromDate, toDate);
 
                 var bookingRevenue = await CalculateBookingRevenueAsync(fromDate, toDate);
                 var serviceRevenue = await CalculateServiceRevenueAsync(fromDate, toDate);
                 var topSports = await GetTopSportsAsync(fromDate, toDate);
                 var growthRate = await CalculateGrowthRateAsync(fromDate, toDate);
+
+                _logger.LogInformation("Tổng doanh thu: {Total}₫ (Booking: {Booking}₫ + Service: {Service}₫)",
+                    bookingRevenue + serviceRevenue, bookingRevenue, serviceRevenue);
 
                 // Mặc định hiển thị 3 tháng gần nhất trong bảng Monthly Summary
                 var monthlySummaries = await GetMonthlySummariesAsync(3);
@@ -50,47 +58,82 @@ namespace SportBookingSystem.Services
 
         public async Task<decimal> CalculateBookingRevenueAsync(DateTime fromDate, DateTime toDate)
         {
-            var revenue = await _context.Bookings
-                .Where(b => b.BookingDate >= fromDate
-                         && b.BookingDate <= toDate
-                         && b.Status == 1) // Status = 1: Confirmed
-                .SumAsync(b => b.TotalPrice ?? 0);
+            // Booking Revenue = Thanh toán Booking - Hoàn tiền đặt sân
+            var bookingIncome = await _context.Transactions
+                .Where(t => t.TransactionDate >= fromDate
+                         && t.TransactionDate <= toDate
+                         && t.Status.Trim() != "Chờ xác nhận"
+                         && t.TransactionType.Trim() == "Thanh toán Booking")
+                .SumAsync(t => t.Amount);
+
+            var bookingRefund = await _context.Transactions
+                .Where(t => t.TransactionDate >= fromDate
+                         && t.TransactionDate <= toDate
+                         && t.Status.Trim() != "Chờ xác nhận"
+                         && t.TransactionType.Trim() == "Hoàn tiền đặt sân")
+                .SumAsync(t => t.Amount);
+
+            var revenue = bookingIncome - bookingRefund;
+
+            _logger.LogInformation("Booking Revenue từ {FromDate} đến {ToDate}: {Income}₫ - {Refund}₫ = {Revenue}₫",
+                fromDate, toDate, bookingIncome, bookingRefund, revenue);
 
             return revenue;
         }
 
         public async Task<decimal> CalculateServiceRevenueAsync(DateTime fromDate, DateTime toDate)
         {
-            var revenue = await _context.Orders
-                .Where(o => o.OrderDate >= fromDate
-                         && o.OrderDate <= toDate
-                         && o.Status == 1) // Status = 1: Completed
-                .SumAsync(o => o.TotalAmount ?? 0);
+            // Service Revenue = Thanh toán Order - Hoàn tiền
+            var orderIncome = await _context.Transactions
+                .Where(t => t.TransactionDate >= fromDate
+                         && t.TransactionDate <= toDate
+                         && t.Status.Trim() != "Chờ xác nhận"
+                         && t.TransactionType.Trim() == "Thanh toán Order")
+                .SumAsync(t => t.Amount);
+
+            var orderRefund = await _context.Transactions
+                .Where(t => t.TransactionDate >= fromDate
+                         && t.TransactionDate <= toDate
+                         && t.Status.Trim() != "Chờ xác nhận"
+                         && t.TransactionType.Trim() == "Hoàn tiền")
+                .SumAsync(t => t.Amount);
+
+            var revenue = orderIncome - orderRefund;
+
+            _logger.LogInformation("Service Revenue từ {FromDate} đến {ToDate}: {Income}₫ - {Refund}₫ = {Revenue}₫",
+                fromDate, toDate, orderIncome, orderRefund, revenue);
 
             return revenue;
         }
 
         public async Task<List<SportStatsViewModel>> GetTopSportsAsync(DateTime fromDate, DateTime toDate)
         {
-            var sportStats = await _context.Bookings
-                .Include(b => b.Pitch)
+            // Lấy doanh thu booking theo từng môn thể thao (Thanh toán Booking)
+            // Không xét status
+            var sportStats = await _context.Transactions
+                .Include(t => t.Booking)
+                    .ThenInclude(b => b.Pitch)
                     .ThenInclude(p => p.Category)
-                .Where(b => b.BookingDate >= fromDate
-                         && b.BookingDate <= toDate
-                         && b.Status == 1
-                         && b.Pitch.Category.Type == "Pitch")
-                .GroupBy(b => b.Pitch.Category.CategoryName)
+                .Where(t => t.TransactionDate >= fromDate
+                         && t.TransactionDate <= toDate
+                         && t.Status.Trim() != "Chờ xác nhận"
+                         && t.TransactionType.Trim() == "Thanh toán Booking"
+                         && t.Booking != null
+                         && t.Booking.Pitch != null
+                         && t.Booking.Pitch.Category != null
+                         && t.Booking.Pitch.Category.Type == "Pitch")
+                .GroupBy(t => t.Booking.Pitch.Category.CategoryName)
                 .Select(g => new
                 {
                     SportName = g.Key,
-                    Revenue = g.Sum(x => x.TotalPrice ?? 0),
+                    Revenue = g.Sum(x => x.Amount),
                     BookingCount = g.Count()
                 })
                 .OrderByDescending(x => x.Revenue)
                 .Take(3)
                 .ToListAsync();
 
-            // Tính tỷ lệ tăng trưởng cho từng môn (so với kỳ trước)
+            // Trừ hoàn tiền cho từng môn thể thao
             var results = new List<SportStatsViewModel>();
             var previousPeriodDays = (toDate - fromDate).Days;
             var previousFromDate = fromDate.AddDays(-previousPeriodDays);
@@ -98,21 +141,59 @@ namespace SportBookingSystem.Services
 
             foreach (var stat in sportStats)
             {
-                var previousRevenue = await _context.Bookings
-                    .Include(b => b.Pitch)
+                // Trừ hoàn tiền đặt sân cho môn thể thao này (không xét status)
+                var refund = await _context.Transactions
+                    .Include(t => t.Booking)
+                        .ThenInclude(b => b.Pitch)
                         .ThenInclude(p => p.Category)
-                    .Where(b => b.BookingDate >= previousFromDate
-                             && b.BookingDate <= previousToDate
-                             && b.Status == 1
-                             && b.Pitch.Category.CategoryName == stat.SportName)
-                    .SumAsync(x => x.TotalPrice ?? 0);
+                    .Where(t => t.TransactionDate >= fromDate
+                             && t.TransactionDate <= toDate
+                             && t.Status.Trim() != "Chờ xác nhận"
+                             && t.TransactionType.Trim() == "Hoàn tiền đặt sân"
+                             && t.Booking != null
+                             && t.Booking.Pitch != null
+                             && t.Booking.Pitch.Category != null
+                             && t.Booking.Pitch.Category.CategoryName == stat.SportName)
+                    .SumAsync(x => x.Amount);
+
+                var actualRevenue = stat.Revenue - refund;
+
+                // Tính doanh thu kỳ trước (không xét status)
+                var previousIncome = await _context.Transactions
+                    .Include(t => t.Booking)
+                        .ThenInclude(b => b.Pitch)
+                        .ThenInclude(p => p.Category)
+                    .Where(t => t.TransactionDate >= previousFromDate
+                             && t.TransactionDate <= previousToDate
+                             && t.Status.Trim() != "Chờ xác nhận"
+                             && t.TransactionType.Trim() == "Thanh toán Booking"
+                             && t.Booking != null
+                             && t.Booking.Pitch != null
+                             && t.Booking.Pitch.Category != null
+                             && t.Booking.Pitch.Category.CategoryName == stat.SportName)
+                    .SumAsync(x => x.Amount);
+
+                var previousRefund = await _context.Transactions
+                    .Include(t => t.Booking)
+                        .ThenInclude(b => b.Pitch)
+                        .ThenInclude(p => p.Category)
+                    .Where(t => t.TransactionDate >= previousFromDate
+                             && t.TransactionDate <= previousToDate
+                             && t.TransactionType.Trim() == "Hoàn tiền đặt sân"
+                             && t.Booking != null
+                             && t.Booking.Pitch != null
+                             && t.Booking.Pitch.Category != null
+                             && t.Booking.Pitch.Category.CategoryName == stat.SportName)
+                    .SumAsync(x => x.Amount);
+
+                var previousRevenue = previousIncome - previousRefund;
 
                 double growth = 0;
                 if (previousRevenue > 0)
                 {
-                    growth = (double)((stat.Revenue - previousRevenue) / previousRevenue * 100);
+                    growth = (double)((actualRevenue - previousRevenue) / previousRevenue * 100);
                 }
-                else if (stat.Revenue > 0)
+                else if (actualRevenue > 0)
                 {
                     growth = 100; // Tăng trưởng 100% nếu kỳ trước không có doanh thu
                 }
@@ -120,7 +201,7 @@ namespace SportBookingSystem.Services
                 var viewModel = new SportStatsViewModel
                 {
                     SportName = stat.SportName,
-                    Revenue = stat.Revenue,
+                    Revenue = actualRevenue,
                     BookingCount = stat.BookingCount,
                     Growth = Math.Round(growth, 1)
                 };
@@ -159,12 +240,13 @@ namespace SportBookingSystem.Services
                 var serviceRevenue = await CalculateServiceRevenueAsync(fromDate, toDate);
                 var totalRevenue = bookingRevenue + serviceRevenue;
 
-                var transactionCount = await _context.Bookings
-                    .Where(b => b.BookingDate >= fromDate && b.BookingDate <= toDate && b.Status == 1)
-                    .CountAsync();
-
-                transactionCount += await _context.Orders
-                    .Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate && o.Status == 1)
+                // Đếm số giao dịch (chỉ tính Booking và Order, không tính refund, không xét status)
+                var transactionCount = await _context.Transactions
+                    .Where(t => t.TransactionDate >= fromDate
+                             && t.TransactionDate <= toDate
+                             && t.Status.Trim() != "Chờ xác nhận"
+                             && (t.TransactionType.Trim() == "Thanh toán Booking"
+                              || t.TransactionType.Trim() == "Thanh toán Order"))
                     .CountAsync();
 
                 var averagePerTransaction = transactionCount > 0
@@ -187,13 +269,19 @@ namespace SportBookingSystem.Services
                     {
                         growthRate = (double)((totalRevenue - previousTotal) / previousTotal * 100);
                     }
+                    else if (totalRevenue > 0)
+                    {
+                        growthRate = 100;
+                    }
                 }
+
+                var isCurrentMonth = i == 0;
 
                 var summary = new MonthlySummaryViewModel
                 {
                     MonthLabel = $"Tháng {month.Month}/{month.Year}",
-                    DateRange = i == 0
-                        ? $"{fromDate:dd/MM} - {toDate:dd/MM}"
+                    DateRange = isCurrentMonth
+                        ? $"{fromDate:dd/MM} - {currentDate:dd/MM}"
                         : "Toàn tháng",
                     TotalRevenue = totalRevenue,
                     TransactionCount = transactionCount,
@@ -210,34 +298,34 @@ namespace SportBookingSystem.Services
         public async Task<List<MonthlySummaryViewModel>> GetMonthlySummariesByRangeAsync(DateTime startMonth, DateTime endMonth)
         {
             var summaries = new List<MonthlySummaryViewModel>();
-            var currentMonth = startMonth;
             var now = DateTime.Now;
 
-            while (currentMonth <= endMonth)
-            {
-                DateTime fromDate = new DateTime(currentMonth.Year, currentMonth.Month, 1);
-                DateTime toDate;
+            // Normalize dates to first day of month
+            var currentMonth = new DateTime(startMonth.Year, startMonth.Month, 1);
+            var lastMonth = new DateTime(endMonth.Year, endMonth.Month, 1);
 
-                // Nếu là tháng hiện tại, lấy đến thời điểm hiện tại
+            while (currentMonth <= lastMonth)
+            {
+                var fromDate = currentMonth;
+                var toDate = currentMonth.AddMonths(1).AddTicks(-1);
+
+                // Nếu là tháng hiện tại và chưa kết thúc, chỉ lấy đến thời điểm hiện tại
                 if (currentMonth.Year == now.Year && currentMonth.Month == now.Month)
                 {
                     toDate = now;
-                }
-                else
-                {
-                    toDate = fromDate.AddMonths(1).AddTicks(-1);
                 }
 
                 var bookingRevenue = await CalculateBookingRevenueAsync(fromDate, toDate);
                 var serviceRevenue = await CalculateServiceRevenueAsync(fromDate, toDate);
                 var totalRevenue = bookingRevenue + serviceRevenue;
 
-                var transactionCount = await _context.Bookings
-                    .Where(b => b.BookingDate >= fromDate && b.BookingDate <= toDate && b.Status == 1)
-                    .CountAsync();
-
-                transactionCount += await _context.Orders
-                    .Where(o => o.OrderDate >= fromDate && o.OrderDate <= toDate && o.Status == 1)
+                // Đếm số giao dịch (chỉ tính Booking và Order, không tính refund, không xét status)
+                var transactionCount = await _context.Transactions
+                    .Where(t => t.TransactionDate >= fromDate
+                             && t.TransactionDate <= toDate
+                             && t.Status.Trim() != "Chờ xác nhận"
+                             && (t.TransactionType.Trim() == "Thanh toán Booking"
+                              || t.TransactionType.Trim() == "Thanh toán Order"))
                     .CountAsync();
 
                 var averagePerTransaction = transactionCount > 0

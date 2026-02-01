@@ -19,7 +19,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.classList.add('disabled');
                 this.disabled = true;
 
-                // Reset modal content for Booking
                 const modalTitle = document.getElementById('qrModalTitle');
                 const modalAlert = document.getElementById('qrModalAlert');
                 if (modalTitle) modalTitle.textContent = "Mã Check-in Đặt Sân";
