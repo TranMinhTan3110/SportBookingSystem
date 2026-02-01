@@ -134,7 +134,7 @@ namespace SportBookingSystem.Services
                 var timeSlot = await _context.TimeSlots.FindAsync(slotId);
                 var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
 
-                // ✅ FIX: TÍNH GIÁ ĐÚNG THEO KHUNG GIỜ ĐẶC BIỆT TỪ BẢNG PitchPriceSettings
+             
                 decimal currentPricePerHour = pitch.PricePerHour;
                 var specialPrice = await _context.PitchPriceSettings
                     .FirstOrDefaultAsync(s => s.PitchId == pitchId
@@ -298,7 +298,7 @@ namespace SportBookingSystem.Services
                     var booking = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
                     if (booking != null)
                     {
-                        refundAmount = booking.Amount * 0.5m; // Hoàn 50%
+                        refundAmount = booking.Amount * 1m; // Hoàn 100
                         isRefunded = true;
 
                         var user = await _context.Users.FindAsync(slot.UserId);
@@ -317,7 +317,7 @@ namespace SportBookingSystem.Services
                                 Source = TransactionSources.Wallet,
                                 TransactionDate = DateTime.Now,
                                 TransactionCode = $"REF-{DateTime.Now:yyMMddHHmmss}{user.UserId}",
-                                Message = $"Hoàn tiền 50% hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
+                                Message = $"Hoàn tiền 100% hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
                                 BalanceAfter = user.WalletBalance
                             };
                             _context.Transactions.Add(refundTrans);
@@ -341,7 +341,7 @@ namespace SportBookingSystem.Services
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                string msg = isRefunded ? $"Hủy sân thành công. Bạn được hoàn lại {refundAmount:N0}₫ (50%)." : "Hủy sân thành công. Giao dịch không đủ điều kiện hoàn tiền.";
+                string msg = isRefunded ? $"Hủy sân thành công. Bạn được hoàn lại {refundAmount:N0}₫ (100%)." : "Hủy sân thành công. Giao dịch không đủ điều kiện hoàn tiền.";
                 if (isAutoCancel) msg = "Hệ thống tự động hủy sân do quá hạn check-in.";
 
                 return (true, msg, refundAmount);
