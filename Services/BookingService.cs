@@ -2,6 +2,7 @@
 using QRCoder;
 using SportBookingSystem.Constants;
 using SportBookingSystem.Models.EF;
+using SportBookingSystem.Models.DTOs;
 using SportBookingSystem.Models.Entities;
 using SportBookingSystem.Models.ViewModels;
 
@@ -134,7 +135,6 @@ namespace SportBookingSystem.Services
                 var timeSlot = await _context.TimeSlots.FindAsync(slotId);
                 var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
 
-                // ✅ FIX: TÍNH GIÁ ĐÚNG THEO KHUNG GIỜ ĐẶC BIỆT TỪ BẢNG PitchPriceSettings
                 decimal currentPricePerHour = pitch.PricePerHour;
                 var specialPrice = await _context.PitchPriceSettings
                     .FirstOrDefaultAsync(s => s.PitchId == pitchId
@@ -298,7 +298,7 @@ namespace SportBookingSystem.Services
                     var booking = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
                     if (booking != null)
                     {
-                        refundAmount = booking.Amount * 0.5m; // Hoàn 50%
+                        refundAmount = booking.Amount;
                         isRefunded = true;
 
                         var user = await _context.Users.FindAsync(slot.UserId);
@@ -317,7 +317,7 @@ namespace SportBookingSystem.Services
                                 Source = TransactionSources.Wallet,
                                 TransactionDate = DateTime.Now,
                                 TransactionCode = $"REF-{DateTime.Now:yyMMddHHmmss}{user.UserId}",
-                                Message = $"Hoàn tiền 50% hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
+                                Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
                                 BalanceAfter = user.WalletBalance
                             };
                             _context.Transactions.Add(refundTrans);
@@ -351,6 +351,84 @@ namespace SportBookingSystem.Services
                 await transaction.RollbackAsync();
                 return (false, "Lỗi khi hủy sân: " + ex.Message, 0);
             }
+        }
+
+        public async Task<List<BookingManagementDTO>> GetPendingBookingsAsync(DateTime? fromDate, DateTime? toDate, int? timeSlotId, int? categoryId, string? search)
+        {
+            var query = _context.PitchSlots
+                .Include(ps => ps.Pitch)
+                    .ThenInclude(p => p.Category)
+                .Include(ps => ps.TimeSlot)
+                .Include(ps => ps.User)
+                .Where(ps => ps.Status == BookingStatus.PendingConfirm);
+
+            if (fromDate.HasValue)
+                query = query.Where(ps => ps.PlayDate >= fromDate.Value);
+
+            if (toDate.HasValue)
+                query = query.Where(ps => ps.PlayDate <= toDate.Value);
+
+            if (timeSlotId.HasValue)
+                query = query.Where(ps => ps.SlotId == timeSlotId.Value);
+
+            if (categoryId.HasValue)
+                query = query.Where(ps => ps.Pitch.CategoryId == categoryId.Value);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                search = search.ToLower();
+                query = query.Where(ps => ps.BookingCode.ToLower().Contains(search) ||
+                                          (ps.User.FullName != null && ps.User.FullName.ToLower().Contains(search)) ||
+                                          (ps.User.Phone != null && ps.User.Phone.Contains(search)));
+            }
+            
+            var bookings = await query.OrderByDescending(ps => ps.PlayDate).ThenBy(ps => ps.TimeSlot.StartTime).ToListAsync();
+            var result = new List<BookingManagementDTO>();
+            
+            foreach (var b in bookings)
+            {
+                var trans = await _context.Transactions
+                    .Where(t => t.TransactionCode == b.BookingCode && t.TransactionType == TransactionTypes.Booking)
+                    .FirstOrDefaultAsync();
+
+                result.Add(new BookingManagementDTO
+                {
+                    Id = b.PitchSlotId,
+                    Code = b.BookingCode,
+                    CustomerName = b.User?.FullName ?? "N/A",
+                    CustomerPhone = b.User?.Phone ?? "N/A",
+                    PitchName = b.Pitch?.PitchName ?? "N/A",
+                    Date = b.PlayDate.ToString("dd/MM/yyyy"),
+                    Time = $"{b.TimeSlot.StartTime:hh\\:mm} - {b.TimeSlot.EndTime:hh\\:mm}",
+                    SlotId = b.SlotId,
+                    TotalPrice = trans?.Amount ?? 0
+                });
+            }
+            
+            return result;
+        }
+
+        public async Task<(bool Success, string Message)> ApproveBookingAsync(int bookingId)
+        {
+            var booking = await _context.PitchSlots.FindAsync(bookingId);
+            if (booking == null) return (false, "Booking not found");
+            if (booking.Status != BookingStatus.PendingConfirm) return (false, "Status invalid");
+
+            booking.Status = BookingStatus.Completed; 
+            return (true, "Đã duyệt đơn.");
+        }
+
+        public async Task<(bool Success, string Message)> RejectBookingAsync(int bookingId)
+        {
+             return await CancelBooking(bookingId); 
+        }
+        
+        private async Task<(bool Success, string Message)> CancelBooking(int bookingId)
+        {
+            var booking = await _context.PitchSlots.FindAsync(bookingId);
+            if (booking == null) return (false, "Not found");
+            var result = await CancelBookingAsync(booking.BookingCode, false);
+            return (result.Success, result.Message);
         }
 
         private string GenerateQrCode(string content)

@@ -1,4 +1,5 @@
-﻿using SportBookingSystem.Models.ViewModels;
+﻿using SportBookingSystem.Models.DTOs;
+using SportBookingSystem.Models.ViewModels;
 
 namespace SportBookingSystem.Services
 {
@@ -34,5 +35,9 @@ namespace SportBookingSystem.Services
 
         Task<(bool Success, string Message, string? QrBase64, string? BookingCode)> BookPitchAsync(int userId, int pitchId, int slotId, DateTime date);
         Task<(bool Success, string Message, decimal RefundAmount)> CancelBookingAsync(string bookingCode, bool isAutoCancel = false);
+
+        Task<List<BookingManagementDTO>> GetPendingBookingsAsync(DateTime? fromDate, DateTime? toDate, int? timeSlotId, int? categoryId, string? search);
+        Task<(bool Success, string Message)> ApproveBookingAsync(int bookingId);
+        Task<(bool Success, string Message)> RejectBookingAsync(int bookingId);
     }
 }
