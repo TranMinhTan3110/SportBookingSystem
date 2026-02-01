@@ -37,6 +37,7 @@ builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddHostedService<OrderCancellationBackgroundService>();
 builder.Services.AddHostedService<BookingAutoCancellationService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>

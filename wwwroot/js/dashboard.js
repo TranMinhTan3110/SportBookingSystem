@@ -7,11 +7,22 @@
         return;
     }
 
+    if (typeof chartData === 'undefined' || !chartData || chartData.length === 0) {
+        console.log('No chart data available');
+        return;
+    }
+
+    const labels = chartData.map(item => item.dayOfWeek);
+    const revenues = chartData.map(item => item.revenue);
+
+    const maxRevenue = Math.max(...revenues);
+    const chartMax = Math.ceil(maxRevenue / 10000000) * 10000000; 
+
     const data = {
-        labels: ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'],
+        labels: labels,
         datasets: [{
             label: 'Doanh thu',
-            data: [36000000, 45000000, 33000000, 54000000, 42000000, 51000000, 57000000],
+            data: revenues,
             backgroundColor: function (context) {
                 const chart = context.chart;
                 const { ctx, chartArea } = chart;
@@ -67,8 +78,10 @@
                     displayColors: false,
                     callbacks: {
                         title: function (context) {
-                            const days = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
-                            return days[context[0].dataIndex];
+                            const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
+                            const fullDays = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+                            const index = days.indexOf(context[0].label);
+                            return index >= 0 ? fullDays[index] : context[0].label;
                         },
                         label: function (context) {
                             return new Intl.NumberFormat('vi-VN', {
@@ -83,7 +96,7 @@
             scales: {
                 y: {
                     beginAtZero: true,
-                    max: 60000000,
+                    max: chartMax > 0 ? chartMax : 60000000,
                     ticks: {
                         color: '#94A3AF',
                         font: {
@@ -91,7 +104,12 @@
                             weight: '600'
                         },
                         callback: function (value) {
-                            return (value / 1000000) + 'M';
+                            if (value >= 1000000) {
+                                return (value / 1000000) + 'M';
+                            } else if (value >= 1000) {
+                                return (value / 1000) + 'K';
+                            }
+                            return value;
                         }
                     },
                     grid: {
@@ -124,5 +142,18 @@
 
     const chart = new Chart(ctx, config);
 
-    console.log('Chart.js loaded successfully!');
+    console.log('Chart.js loaded successfully with real data!');
 });
+
+function refreshStats() {
+    fetch('/Dashboard/GetStats')
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                console.log('Stats refreshed:', result.data);
+            }
+        })
+        .catch(error => {
+            console.error('Error refreshing stats:', error);
+        });
+}
