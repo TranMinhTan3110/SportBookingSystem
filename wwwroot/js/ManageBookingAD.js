@@ -4,12 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initFilters() {
-    // Date inputs default: From = Today
     const today = new Date().toISOString().split('T')[0];
     const fromDateEl = document.getElementById('fromDate');
     if (fromDateEl) fromDateEl.value = today;
 
-    // Event Listeners
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.addEventListener('input', debounce(loadBookings, 500));
 
@@ -96,71 +94,6 @@ function renderTable(data) {
     `).join('');
 }
 
-// Action functions global assignment
-window.approveBooking = function (id) {
-    Swal.fire({
-        title: 'Xác nhận duyệt?',
-        text: `Bạn có chắc muốn duyệt đơn này?`, // Using ID in text might be confusing if ID is DB ID, not Code
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonText: 'Duyệt ngay',
-        cancelButtonText: 'Hủy',
-        confirmButtonColor: '#10B981'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/ManageBookingAD/ApproveBooking`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${id}`
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('Thành công', 'Đã duyệt đơn đặt sân.', 'success');
-                        loadBookings();
-                    } else {
-                        Swal.fire('Lỗi', data.message || 'Không thể duyệt đơn.', 'error');
-                    }
-                })
-                .catch(err => Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối server.', 'error'));
-        }
-    });
-};
-
-window.rejectBooking = function (id) {
-    Swal.fire({
-        title: 'Từ chối đơn?',
-        text: `Bạn có chắc muốn hủy đơn này?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Hủy đơn',
-        cancelButtonText: 'Quay lại',
-        confirmButtonColor: '#EF4444'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(`/ManageBookingAD/RejectBooking`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `id=${id}`
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire('Đã hủy', 'Đơn đặt sân đã bị hủy.', 'success');
-                        loadBookings();
-                    } else {
-                        Swal.fire('Lỗi', data.message || 'Không thể hủy đơn.', 'error');
-                    }
-                })
-                .catch(err => Swal.fire('Lỗi', 'Có lỗi xảy ra khi kết nối server.', 'error'));
-        }
-    });
-};
-
-window.viewDetails = function (id) {
-    // Assuming we might have a detail page or modal later.
-    Swal.fire('Info', `Xem chi tiết đơn #${id} (Chức năng đang phát triển)`, 'info');
-}
 
 function debounce(func, wait) {
     let timeout;
