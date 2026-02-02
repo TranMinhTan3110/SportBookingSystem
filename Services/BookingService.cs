@@ -363,7 +363,7 @@ namespace SportBookingSystem.Services
                 .Where(ps => ps.Status == BookingStatus.PendingConfirm);
 
             if (fromDate.HasValue)
-                query = query.Where(ps => ps.PlayDate >= fromDate.Value);
+                query = query.Where(ps => ps.PlayDate == fromDate.Value);
 
             if (toDate.HasValue)
                 query = query.Where(ps => ps.PlayDate <= toDate.Value);
