@@ -6,7 +6,7 @@ const bookingModalElement = document.getElementById('bookingModal');
 const bookingModal = bookingModalElement ? new bootstrap.Modal(bookingModalElement) : null;
 
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('booking.js loaded');
+    console.log(' booking.js loaded');
 
     const modalDateInput = document.getElementById('modalBookingDate');
     if (modalDateInput) {
@@ -239,7 +239,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                 formData.append('slotId', slotId);
                 formData.append('date', dateSelected);
 
-                console.log('📤 Đang gửi request đặt sân...');
+                console.log(' Đang gửi request đặt sân...');
 
                 const response = await fetch('/Booking/BookPitch', { method: 'POST', body: formData });
                 const data = await response.json();
@@ -253,7 +253,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                         console.log(' Đang cập nhật số dư ví...');
                         updateWalletBalance(data.newBalance);
                     } else {
-                        console.warn('⚠️ Server không trả về newBalance!');
+                        console.warn('⚠ Server không trả về newBalance!');
                     }
 
                     await Swal.fire({
