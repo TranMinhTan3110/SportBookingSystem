@@ -233,7 +233,7 @@ function updateRevenueChart(labels, bookingData, serviceData) {
                     display: true,
                     position: 'top',
                     labels: {
-                        color: '#e2e8f0',
+                        color: '#000',
                         font: { size: 12 }
                     }
                 },
@@ -249,7 +249,7 @@ function updateRevenueChart(labels, bookingData, serviceData) {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: '#94a3b8',
+                        color: '#000',
                         callback: function (value) {
                             return (value / 1000000).toFixed(1) + 'M';
                         }
@@ -260,7 +260,7 @@ function updateRevenueChart(labels, bookingData, serviceData) {
                 },
                 x: {
                     ticks: {
-                        color: '#94a3b8'
+                        color: '#000'
                     },
                     grid: {
                         color: 'rgba(148, 163, 184, 0.1)'
@@ -300,7 +300,7 @@ function updateCategoryChart(booking, service) {
                     display: true,
                     position: 'bottom',
                     labels: {
-                        color: '#e2e8f0',
+                        color: '#000',
                         font: { size: 12 },
                         padding: 15
                     }
@@ -334,7 +334,7 @@ async function handlePeriodChange() {
     const period = document.getElementById('reportPeriod').value;
 
     if (period === 'custom') {
-        return; 
+        return;
     }
 
     try {

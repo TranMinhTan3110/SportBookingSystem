@@ -9,6 +9,26 @@
     --primary-dark: #059669;
     --secondary: #F59E0B;
     --secondary-dark: #D97706;
+    --success: #10B981;
+    --info: #3B82F6;
+    --warning: #F59E0B;
+    --danger: #EF4444;
+    --bg-color: #F8FAFC;
+    --background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+    --surface: #FFFFFF;
+    --surface-light: #F1F5F9;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+    --border: rgba(100, 116, 139, 0.2);
+    --gradient-main: linear-gradient(135deg, #10B981 0%, #F59E0B 100%);
+}
+
+/* :root {
+    --primary: #10B981;
+    --primary-dark: #059669;
+    --secondary: #F59E0B;
+    --secondary-dark: #D97706;
+    --bg-color: #0F172A;
     --background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
     --surface: #1E293B;
     --surface-light: #334155;
@@ -16,11 +36,11 @@
     --text-secondary: #94A3AF;
     --border: rgba(148, 163, 175, 0.15);
     --gradient-main: linear-gradient(135deg, #10B981 0%, #F59E0B 100%);
-}
+} */
 
 body {
     font-family: 'Inter', sans-serif;
-    background: #0F172A;
+    background: var(--bg-color);
     background-image: var(--background);
     color: var(--text-primary);
     min-height: 100vh;
@@ -203,6 +223,17 @@ body {
     color: var(--text-secondary);
     font-size: 14px;
     font-family: 'Inter', sans-serif;
+}
+
+#startScannerBtn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .menu-toggle {
