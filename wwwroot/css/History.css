@@ -4,7 +4,6 @@
     padding: 0 24px;
 }
 
-/* Page Header & Tabs */
 .page-header-content {
     margin-bottom: 30px;
 }
@@ -45,7 +44,6 @@
     border-bottom-color: var(--primary);
 }
 
-/* Tab Content */
 .tab-content {
     display: none;
     animation: fadeIn 0.4s ease;
@@ -67,7 +65,6 @@
     }
 }
 
-/* Tables */
 .table-wrapper {
     background: var(--surface);
     border-radius: 16px;
@@ -80,7 +77,6 @@
     width: 100%;
     border-collapse: collapse;
     min-width: 800px;
-    /* Để scroll ngang trên mobile */
 }
 
 .data-table th {
@@ -107,7 +103,6 @@
     background-color: #F8FAFC;
 }
 
-/* Table Elements Styling */
 .court-info,
 .trans-info {
     display: flex;
@@ -131,15 +126,15 @@
 }
 
 .amount.positive {
-    color: #10b981; /* Xanh lá - Nhận tiền */
+    color: #10b981;
     font-weight: 700;
 }
 
 .amount.negative {
-    color: #ef4444; /* Đỏ - Gửi tiền */
+    color: #ef4444; 
     font-weight: 700;
 }
-/* PHÂN TRANG */
+
 .pagination-wrapper {
     display: flex;
     justify-content: center;
@@ -181,7 +176,7 @@
     padding: 0 8px;
     color: #999;
 }
-/* Badges */
+
 .badge {
     padding: 6px 12px;
     border-radius: 20px;
@@ -205,7 +200,6 @@
     color: var(--danger);
 }
 
-/* Action Button */
 .btn-action {
     padding: 8px 16px;
     background: white;
@@ -222,7 +216,6 @@
     color: var(--primary);
 }
 
-/* Responsive Table */
 @media (max-width: 768px) {
     .table-wrapper {
         overflow-x: auto;
@@ -234,8 +227,5 @@
 
     .nav-menu {
         display: none;
-
-        /* Ẩn menu trên mobile để demo đơn giản */
-
     }
 }

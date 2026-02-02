@@ -162,14 +162,22 @@ namespace SportBookingSystem.Services
                 {
                     Code = t.TransactionCode,
                     User = t.Sender?.FullName ?? t.Sender?.Username,
-                    Amount = Math.Abs(t.Amount),
+                    Amount = Math.Abs(t.Amount), 
                     Date = t.TransactionDate,
                     Type = t.TransactionType,
                     Status = t.Status,
                     Source = t.Source
                 }).ToList(),
-                TotalDeposits = totalDeposits,
-                Revenue = actualRevenue, // ✅ DOANH THU THỰC TẾ
+
+                TotalDeposits = allTransactions
+                    .Where(t => t.TransactionType == TransactionTypes.Recharge && t.Status == TransactionStatus.Success)
+                    .Sum(t => t.Amount),
+
+                Revenue = allTransactions
+                    .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
+                             && t.Status == TransactionStatus.Success)
+                    .Sum(t => Math.Abs(t.Amount)),
+
                 TransactionCount = totalRecords,
                 CurrentPage = page,
                 PageSize = pageSize,

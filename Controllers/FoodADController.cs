@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SportBookingSystem.Models.ViewModels;
 using SportBookingSystem.Services;
-using SportBookingSystem.Models.ViewModels;
 
 namespace SportBookingSystem.Controllers
 {
@@ -14,7 +13,6 @@ namespace SportBookingSystem.Controllers
             _foodADService = foodADService;
         }
 
-        // GET: FoodAD/Index
         public async Task<IActionResult> Index(string searchTerm = null, int? categoryId = null, string stockFilter = null)
         {
             var products = await _foodADService.GetAllProductsAsync(searchTerm, categoryId, stockFilter);
@@ -28,7 +26,6 @@ namespace SportBookingSystem.Controllers
             return View(products);
         }
 
-        // POST: FoodAD/Create (API)
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductCreateEditViewModel model)
         {
@@ -47,7 +44,6 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi thêm sản phẩm!" });
         }
 
-        // GET: FoodAD/GetProduct/{id} (API)
         [HttpGet]
         public async Task<IActionResult> GetProduct(int id)
         {
@@ -74,7 +70,6 @@ namespace SportBookingSystem.Controllers
             });
         }
 
-        // POST: FoodAD/Update (API)
         [HttpPost]
         public async Task<IActionResult> Update([FromBody] ProductCreateEditViewModel model)
         {
@@ -93,21 +88,27 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật sản phẩm!" });
         }
 
-        // POST: FoodAD/Delete/{id} (API)
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> ToggleStatus(int id)
         {
-            var result = await _foodADService.DeleteProductAsync(id);
+            var product = await _foodADService.GetProductByIdAsync(id);
+            if (product == null)
+            {
+                return Json(new { status = "error", message = "Không tìm thấy sản phẩm!" });
+            }
+
+            var result = await _foodADService.ToggleProductStatusAsync(id);
 
             if (result)
             {
-                return Json(new { status = "success", message = "Xóa sản phẩm thành công!" });
+                var newStatus = !product.Status;
+                var message = newStatus ? "Đã hiển thị sản phẩm!" : "Đã ẩn sản phẩm!";
+                return Json(new { status = "success", message = message, newStatus = newStatus });
             }
 
-            return Json(new { status = "error", message = "Có lỗi xảy ra khi xóa sản phẩm!" });
+            return Json(new { status = "error", message = "Có lỗi xảy ra khi thay đổi trạng thái!" });
         }
 
-        // POST: FoodAD/AddStock (API)
         [HttpPost]
         public async Task<IActionResult> AddStock([FromBody] AddStockViewModel model)
         {
@@ -131,6 +132,7 @@ namespace SportBookingSystem.Controllers
 
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật số lượng!" });
         }
+
         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile imageFile)
         {
@@ -140,7 +142,6 @@ namespace SportBookingSystem.Controllers
                 {
                     return Json(new { success = false, message = "Không có file được chọn!" });
                 }
-
 
                 var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
                 var extension = Path.GetExtension(imageFile.FileName).ToLower();
@@ -177,5 +178,11 @@ namespace SportBookingSystem.Controllers
                 return Json(new { success = false, message = "Có lỗi xảy ra khi upload hình ảnh: " + ex.Message });
             }
         }
+    }
+
+    public class AddStockViewModel
+    {
+        public int ProductId { get; set; }
+        public int Amount { get; set; }
     }
 }

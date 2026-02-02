@@ -14,7 +14,6 @@ namespace SportBookingSystem.Controllers
             _context = context;
         }
 
-        // 1. API Lấy danh sách khung giờ (Cho Modal)
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
@@ -22,7 +21,6 @@ namespace SportBookingSystem.Controllers
             return Json(new { success = true, data = slots });
         }
 
-        // 2. API Thêm khung giờ
         [HttpPost]
         public async Task<IActionResult> Create(string startTime, string endTime)
         {
@@ -51,7 +49,6 @@ namespace SportBookingSystem.Controllers
             }
         }
 
-        // 3. API Xóa khung giờ
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {

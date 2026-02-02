@@ -1,8 +1,6 @@
-﻿// Global chart instances
-let revenueChart = null;
+﻿let revenueChart = null;
 let categoryChart = null;
 
-// Khởi tạo giá trị mặc định cho month filter
 function initializeMonthFilters() {
     const now = new Date();
     const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, 1);
@@ -30,7 +28,6 @@ async function applyMonthFilter() {
     const toMonth = parseInt(document.getElementById('toMonth').value);
     const toYear = parseInt(document.getElementById('toYear').value);
 
-    // Validate
     const fromDate = new Date(fromYear, fromMonth - 1, 1);
     const toDate = new Date(toYear, toMonth - 1, 1);
 
@@ -78,21 +75,16 @@ async function applyFilter() {
     try {
         showLoading();
 
-        // Gọi API lấy dữ liệu
         const response = await fetch(`/ReportAD/GetReportData?fromDate=${fromDate}&toDate=${toDate}`);
         const result = await response.json();
 
         if (result.success) {
-            // Cập nhật thẻ thống kê
             updateStatsCards(result);
 
-            // Cập nhật danh sách môn thể thao
             updateTopSports(result.topSports);
 
-            // Cập nhật bảng tổng kết tháng (giữ nguyên 3 tháng mặc định)
             updateMonthlySummary(result.monthlySummaries);
 
-            // Cập nhật biểu đồ
             await updateCharts(fromDate, toDate);
         } else {
             alert(result.message || 'Có lỗi xảy ra khi tải dữ liệu');
@@ -111,7 +103,6 @@ function updateStatsCards(data) {
     document.getElementById('bookingRevenue').innerText = formatCurrency(data.bookingRevenue);
     document.getElementById('serviceRevenue').innerText = formatCurrency(data.serviceRevenue);
 
-    // Cập nhật growth rate
     const growthElement = document.querySelector('.card-total .stat-change');
     const isPositive = data.growthRate >= 0;
 
@@ -190,10 +181,8 @@ async function updateCharts(fromDate, toDate) {
         const result = await response.json();
 
         if (result.success) {
-            // Cập nhật biểu đồ doanh thu theo thời gian
             updateRevenueChart(result.labels, result.bookingData, result.serviceData);
 
-            // Cập nhật biểu đồ doanh thu theo nguồn
             const totalBooking = result.bookingData.reduce((a, b) => a + b, 0);
             const totalService = result.serviceData.reduce((a, b) => a + b, 0);
             updateCategoryChart(totalBooking, totalService);
@@ -345,7 +334,7 @@ async function handlePeriodChange() {
     const period = document.getElementById('reportPeriod').value;
 
     if (period === 'custom') {
-        return; // Người dùng tự chọn ngày
+        return; 
     }
 
     try {
@@ -355,11 +344,9 @@ async function handlePeriodChange() {
         const result = await response.json();
 
         if (result.success) {
-            // Cập nhật input date
             document.getElementById('fromDate').value = result.fromDate;
             document.getElementById('toDate').value = result.toDate;
 
-            // Cập nhật dữ liệu
             updateStatsCards(result.data);
             updateTopSports(result.data.topSports);
             updateMonthlySummary(result.data.monthlySummaries);
@@ -380,7 +367,6 @@ function formatCurrency(value) {
 
 // Hiển thị loading
 function showLoading() {
-    // Tạo overlay loading nếu chưa có
     let loadingOverlay = document.getElementById('loadingOverlay');
 
     if (!loadingOverlay) {

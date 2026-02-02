@@ -194,7 +194,6 @@
     border: 2px solid white;
 }
 
-/* Profile Wallet */
 .profile-wallet {
     text-align: right;
     color: white;
@@ -698,7 +697,6 @@
     color: var(--primary);
 }
 
-/* Animation */
 @keyframes fadeInUp {
     from {
         opacity: 0;

@@ -1,12 +1,7 @@
-﻿/* ============================================
-   FOOD & DRINK MANAGEMENT CSS - PROPER RESPONSIVE
-   ============================================ */
-/* Hide rows by pagination */
-#productTableBody tr.pagination-hidden {
+﻿#productTableBody tr.pagination-hidden {
     display: none !important;
 }
 
-/* Reset & Base */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -18,7 +13,6 @@ html, body {
     overflow-x: hidden;
 }
 
-/* Container chính */
 .page-container {
     padding: 20px;
     width: 100%;
@@ -27,7 +21,6 @@ html, body {
     box-sizing: border-box;
 }
 
-/* --- Header --- */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -68,7 +61,6 @@ html, body {
         box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
     }
 
-/* --- Filter Section --- */
 .filter-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -126,7 +118,6 @@ html, body {
         color: var(--text-secondary);
     }
 
-/* --- Stats Cards --- */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -185,7 +176,6 @@ html, body {
     margin: 0;
 }
 
-/* --- Table Section --- */
 .table-section {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -264,7 +254,6 @@ html, body {
             background: rgba(16, 185, 129, 0.05);
         }
 
-/* Product Image */
 .product-img {
     width: 60px;
     height: 60px;
@@ -274,7 +263,6 @@ html, body {
     display: block;
 }
 
-/* Product Info */
 .product-name {
     font-weight: 600;
     color: var(--text-primary);
@@ -288,7 +276,6 @@ html, body {
     white-space: nowrap;
 }
 
-/* Badge Styles */
 .badge {
     display: inline-block;
     padding: 6px 12px;
@@ -299,28 +286,7 @@ html, body {
     letter-spacing: 0.5px;
     white-space: nowrap;
 }
-/*
-.badge-food {
-    background: rgba(239, 68, 68, 0.2);
-    color: #EF4444;
-}
 
-.badge-drink {
-    background: rgba(59, 130, 246, 0.2);
-    color: #3B82F6;
-}
-
-.badge-snack {
-    background: rgba(245, 158, 11, 0.2);
-    color: #F59E0B;
-}
-
-.badge-dessert {
-    background: rgba(236, 72, 153, 0.2);
-    color: #EC4899;
-}*/
-
-/* Stock Status */
 .stock-status {
     font-weight: 600;
     font-size: 13px;
@@ -339,7 +305,6 @@ html, body {
     color: var(--secondary);
 }
 
-/* Action Buttons */
 .action-buttons {
     display: flex;
     gap: 8px;
@@ -394,7 +359,6 @@ html, body {
         color: white;
     }
 
-/* --- Modal Styles --- */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -545,9 +509,6 @@ textarea.form-control {
         box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
     }
 
-/* ======================== RESPONSIVE DESIGN ======================== */
-
-/* Tablets (max-width: 1024px) */
 @media (max-width: 1024px) {
     .page-container {
         padding: 16px;
@@ -581,7 +542,6 @@ textarea.form-control {
     }
 }
 
-/* Mobile (max-width: 768px) */
 @media (max-width: 768px) {
     html {
         overflow-x: hidden;
@@ -602,7 +562,6 @@ textarea.form-control {
         position: relative;
     }
 
-    /* Header */
     .page-header {
         flex-direction: column;
         align-items: stretch;
@@ -622,7 +581,6 @@ textarea.form-control {
         padding: 14px 20px;
     }
 
-    /* Filter Section - COMPACT VERTICAL LAYOUT */
     .filter-section {
         padding: 20px 16px;
         border-radius: 16px;
@@ -632,7 +590,7 @@ textarea.form-control {
     }
 
     .filter-grid {
-        grid-template-columns: 1fr; /* CHỈ 1 CỘT DỌC */
+        grid-template-columns: 1fr; 
         gap: 16px;
         width: 100%;
     }
@@ -662,7 +620,6 @@ textarea.form-control {
         appearance: none;
     }
 
-    /* Stats Grid */
     .stats-grid {
         grid-template-columns: 1fr;
         gap: 12px;
@@ -683,7 +640,6 @@ textarea.form-control {
         font-size: 20px;
     }
 
-    /* Table - Scrollable */
     .table-section {
         border-radius: 16px;
         margin-top: 20px;
@@ -750,7 +706,6 @@ textarea.form-control {
         font-size: 14px;
     }
 
-    /* Modal */
     .modal-overlay {
         padding: 0;
         align-items: flex-end;
@@ -809,7 +764,6 @@ textarea.form-control {
     }
 }
 
-/* Small Mobile (max-width: 480px) */
 @media (max-width: 480px) {
     .page-container {
         padding: 12px;
@@ -908,7 +862,6 @@ textarea.form-control {
     }
 }
 
-/* Landscape orientation on mobile */
 @media (max-width: 768px) and (orientation: landscape) {
     .modal-content {
         max-height: 85vh;
@@ -923,7 +876,6 @@ textarea.form-control {
     }
 }
 
-/* Touch optimization */
 @media (hover: none) and (pointer: coarse) {
     .btn-action,
     .btn-add,
@@ -949,7 +901,6 @@ textarea.form-control {
     }
 }
 
-/* Scroll Hint */
 .table-section::after {
     content: '← Vuốt ngang để xem thêm →';
     display: none;
@@ -985,7 +936,6 @@ textarea.form-control {
     }
 }
 
-/* Fix viewport */
 @media (max-width: 768px) {
     html {
         -webkit-text-size-adjust: 100%;
@@ -1007,7 +957,6 @@ textarea.form-control {
     }
 }
 
-/* Đảm bảo không có element nào vượt quá màn hình */
 @media (max-width: 768px) {
     * {
         max-width: 100%;
@@ -1018,14 +967,11 @@ textarea.form-control {
         max-width: 100%;
     }
 
-    /* Riêng table thì cho phép nó rộng nhưng scroll trong wrapper */
     .product-table {
         max-width: none;
     }
 }
-/* ============================================
-   NÚT LÀM MỚI - IMPROVED VERSION
-   ============================================ */
+
 .btn-refresh {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
@@ -1063,16 +1009,12 @@ textarea.form-control {
         transform: rotate(180deg);
     }
 
-/* ============================================
-   IMAGE UPLOAD - IMPROVED VERSION
-   ============================================ */
 .image-upload-wrapper {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
-/* Custom File Input */
 .form-control-file {
     position: relative;
     padding: 16px;
@@ -1096,7 +1038,6 @@ textarea.form-control {
         box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
-    /* File Input Label Style */
     .form-control-file::file-selector-button {
         background: var(--gradient-main);
         color: white;
@@ -1114,7 +1055,7 @@ textarea.form-control {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
         }
-/* Nút Làm Mới - Kế thừa style từ form-control */
+
 .btn-refresh {
     background: var(--surface-light);
     border: 1px solid var(--border);
@@ -1153,7 +1094,6 @@ textarea.form-control {
         transform: rotate(180deg);
     }
 
-/* Responsive cho nút làm mới */
 @media (max-width: 768px) {
     .btn-refresh {
         padding: 14px 16px;
@@ -1170,7 +1110,7 @@ textarea.form-control {
         font-size: 18px;
     }
 }
-/* Image Upload - Simple & Clean */
+
 .image-upload-container {
     display: flex;
     flex-direction: column;
@@ -1268,7 +1208,6 @@ textarea.form-control {
         font-size: 16px;
     }
 
-/* Responsive */
 @media (max-width: 768px) {
     .image-preview {
         max-width: 100%;
@@ -1286,9 +1225,7 @@ textarea.form-control {
         height: 28px;
     }
 }
-/* ============================================
-   PAGINATION STYLES
-   ============================================ */
+
 .pagination-container {
     display: flex;
     justify-content: space-between;
@@ -1387,7 +1324,6 @@ textarea.form-control {
     font-size: 14px;
 }
 
-/* Responsive Pagination */
 @media (max-width: 768px) {
     .pagination-container {
         flex-direction: column;
@@ -1426,3 +1362,49 @@ textarea.form-control {
         display: none;
     }
 }
+
+.row-hidden {
+    opacity: 0.5;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.img-grayscale {
+    filter: grayscale(100%);
+    opacity: 0.6;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.status-hidden {
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
+}
+
+.btn-hide {
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+}
+
+    .btn-hide:hover {
+        background: #F59E0B;
+        color: white;
+    }
+
+.btn-show {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+}
+
+    .btn-show:hover {
+        background: #10B981;
+        color: white;
+    }

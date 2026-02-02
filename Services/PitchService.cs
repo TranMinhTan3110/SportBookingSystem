@@ -236,9 +236,6 @@ namespace SportBookingSystem.Services
             }
         }
 
-        //hàm mới 
-        // Trong PitchService.cs
-
         public async Task<List<PitchPriceSetting>> GetPitchPricesAsync(int pitchId)
         {
             return await _context.PitchPriceSettings
@@ -251,11 +248,8 @@ namespace SportBookingSystem.Services
         {
             try
             {
-                // Validate logic: Giờ kết thúc phải sau giờ bắt đầu
                 if (model.EndTime <= model.StartTime)
                     return (false, "Giờ kết thúc phải lớn hơn giờ bắt đầu");
-
-                // Validate logic: Kiểm tra trùng giờ (Nâng cao - có thể làm sau, tạm thời cho phép chèn)
 
                 var setting = new PitchPriceSetting
                 {

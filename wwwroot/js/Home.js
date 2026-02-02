@@ -1,7 +1,3 @@
-
-// CHUYỂN TIỀN NỘI BỘ
-
-// Kiểm tra người nhận khi blur khỏi input SĐT
 document.getElementById('trf_phone')?.addEventListener('blur', async function () {
     const phone = this.value.trim();
     const receiverNameDiv = document.getElementById('trf_receiver_name');
@@ -141,12 +137,11 @@ async function processTopup() {
     }
 }
 
-// PURCHASE LOGIC FOR PRODUCTS
 let selectedProduct = null;
 let purchaseModal = null;
 let qrModal = null;
 let homeInterval;
-let purchaseType = 'food'; // 'food' or 'supply'
+let purchaseType = 'food'; // 'food' hoac 'supply'
 
 window.openPurchaseModal = function (id, name, price, image, type) {
     selectedProduct = { id, name, price };

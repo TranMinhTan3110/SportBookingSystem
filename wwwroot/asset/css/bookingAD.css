@@ -1,4 +1,4 @@
-﻿/* Fields Management Page */
+﻿
 .fields-management {
     animation: fadeIn 0.5s ease;
 }
@@ -15,7 +15,6 @@
     }
 }
 
-/* Page Header */
 .page-header {
     display: flex;
     justify-content: space-between;
@@ -67,7 +66,6 @@
         font-size: 18px;
     }
 
-/* Filters Section */
 .filters-section {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -137,14 +135,12 @@
     position: relative;
 }
 
-/* Fields Grid */
 .fields-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 24px;
 }
 
-/* Field Card */
 .field-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -218,7 +214,6 @@
     color: white;
 }
 
-/* Field Content */
 .field-content {
     padding: 24px;
 }
@@ -336,7 +331,6 @@
         font-size: 17px;
     }
 
-/* Modal Styles */
 .modal {
     display: none !important;
 }
@@ -468,7 +462,6 @@ textarea.form-control {
     min-height: 100px;
 }
 
-/* Image Upload */
 .image-upload-area {
     display: flex;
     flex-direction: column;
@@ -601,7 +594,6 @@ textarea.form-control {
         box-shadow: 0 6px 24px rgba(16, 185, 129, 0.4);
     }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
     .fields-grid {
         grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));

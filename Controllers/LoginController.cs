@@ -19,12 +19,10 @@ namespace SportBookingSystem.Controllers
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> SignIn(string phoneNumber, string password)
         {
-            // 1. Gọi service kiểm tra thông tin đăng nhập
             var user = await _loginServices.CheckLoginAsync(phoneNumber, password);
 
             if (user != null)
             {
-                // 2. KIỂM TRA KHÓA: Nếu tài khoản bị khóa (IsActive == false) thì chặn lại ngay
                 if (user.IsActive == false)
                 {
                     return Json(new
@@ -34,7 +32,6 @@ namespace SportBookingSystem.Controllers
                     });
                 }
 
-                // 3. Tạo danh sách quyền (Claims)
                 var claims = new List<Claim>
         {
             new Claim(ClaimTypes.Name, user.Username),
@@ -45,12 +42,10 @@ namespace SportBookingSystem.Controllers
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-                // 4. Lưu phiên đăng nhập vào Cookie
                 await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
                     new ClaimsPrincipal(claimsIdentity));
 
-                // 5. Xác định trang chuyển hướng dựa trên Role
-                string redirectUrl = "/Home/Index"; // Mặc định cho người dùng
+                string redirectUrl = "/Home/Index"; 
                 if (user.Role.RoleName == "Admin")
                 {
                     redirectUrl = "/Dashboard/Index";
@@ -59,7 +54,6 @@ namespace SportBookingSystem.Controllers
                 return Json(new { status = "success", redirect = redirectUrl });
             }
 
-            // Nếu thông tin sai
             return Json(new { status = "error", message = "Số điện thoại hoặc mật khẩu không chính xác!" });
         }
 

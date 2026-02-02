@@ -166,8 +166,7 @@ namespace SportBookingSystem.Controllers
                     return Json(new { error = true, message = "Không tìm thấy đơn hàng" });
                 }
 
-                // ✅ Kiểm tra nếu đơn đã xử lý rồi (QUAN TRỌNG)
-                if (order.StatusCode == 1) // Đã thành công
+                if (order.StatusCode == 1) 
                 {
                     return Json(new
                     {
@@ -176,7 +175,7 @@ namespace SportBookingSystem.Controllers
                     });
                 }
 
-                if (order.StatusCode == -1) // Đã hủy
+                if (order.StatusCode == -1) 
                 {
                     return Json(new
                     {
@@ -185,7 +184,7 @@ namespace SportBookingSystem.Controllers
                     });
                 }
 
-                // ✅ Kiểm tra thời gian hết hạn (15 phút)
+                //Kiểm tra thời gian hết hạn (15 phút)
                 if (order.StatusCode == 0 && DateTime.Now > order.OrderDate.AddMinutes(15))
                 {
                     return Json(new
@@ -195,7 +194,7 @@ namespace SportBookingSystem.Controllers
                     });
                 }
 
-                // ✅ Trả về thông tin đơn hàng hợp lệ
+                //Trả về thông tin đơn hàng hợp lệ
                 return Json(new
                 {
                     orderId = order.OrderId,
