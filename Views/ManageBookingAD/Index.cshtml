@@ -2,3 +2,129 @@
     ViewData["Title"] = "Quản Lý Đặt sân";
     Layout = "~/Views/Shared/LayoutAdmin.cshtml";
 }
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/ManageBookingAD.css" />
+    <link rel="stylesheet" href="/asset/css/booking.css" /> 
+    <style>
+        .slot-modal {
+            cursor: default; 
+        }
+    </style>
+}
+
+<div class="manage-booking-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Quản Lý Đặt Sân</h1>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-row">
+            <div class="search-wrapper">
+                <i class="bi bi-search"></i>
+                <input type="text" class="search-input" placeholder="Tìm tên KH, SĐT, Mã đơn..." id="searchInput">
+            </div>
+            
+            <div class="date-range-wrapper d-flex align-items-center gap-2">
+                 <input type="date" class="filter-date" id="fromDate" placeholder="Từ ngày">
+                 <span class="text-muted">-</span>
+            </div>
+
+            <select class="filter-select" id="filterTimeSlot">
+                <option value="">-- Tất cả khung giờ --</option>
+                @if (ViewBag.TimeSlots != null)
+                {
+                    foreach (var slot in ViewBag.TimeSlots)
+                    {
+                        var timeRange = $"{(slot.StartTime.ToString(@"hh\:mm"))} - {(slot.EndTime.ToString(@"hh\:mm"))}";
+                        <option value="@slot.SlotId">@slot.SlotName (@timeRange)</option>
+                    }
+                }
+            </select>
+            
+            <select class="filter-select" id="filterPitchCategory">
+                <option value="">-- Tất cả loại sân --</option>
+                @if (ViewBag.Categories != null)
+                {
+                    foreach (var cat in ViewBag.Categories)
+                    {
+                        <option value="@cat.CategoryId">@cat.CategoryName</option>
+                    }
+                }
+            </select>
+
+            <button class="btn-reset" id="btnResetFilter" title="Làm mới">
+                <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-wrapper">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Mã Đơn</th>
+                        <th>Khách Hàng</th>
+                        <th>Thông tin Sân</th>
+                        <th>Thời Gian</th>
+                        <th>Tổng Tiền</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingTableBody">
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">Đang tải dữ liệu...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="p-3 border-top border-secondary border-opacity-10 d-flex justify-content-between align-items-center">
+            <span class="text-muted small">Hiển thị <span id="showingCount">0</span> đơn hàng</span>
+            <div id="pagination"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="scheduleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Tra Cứu Lịch Sân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Chọn Sân:</label>
+                        <select class="form-select" id="modalPitchSelect">
+                            <option value="">Đang tải danh sách sân...</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold small">Chọn Ngày:</label>
+                        <input type="date" class="form-control" id="modalScheduleDate">
+                    </div>
+                </div>
+                
+                <hr class="my-3">
+                
+                <h6 class="fw-bold mb-2">Trạng thái các khung giờ:</h6>
+                <div id="modalSlotsGrid" class="slots-grid-modal" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 400px; overflow-y: auto;">
+                    <div class="text-center text-muted py-3">Vui lòng chọn sân để xem lịch...</div>
+                </div>
+                
+                <div class="mt-3 small text-muted">
+                    <span class="badge bg-white border text-dark me-2">Trống</span>
+                    <span class="badge bg-secondary text-white me-2">Đã đặt</span>
+                    <span class="badge bg-danger text-white">Đã hết hạn</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/ManageBookingAD.js"></script>
+}

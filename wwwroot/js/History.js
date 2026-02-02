@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
 async function handleCancelBooking(bookingCode) {
     const result = await Swal.fire({
         title: 'Xác nhận hủy sân?',
-        text: 'Lưu ý: Bạn sẽ được hoàn 50% nếu hủy trước thời gian bắt đầu > 24h.',
+        text: 'Lưu ý: Bạn sẽ được hoàn 100% nếu hủy trước thời gian bắt đầu > 24h.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',

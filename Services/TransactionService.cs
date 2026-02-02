@@ -45,9 +45,26 @@ namespace SportBookingSystem.Services
                     .Sum(t => t.Amount),
 
                 Revenue = allTransactions
-                    .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
-                             && t.Status == TransactionStatus.Success )
-                    .Sum(t => Math.Abs(t.Amount)),
+                    .Sum(t =>
+                    {
+                        if (t.TransactionType == TransactionTypes.Booking || 
+                            t.TransactionType == TransactionTypes.Order)
+                        {
+                            if (t.Status == TransactionStatus.Success || 
+                                t.Status == TransactionStatus.Canceled || 
+                                t.Status == TransactionStatus.CancelBooking)
+                            {
+                                return Math.Abs(t.Amount);
+                            }
+                        }
+                        else if ((t.TransactionType == TransactionTypes.Refund || 
+                                  t.TransactionType == TransactionTypes.RefundBooking) && 
+                                 t.Status == TransactionStatus.Success)
+                        {
+                            return -Math.Abs(t.Amount);
+                        }
+                        return 0;
+                    }), 
 
                 TransactionCount = totalRecords,
                 CurrentPage = page,
@@ -174,9 +191,26 @@ namespace SportBookingSystem.Services
                     .Sum(t => t.Amount),
 
                 Revenue = allTransactions
-                    .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
-                             && t.Status == TransactionStatus.Success)
-                    .Sum(t => Math.Abs(t.Amount)),
+                    .Sum(t =>
+                    {
+                        if (t.TransactionType == TransactionTypes.Booking || 
+                            t.TransactionType == TransactionTypes.Order)
+                        {
+                            if (t.Status == TransactionStatus.Success || 
+                                t.Status == TransactionStatus.Canceled || 
+                                t.Status == TransactionStatus.CancelBooking)
+                            {
+                                return Math.Abs(t.Amount);
+                            }
+                        }
+                        else if ((t.TransactionType == TransactionTypes.Refund || 
+                                  t.TransactionType == TransactionTypes.RefundBooking) && 
+                                 t.Status == TransactionStatus.Success)
+                        {
+                            return -Math.Abs(t.Amount);
+                        }
+                        return 0;
+                    }),
 
                 TransactionCount = totalRecords,
                 CurrentPage = page,

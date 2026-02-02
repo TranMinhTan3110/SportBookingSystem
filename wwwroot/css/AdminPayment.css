@@ -1,15 +1,15 @@
-﻿:root {
+﻿/* :root {
     --primary: #10B981;
     --success: #10B981;
     --info: #3B82F6;
     --warning: #F59E0B;
     --danger: #EF4444;
-    --surface: #1a2332;
-    --surface-light: #243447;
+    --surface: #F1F5F9;
+    --surface-light: #94A3B8;
     --border: rgba(148, 163, 175, 0.1);
-    --text-primary: #F1F5F9;
-    --text-secondary: #94A3B8;
-}
+    --text-primary: #1a2332;
+    --text-secondary: #243447;
+} */
 
 
 
@@ -52,7 +52,7 @@
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid var(--border);
     background: transparent;
     color: var(--text-primary);
     cursor: pointer;
@@ -304,7 +304,7 @@
     padding: 0.625rem 1rem 0.625rem 2.5rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--surface-light);
     color: var(--text-primary);
     font-size: 0.875rem;
     outline: none;
@@ -326,7 +326,7 @@
     padding: 0.625rem 1rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--surface-light);
     color: var(--text-primary);
     font-size: 0.875rem;
     outline: none;
@@ -792,7 +792,7 @@
     padding: 0.75rem 1rem;
     border: 1px solid var(--border);
     border-radius: 0.5rem;
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--surface-light);
     color: var(--text-primary);
     font-size: 0.875rem;
     outline: none;
@@ -1096,10 +1096,16 @@ select.form-input option {
         font-size: 1rem;
     }
 }
+
 /* Row Highlight Animation */
 @keyframes highlightUpdate {
-    0% { background-color: rgba(16, 185, 129, 0.4); }
-    100% { background-color: transparent; }
+    0% {
+        background-color: rgba(16, 185, 129, 0.4);
+    }
+
+    100% {
+        background-color: transparent;
+    }
 }
 
 .row-updated-highlight {

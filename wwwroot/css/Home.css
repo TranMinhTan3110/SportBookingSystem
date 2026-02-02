@@ -50,17 +50,19 @@
     gap: 16px;
     justify-content: center;
 }
-
-.btn {
-    padding: 16px 32px;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 16px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
+    .hero-actions .btn-primary{
+        border:none !important
+    }
+    .btn {
+        padding: 16px 32px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 16px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
 #btnBookNow {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -80,7 +82,7 @@
 }
 
 .btn-secondary:hover {
-    background: var(--surface);
+/*    background: var(--surface);*/
     transform: translateY(-2px);
 }
 
@@ -279,11 +281,11 @@
     margin-top: 40px;
 }
 
-.feature-item {
+.feature-items {
     text-align: center;
 }
 
-.feature-icon {
+.feature-icons {
     width: 80px;
     height: 80px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
@@ -296,7 +298,7 @@
     transition: transform 0.3s ease;
 }
 
-.feature-item:hover .feature-icon {
+.feature-items:hover .feature-icons {
     transform: scale(1.1) rotate(5deg);
 }
 
