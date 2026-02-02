@@ -5,11 +5,10 @@
 }
 
 body {
-    background: #0f172a;
-    color: #e2e8f0;
+    color: var(--text-primary);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     min-height: 100vh;
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
 
 .container-fluid {
@@ -18,7 +17,7 @@ body {
 }
 
 .glass-card {
-    background: rgba(30, 41, 59, 0.7);
+    background: var(--surface-light);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(148, 163, 184, 0.1);
     border-radius: 1rem;
@@ -32,7 +31,7 @@ body {
 .page-title {
     font-size: 1.875rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -87,7 +86,7 @@ body {
 .stat-value {
     font-size: 2rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-primary);
     margin-bottom: 0.5rem;
 }
 
@@ -141,9 +140,9 @@ body {
 
 .form-control,
 .form-select {
-    background: rgba(15, 23, 42, 0.6);
+    background: var(--surface-light);
     border: 1px solid rgba(148, 163, 184, 0.2);
-    color: #e2e8f0;
+    color: var(--text-primary);
     border-radius: 0.5rem;
     padding: 0.625rem 1rem;
 }
@@ -179,13 +178,13 @@ body {
 .chart-container {
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 .chart-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
     margin-bottom: 1rem;
     display: flex;
     align-items: center;
@@ -196,10 +195,10 @@ body {
     position: relative;
     width: 100%;
     height: 400px;
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(0, 0, 0, 0);
     border-radius: 0.75rem;
     padding: 1rem;
-    overflow: hidden; 
+    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -218,7 +217,7 @@ body {
 .section-title {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary);
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
@@ -383,15 +382,15 @@ body {
 }
 
 .summary-section .table thead th {
-    background: rgba(15, 23, 42, 0.4) !important;
-    color: #94a3b8 !important;
+    background: var(--surface-light) !important;
+    color: var(--text-primary) !important;
     border-bottom: 1px solid rgba(148, 163, 184, 0.1) !important;
 }
 
 .summary-section .table tbody td {
     border-bottom: 1px solid rgba(148, 163, 184, 0.05) !important;
-    background: transparent !important;
-    color: #e2e8f0 !important;
+    background: var(--surface-light) !important;
+    color: var(--text-primary) !important;
 }
 
 @media (max-width: 1024px) {
@@ -399,12 +398,12 @@ body {
         grid-template-columns: repeat(2, 1fr);
         gap: 1.25rem;
     }
-    
+
     .chart-wrapper {
         height: 350px;
         padding: 0.75rem;
     }
-    
+
     .sports-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -442,11 +441,11 @@ body {
         width: 100%;
         box-sizing: border-box;
     }
-    
+
     .col-lg-8 .chart-wrapper {
         height: 300px !important;
     }
-    
+
     .col-lg-4 .chart-wrapper {
         height: 280px !important;
     }
@@ -563,7 +562,7 @@ body {
         margin-right: -0.5rem !important;
     }
 
-    .row > * {
+    .row>* {
         padding-left: 0.5rem !important;
         padding-right: 0.5rem !important;
     }
@@ -600,11 +599,12 @@ body {
     .chart-wrapper {
         height: 200px !important;
     }
-    
+
     .stat-card {
         padding: 1rem;
     }
 }
+
 @media (max-width: 768px) {
     * {
         max-width: 100%;

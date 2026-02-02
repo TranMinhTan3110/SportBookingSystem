@@ -279,11 +279,11 @@
     margin-top: 40px;
 }
 
-.feature-item {
+.feature-items {
     text-align: center;
 }
 
-.feature-icon {
+.feature-icons {
     width: 80px;
     height: 80px;
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(59, 130, 246, 0.2));
@@ -296,7 +296,7 @@
     transition: transform 0.3s ease;
 }
 
-.feature-item:hover .feature-icon {
+.feature-items:hover .feature-icons {
     transform: scale(1.1) rotate(5deg);
 }
 
