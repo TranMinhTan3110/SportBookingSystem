@@ -24,12 +24,12 @@ namespace SportBookingSystem.Services
         }
         public async Task<Users> CheckLoginAsync(string phone, string password)
         {
-            
             var user = await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Phone == phone);
+    .AsNoTracking() 
+    .Include(u => u.Role)
+    .FirstOrDefaultAsync(u => u.Phone == phone);
 
-           
+
             if (user != null && BC.Verify(password, user.Password))
             {
                 return user; 

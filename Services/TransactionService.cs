@@ -145,32 +145,30 @@ namespace SportBookingSystem.Services
                 .Take(pageSize)
                 .ToListAsync();
 
-            // TÍNH TỔNG TIỀN NẠP
             var totalDeposits = allTransactions
                 .Where(t => t.TransactionType == TransactionTypes.Recharge && t.Status == TransactionStatus.Success)
                 .Sum(t => t.Amount);
 
-            // ✅ CÁCH TÍNH DOANH THU ĐÚNG:
+           
 
-            // 1️⃣ CỘNG: Booking/Order THÀNH CÔNG (đã check-in, hoàn thành)
+           
             var successfulBookings = allTransactions
                 .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
                          && t.Status == TransactionStatus.Success)
                 .Sum(t => Math.Abs(t.Amount));
 
-            // 2️⃣ CỘNG: Booking ĐÃ HỦY ĐẶT SÂN (hủy sau 24h → không hoàn tiền → shop giữ được tiền)
+           
             var cancelledBookingsNoRefund = allTransactions
                 .Where(t => (t.TransactionType == TransactionTypes.Booking || t.TransactionType == TransactionTypes.Order)
                          && t.Status == TransactionStatus.CancelBooking)
                 .Sum(t => Math.Abs(t.Amount));
 
-            // 3️⃣ TRỪ: Tiền ĐÃ HOÀN LẠI cho khách (hủy trước 24h → hoàn 100%)
             var refundedAmount = allTransactions
                 .Where(t => t.TransactionType == TransactionTypes.RefundBooking
                          && t.Status == TransactionStatus.Success)
                 .Sum(t => Math.Abs(t.Amount));
 
-            // 📊 CÔNG THỨC: Doanh thu = Thành công + Hủy không hoàn - Đã hoàn lại
+           
             var actualRevenue = successfulBookings + cancelledBookingsNoRefund - refundedAmount;
 
             return new PaymentDashboardDTO
