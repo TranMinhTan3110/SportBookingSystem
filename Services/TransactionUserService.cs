@@ -52,6 +52,7 @@ namespace SportBookingSystem.Services
             var query = from ps in _context.PitchSlots
                         join t in _context.Transactions on ps.BookingCode equals t.TransactionCode
                         where ps.UserId == userId 
+                              && t.UserId == userId
                               && t.TransactionType == TransactionTypes.Booking
                               && ps.Status != 0
                         orderby ps.PitchSlotId descending

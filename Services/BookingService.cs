@@ -128,8 +128,23 @@ namespace SportBookingSystem.Services
             using var transaction = _context.Database.BeginTransaction();
             try
             {
+                // Tạo Lock Resource Name: duy nhất cho (Sân, Slot, Ngày)
+                string lockResource = $"Booking_Lock_{pitchId}_{slotId}_{date:yyyyMMdd}";
+
+                // Yêu cầu SQL Server cấp Application Lock (Chỉ cho phép 1 transaction xử lý bộ này tại một thời điểm)
+                await _context.Database.ExecuteSqlRawAsync($@"
+                    DECLARE @res INT;
+                    EXEC @res = sp_getapplock 
+                        @Resource = '{lockResource}', 
+                        @LockMode = 'Exclusive', 
+                        @LockOwner = 'Transaction', 
+                        @LockTimeout = 5000;
+                    IF @res < 0 THROW 50000, 'Không thể lấy khóa đặt sân', 1;
+                ");
+
+                // Kiểm tra trạng thái sân
                 var slot = await _context.PitchSlots.FirstOrDefaultAsync(ps => ps.PitchId == pitchId && ps.SlotId == slotId && ps.PlayDate.Date == date.Date);
-                if (slot != null && slot.Status >= 1) return (false, "Sân này đã có người đặt rồi!", null, null);
+                if (slot != null && slot.Status >= 1) return (false, "Sân này vừa được người khác đặt rồi!", null, null);
 
                 var pitch = await _context.Pitches.FindAsync(pitchId);
                 var timeSlot = await _context.TimeSlots.FindAsync(slotId);
@@ -152,6 +167,7 @@ namespace SportBookingSystem.Services
                 user.WalletBalance -= amount;
                 _context.Users.Update(user);
 
+                // Tạo mã đặt sân duy nhất (Thêm UserId để phân biệt giữa các người đặt cùng giây)
                 string bookingCode = $"BKG-{DateTime.Now:yyMMddHHmmss}";
 
                 if (slot == null)
