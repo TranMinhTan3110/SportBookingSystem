@@ -1139,3 +1139,32 @@
         border-color: #10b981;
         box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
     }
+
+/* Màu sắc cho ca đá đang trong khung giờ giảm giá 25% */
+.slot-modal.warning {
+    border: 2px solid #f59e0b !important;
+    background-color: #fffbeb !important; 
+    transition: all 0.3s ease;
+}
+
+    .slot-modal.warning .time {
+        color: #b45309 !important; 
+    }
+
+    .slot-modal.warning .price {
+        color: #d97706 !important; 
+        font-weight: 800;
+    }
+
+    .slot-modal.warning .status {
+        color: #d97706 !important;
+        font-weight: 700;
+        font-size: 9px;
+    }
+
+
+    .slot-modal.warning:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        background-color: #fef3c7 !important;
+    }

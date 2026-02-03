@@ -176,11 +176,9 @@ function renderModalSlots(slots, pitchId, pitchName) {
         const isExpired = slot.status === 'expired';
 
         let btnClass = 'slot-modal available';
-        if (isBooked) {
-            btnClass = 'slot-modal booked';
-        } else if (isExpired) {
-            btnClass = 'slot-modal expired';
-        }
+        if (isBooked) btnClass = 'slot-modal booked';
+        else if (isExpired) btnClass = 'slot-modal expired';
+        else if (slot.statusText.includes('25%')) btnClass = 'slot-modal warning'; 
 
         const isDisabled = isBooked || isExpired;
 
@@ -229,6 +227,10 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
         cancelButtonColor: '#6b7280'
     }).then(async (res) => {
         if (res.isConfirmed) {
+            // Chặn nhấn đúp bằng cách vô hiệu hóa nút confirm trong Swal
+            const confirmBtn = Swal.getConfirmButton();
+            if (confirmBtn) confirmBtn.disabled = true;
+
             Swal.fire({
                 title: 'Đang xử lý...',
                 text: 'Vui lòng chờ trong giây lát',
