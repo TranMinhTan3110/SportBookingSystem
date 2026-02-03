@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SportBookingSystem.Constants;
 using SportBookingSystem.Models;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
@@ -51,18 +52,25 @@ namespace SportBookingSystem.Controllers
                 .ToListAsync();
 
             // Top 3 Sân bóng được đặt thành công nhiều nhất
-            var topPitchIds = await _context.Bookings
-                .Where(b => b.Status == 2 || b.Status == 3) // Đã nhận sân hoặc Hoàn thành
-                .GroupBy(b => b.PitchId)
+            var topPitchGroups = await _context.PitchSlots
+                .Where(ps => ps.Status == BookingStatus.CheckedIn || ps.Status == BookingStatus.Completed)
+                .GroupBy(ps => ps.PitchId)
                 .OrderByDescending(g => g.Count())
-                .Select(g => g.Key)
+                .Select(g => new { PitchId = g.Key, Count = g.Count() })
                 .Take(3)
                 .ToListAsync();
 
-            var featuredPitches = await _context.Pitches
+            var topPitchIds = topPitchGroups.Select(x => x.PitchId).ToList();
+
+            var pitchesFromHistory = await _context.Pitches
                 .Include(p => p.Category)
                 .Where(p => topPitchIds.Contains(p.PitchId))
                 .ToListAsync();
+
+            // Sắp xếp lại theo đúng thứ tự phổ biến
+            var featuredPitches = topPitchIds
+                .Select(id => pitchesFromHistory.First(p => p.PitchId == id))
+                .ToList();
 
             // Nếu không đủ 3 sân từ lịch sử, lấy thêm các sân mới nhất để đủ 3
             if (featuredPitches.Count < 3)

@@ -14,7 +14,10 @@ document.addEventListener('DOMContentLoaded', function () {
         modalDateInput.min = today;
     }
 
-    loadPitchesList();
+    const isBookingPage = document.querySelector('.filter-sidebar');
+    if (isBookingPage) {
+        loadPitchesList();
+    }
 
     modalDateInput?.addEventListener('change', function () {
         const pitchId = document.getElementById('modalPitchId').value;
@@ -279,7 +282,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                         allowOutsideClick: false
                     });
 
-                  
+
                     console.log('🔔 Dispatching bookingCreated event...');
                     window.dispatchEvent(new Event('bookingCreated'));
 

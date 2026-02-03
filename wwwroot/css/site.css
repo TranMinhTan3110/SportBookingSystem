@@ -412,6 +412,40 @@ body {
     transform: translateX(0);
 }
 
+.mobile-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mobile-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.mobile-nav::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.mobile-nav::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+.mobile-nav {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+
+body.mobile-nav-open {
+    overflow: hidden;
+}
+
+html.scroll-lock,
+body.scroll-lock {
+    overflow: hidden !important;
+    touch-action: none;
+}
+
+
+
 .mobile-nav-header {
     padding: 20px;
     border-bottom: 1px solid var(--border);
