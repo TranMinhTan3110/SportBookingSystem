@@ -50,17 +50,19 @@
     gap: 16px;
     justify-content: center;
 }
-
-.btn {
-    padding: 16px 32px;
-    border-radius: 14px;
-    font-weight: 700;
-    font-size: 16px;
-    text-decoration: none;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
+    .hero-actions .btn-primary{
+        border:none !important
+    }
+    .btn {
+        padding: 16px 32px;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 16px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
 
 #btnBookNow {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -80,7 +82,7 @@
 }
 
 .btn-secondary:hover {
-    background: var(--surface);
+/*    background: var(--surface);*/
     transform: translateY(-2px);
 }
 
