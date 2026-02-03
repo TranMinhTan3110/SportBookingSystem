@@ -12,15 +12,16 @@
 
     const header = document.querySelector('.header');
 
+    let scrollPosition = 0;
+
     if (servicesDropdown) {
         const toggle = servicesDropdown.querySelector('.dropdown-toggle');
 
         toggle.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
+
             const isOpen = servicesDropdown.classList.contains('open');
-
-
             closeAllDropdowns();
 
             if (!isOpen) {
@@ -34,9 +35,10 @@
         const avatar = userDropdown.querySelector('.user-avatar');
 
         avatar.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            const isOpen = userDropdown.classList.contains('open');
 
+            const isOpen = userDropdown.classList.contains('open');
             closeAllDropdowns();
 
             if (!isOpen) {
@@ -46,11 +48,9 @@
         });
     }
 
-
     if (dropdownOverlay) {
         dropdownOverlay.addEventListener('click', closeAllDropdowns);
     }
-
 
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.dropdown') && !e.target.closest('.user-dropdown')) {
@@ -65,7 +65,6 @@
         });
     }
 
-
     if (mobileNavClose) {
         mobileNavClose.addEventListener('click', function (e) {
             e.stopPropagation();
@@ -74,41 +73,32 @@
     }
 
     if (mobileNavOverlay) {
-        mobileNavOverlay.addEventListener('click', function () {
-            closeMobileMenu();
-        });
+        mobileNavOverlay.addEventListener('click', closeMobileMenu);
     }
 
     mobileNavLinks.forEach(link => {
-        link.addEventListener('click', function () {
-            closeMobileMenu();
-        });
+        link.addEventListener('click', closeMobileMenu);
     });
 
-    const anchorLinks = document.querySelectorAll('a[href^="#"]');
-
-    anchorLinks.forEach(anchor => {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
-            const targetId = this.getAttribute('href');
 
+            const targetId = this.getAttribute('href');
             if (targetId === '#') return;
 
             const target = document.querySelector(targetId);
             if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         });
     });
 
     window.addEventListener('scroll', function () {
-        if (window.pageYOffset > 50) {
-            header.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-        } else {
-            header.style.boxShadow = 'none';
+        if (header) {
+            header.style.boxShadow = window.pageYOffset > 50
+                ? '0 2px 10px rgba(0, 0, 0, 0.1)'
+                : 'none';
         }
     });
 
@@ -118,28 +108,6 @@
         }
     });
 
-    function closeAllDropdowns() {
-        if (servicesDropdown) {
-            servicesDropdown.classList.remove('open');
-        }
-        if (userDropdown) {
-            userDropdown.classList.remove('open');
-        }
-        dropdownOverlay.classList.remove('active');
-    }
-
-    function openMobileMenu() {
-        mobileNav.classList.add('active');
-        mobileNavOverlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeMobileMenu() {
-        mobileNav.classList.remove('active');
-        mobileNavOverlay.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeAllDropdowns();
@@ -147,16 +115,42 @@
         }
     });
 
-    console.log(' SportHub Layout loaded successfully!');
-    console.log(' Mobile menu: ' + (mobileMenuToggle ? 'Ready' : 'Not found'));
-    console.log(' Services dropdown: ' + (servicesDropdown ? 'Ready' : 'Not found'));
-    console.log(' User dropdown: ' + (userDropdown ? 'Ready' : 'Not found'));
+    function closeAllDropdowns() {
+        if (servicesDropdown) servicesDropdown.classList.remove('open');
+        if (userDropdown) userDropdown.classList.remove('open');
+        if (dropdownOverlay) dropdownOverlay.classList.remove('active');
+    }
+
+    function openMobileMenu() {
+        scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+        document.body.style.top = `-${scrollPosition}px`;
+
+        mobileNav.classList.add('active');
+        mobileNavOverlay.classList.add('active');
+    }
+
+    function closeMobileMenu() {
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.top = '';
+
+        window.scrollTo(0, scrollPosition);
+
+        mobileNav.classList.remove('active');
+        mobileNavOverlay.classList.remove('active');
+    }
 });
 
-/**
 
- @param {number} amount 
-  @returns {string} F
+
+/**
+ * @param {number} amount
+ * @returns {string}
  */
 function formatCurrency(amount) {
     return new Intl.NumberFormat('vi-VN', {
@@ -166,34 +160,23 @@ function formatCurrency(amount) {
 }
 
 /**
- * 
- * @param {string} message 
- * @param {string} type 
- */
-function showToast(message, type = 'info') {
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    
-    alert(message);
-}
-
-/**
-
- * @param {Function} func 
- * @param {number} wait 
- * @returns {Function} 
+ * @param {Function} func
+ * @param {number} wait - milliseconds
+ * @returns {Function}
  */
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
         clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
+        timeout = setTimeout(() => func.apply(this, args), wait);
     };
 }
 
+/**
+ * @param {Function} func
+ * @param {number} limit - milliseconds
+ * @returns {Function}
+ */
 function throttle(func, limit) {
     let inThrottle;
     return function (...args) {
