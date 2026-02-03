@@ -341,7 +341,7 @@ namespace SportBookingSystem.Services
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                string msg = isRefunded ? $"Hủy sân thành công. Bạn được hoàn lại {refundAmount:N0}₫ (50%)." : "Hủy sân thành công. Giao dịch không đủ điều kiện hoàn tiền.";
+                string msg = isRefunded ? $"Hủy sân thành công. Bạn được hoàn lại {refundAmount:N0}₫ (100%)." : "Hủy sân thành công. Giao dịch không đủ điều kiện hoàn tiền.";
                 if (isAutoCancel) msg = "Hệ thống tự động hủy sân do quá hạn check-in.";
 
                 return (true, msg, refundAmount);
