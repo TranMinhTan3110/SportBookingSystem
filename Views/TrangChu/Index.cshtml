@@ -1,0 +1,124 @@
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPORTS BOOKING - Trang chủ</title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link rel="stylesheet" href="~/asset/css/trangChu.css" />
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <i class="fas fa-trophy"></i>
+            </div>
+            <div class="brand-text">
+                <h1>SPORTS BOOKING</h1>
+                <p>Online Sports Booking & Payment System</p>
+            </div>
+        </div>
+        <div class="auth-buttons">
+            <a href="/Login/SignIn" class="btn btn-login">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập
+            </a>
+            <a href="/Login/SignUp" class="btn btn-signup">
+                <i class="fas fa-user-plus"></i> Đăng ký
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="hero-section">
+            <h2>Hệ Thống Đặt Sân Thể Thao Thông Minh</h2>
+            <p>
+                Giải pháp quản lý và thanh toán điện tử toàn diện cho các sân thể thao.
+                Đặt sân nhanh chóng, thanh toán an toàn, quản lý dễ dàng.
+            </p>
+        </div>
+
+        <!-- Carousel -->
+        <div class="carousel-container">
+            <div class="carousel-wrapper" id="carouselWrapper">
+                <div class="carousel-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('@Url.Content("~/asset/img/carousel1.jpg")');">
+                    <div class="slide-content">
+                        <i class="fas fa-calendar-check slide-icon"></i>
+                        <h3>Đặt Sân Dễ Dàng</h3>
+                        <p>Tìm kiếm và đặt sân chỉ với vài thao tác đơn giản</p>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('@Url.Content("~/asset/img/carousel2.jpg")');">
+                    <div class="slide-content">
+                        <i class="fas fa-shield-alt slide-icon"></i>
+                        <h3>Thanh Toán An Toàn</h3>
+                        <p>Hệ thống thanh toán điện tử bảo mật và nhanh chóng</p>
+                    </div>
+                </div>
+                <div class="carousel-slide" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('@Url.Content("~/asset/img/carousel3.jpg")');">
+                    <div class="slide-content">
+                        <i class="fas fa-chart-line slide-icon"></i>
+                        <h3>Quản Lý Hiệu Quả</h3>
+                        <p>Theo dõi lịch sử giao dịch và quản lý đặt sân một cách hiệu quả</p>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-arrow prev" onclick="moveSlide(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-arrow next" onclick="moveSlide(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div class="carousel-nav">
+                <span class="nav-dot active" onclick="goToSlide(0)"></span>
+                <span class="nav-dot" onclick="goToSlide(1)"></span>
+                <span class="nav-dot" onclick="goToSlide(2)"></span>
+            </div>
+        </div>
+
+        <!-- Features -->
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Đặt Sân Nhanh Chóng</h3>
+                <p>Tìm kiếm và đặt sân yêu thích của bạn chỉ trong vài giây với giao diện thân thiện</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h3>Thanh Toán Linh Hoạt</h3>
+                <p>Hỗ trợ nhiều phương thức thanh toán điện tử an toàn và tiện lợi</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3>Quản Lý Thông Minh</h3>
+                <p>Theo dõi lịch sử đặt sân, quản lý giao dịch một cách dễ dàng và hiệu quả</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 Sports Booking System. All rights reserved.</p>
+            <div class="footer-cta">
+                Chưa có tài khoản? <a href="/Login/SignUp">Tạo tài khoản ngay <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/asset/js/trangChu.js"></script>
+</body>
+</html>
