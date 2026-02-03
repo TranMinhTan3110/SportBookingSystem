@@ -8,7 +8,9 @@ function openModal(mode, productId = null) {
         modalTitle.innerHTML = 'Thêm Sản Phẩm Mới';
         document.getElementById('productForm').reset();
         currentEditId = null;
-        removeImage();
+        document.getElementById('previewImg').src = '/asset/img/default-product.png';
+        document.querySelector('.btn-remove-image').style.display = 'none';
+        selectedImageFile = null;
     } else if (mode === 'edit') {
         modalTitle.innerHTML = 'Chỉnh Sửa Sản Phẩm';
         currentEditId = productId;
@@ -359,7 +361,7 @@ function removeImage() {
     if (fileInput) {
         fileInput.value = '';
     }
-    document.getElementById('previewImg').src = 'https://via.placeholder.com/300x300/374151/9CA3AF?text=Chon+Hinh';
+    document.getElementById('previewImg').src = '/asset/img/default-product.png';
     const btnRemove = document.querySelector('.btn-remove-image');
     if (btnRemove) {
         btnRemove.style.display = 'none';

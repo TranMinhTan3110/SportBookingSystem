@@ -134,7 +134,6 @@ namespace SportBookingSystem.Services
                 var pitch = await _context.Pitches.FindAsync(pitchId);
                 var timeSlot = await _context.TimeSlots.FindAsync(slotId);
                 var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
-
                 decimal currentPricePerHour = pitch.PricePerHour;
                 var specialPrice = await _context.PitchPriceSettings
                     .FirstOrDefaultAsync(s => s.PitchId == pitchId
@@ -298,7 +297,10 @@ namespace SportBookingSystem.Services
                     var booking = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
                     if (booking != null)
                     {
+                        refundAmount = booking.Amount * 1m; // Hoàn 100
+
                         refundAmount = booking.Amount;
+
                         isRefunded = true;
 
                         var user = await _context.Users.FindAsync(slot.UserId);
@@ -317,6 +319,7 @@ namespace SportBookingSystem.Services
                                 Source = TransactionSources.Wallet,
                                 TransactionDate = DateTime.Now,
                                 TransactionCode = $"REF-{DateTime.Now:yyMMddHHmmss}{user.UserId}",
+                              
                                 Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
                                 BalanceAfter = user.WalletBalance
                             };

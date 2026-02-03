@@ -999,3 +999,59 @@
     transform: none;
     box-shadow: none;
 }
+
+/*reponsive cho cái lấy mã đặt sân strong profile*/
+@media (max-width: 768px) {
+    .reminder-card.order-reminder {
+        flex-direction: column !important; 
+        text-align: center;
+        padding: 20px;
+        gap: 15px;
+    }
+
+        .reminder-card.order-reminder .reminder-content {
+            width: 100%;
+        }
+
+    
+    .important-reminder-banner {
+        flex-direction: column !important; 
+        text-align: center;
+        padding: 20px;
+        gap: 16px;
+    }
+
+        .important-reminder-banner .reminder-banner-info {
+            justify-content: center;
+        }
+
+  
+    .btn-checkin,
+    .btn-banner-qr,
+    .btn-order-qr {
+        width: 100% !important; 
+        justify-content: center;
+        padding: 12px;
+        margin: 0 !important;
+        position: static !important; 
+    }
+
+    /* 4. Fix icon chuông trong banner bị lệch */
+    .reminder-banner-icon {
+        margin: 0 auto;
+    }
+}
+
+/* Fix lỗi hiển thị cho màn hình cực nhỏ (iPhone SE, v.v.) */
+@media (max-width: 480px) {
+    .reminder-banner-title {
+        font-size: 18px;
+    }
+
+    .reminder-banner-info {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+
