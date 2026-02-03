@@ -176,11 +176,9 @@ function renderModalSlots(slots, pitchId, pitchName) {
         const isExpired = slot.status === 'expired';
 
         let btnClass = 'slot-modal available';
-        if (isBooked) {
-            btnClass = 'slot-modal booked';
-        } else if (isExpired) {
-            btnClass = 'slot-modal expired';
-        }
+        if (isBooked) btnClass = 'slot-modal booked';
+        else if (isExpired) btnClass = 'slot-modal expired';
+        else if (slot.statusText.includes('25%')) btnClass = 'slot-modal warning'; 
 
         const isDisabled = isBooked || isExpired;
 

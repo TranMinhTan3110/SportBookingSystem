@@ -75,12 +75,35 @@ namespace SportBookingSystem.Services
                         isAvailable = false;
                     }
 
+                    DateTime slotStartTime = date.Date.Add(timeSlot.StartTime);
                     DateTime slotEndTime = date.Date.Add(timeSlot.EndTime);
-                    if (slotEndTime < DateTime.Now && status != "booked")
+                    DateTime now = DateTime.Now; 
+
+                    if (status != "booked")
                     {
-                        status = "expired";
-                        statusText = "Đã qua";
-                        isAvailable = false;
+                        double minutesPassed = (now - slotStartTime).TotalMinutes;
+
+                        if (now >= slotEndTime) 
+                        {
+                            status = "expired";
+                            statusText = "Đã qua";
+                            isAvailable = false;
+                        }
+                        else if (now >= slotStartTime) 
+                        {
+                            if (minutesPassed > 30)
+                            {
+                                status = "expired";
+                                statusText = "Đã qua";
+                                isAvailable = false;
+                            }
+                            else if (minutesPassed > 15) 
+                            {
+                                fullPrice = fullPrice * 0.75m;
+                                depositPrice = fullPrice * 0.3m;
+                                statusText = "Muộn -25%";
+                            }
+                        }
                     }
 
                     pitchGroup.Slots.Add(new SlotInfoViewModel
