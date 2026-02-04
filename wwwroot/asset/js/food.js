@@ -85,6 +85,7 @@ function renderProducts(products) {
 
 window.openPurchaseModal = function (id, name, price, image) {
     selectedProduct = { id, name, price };
+    document.getElementById('modalProductImage').src = image;
     document.getElementById('modalProductName').innerText = name;
     document.getElementById('modalProductPrice').innerText = price.toLocaleString('vi-VN') + '₫';
     document.getElementById('purchaseQuantity').value = 1;

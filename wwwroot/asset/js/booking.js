@@ -258,7 +258,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                         console.log(' Đang cập nhật số dư ví...');
                         updateWalletBalance(data.newBalance);
                     } else {
-                        console.warn('⚠ Server không trả về newBalance!');
+                        console.warn(' Server không trả về newBalance!');
                     }
 
                     await Swal.fire({

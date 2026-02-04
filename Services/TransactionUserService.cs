@@ -35,7 +35,8 @@ namespace SportBookingSystem.Services
                     TransactionCode = t.TransactionCode,
                     Amount = t.Amount,
                     IsPositive = t.TransactionType == TransactionTypes.Recharge ||
-                                 t.TransactionType == TransactionTypes.Refund,
+                                 t.TransactionType == TransactionTypes.Refund||
+                    t.TransactionType == TransactionTypes.RefundBooking,
                     TransactionType = t.TransactionType,
                     TransactionSource = t.Source,
                     Date = t.TransactionDate,
@@ -206,10 +207,21 @@ namespace SportBookingSystem.Services
                 .Select(t => new UserTransferDTO
                 {
                     TransactionCode = t.TransactionCode,
-                    Amount = t.Amount,
-                    IsSender = t.UserId == userId,
-                    SenderName = t.Sender.FullName ?? t.Sender.Username,
-                    ReceiverName = t.Receiver != null ? (t.Receiver.FullName ?? t.Receiver.Username) : "N/A",
+
+                    Amount = Math.Abs(t.Amount),
+
+                    
+                    IsSender = t.TransactionType == "Chuyển tiền",
+
+                  
+                    SenderName = t.TransactionType == "Chuyển tiền"
+                        ? (t.Sender.FullName ?? t.Sender.Username)  // Người gửi chính là user hiện tại
+                        : (t.Receiver != null ? (t.Receiver.FullName ?? t.Receiver.Username) : "N/A"), // Người gửi là người kia
+
+                    ReceiverName = t.TransactionType == "Chuyển tiền"
+                        ? (t.Receiver != null ? (t.Receiver.FullName ?? t.Receiver.Username) : "N/A") // Người nhận là người kia
+                        : (t.Sender.FullName ?? t.Sender.Username), // Người nhận chính là user hiện tại
+
                     Date = t.TransactionDate,
                     Status = t.Status,
                     Message = t.Message

@@ -46,10 +46,12 @@ namespace SportBookingSystem.Controllers
                 .CountAsync();
 
             var recentTransactions = await _context.Transactions
-                .Where(t => t.UserId == userId || t.ReceiverId == userId)
-                .OrderByDescending(t => t.TransactionDate)
-                .Take(5)
-                .ToListAsync();
+           .Where(t => t.UserId == userId
+                    && t.TransactionType != "Chuyển tiền"
+                    && t.TransactionType != "Nhận tiền")  
+           .OrderByDescending(t => t.TransactionDate)
+           .Take(5)
+           .ToListAsync();
 
             // Top 3 Sân bóng được đặt thành công nhiều nhất
             var topPitchGroups = await _context.PitchSlots

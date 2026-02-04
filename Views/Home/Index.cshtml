@@ -277,15 +277,28 @@
         <div class="history-list">
             @if (Model.RecentTransactions != null && Model.RecentTransactions.Any())
             {
-                foreach (var transaction in Model.RecentTransactions)
+                // FIX: Loại bỏ giao dịch "Chuyển tiền" và "Nhận tiền"
+                var filteredTransactions = Model.RecentTransactions
+                .Where(t => t.TransactionType != "Chuyển tiền"
+                && t.TransactionType != "Nhận tiền")
+                .ToList();
+
+                foreach (var transaction in filteredTransactions)
                 {
-                    var isNegative = transaction.UserId == Model.User.UserId && transaction.ReceiverId != null && transaction.ReceiverId != Model.User.UserId;
+                    var isNegative = transaction.TransactionType?.Contains("Thanh toán") == true
+                    || transaction.TransactionType?.Contains("Mua") == true;
                     var amountClass = isNegative ? "negative" : "positive";
-                    var amountPrefix = isNegative ? "-" : "+";
-                    
+
+                    // FIX: KHÔNG THÊM dấu +/- thủ công, để CSS tự xử lý
+                    var displayAmount = transaction.Amount.ToString("N0");
+
                     var iconClass = "bi-cash-coin";
-                    if (transaction.TransactionType?.Contains("Sân") == true || transaction.Message?.Contains("Đặt sân") == true) iconClass = "bi-building";
-                    else if (transaction.TransactionType?.Contains("Thức ăn") == true || transaction.Message?.Contains("Canteen") == true) iconClass = "bi-cup-hot-fill";
+                    if (transaction.TransactionType?.Contains("Sân") == true || transaction.Message?.Contains("Đặt sân") == true)
+                        iconClass = "bi-building";
+                    else if (transaction.TransactionType?.Contains("Thức ăn") == true || transaction.Message?.Contains("Canteen") == true)
+                        iconClass = "bi-cup-hot-fill";
+                    else if (transaction.TransactionType?.Contains("Nạp") == true)
+                        iconClass = "bi-credit-card-fill";
 
                     <div class="history-item">
                         <div class="history-icon"><i class="bi @iconClass"></i></div>
@@ -293,7 +306,7 @@
                             <div class="history-item-title">@transaction.Message</div>
                             <div class="history-item-date">@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</div>
                         </div>
-                        <div class="history-amount @amountClass">@amountPrefix@transaction.Amount.ToString("N0")₫</div>
+                        <div class="history-amount @amountClass">@displayAmount₫</div>
                         <span class="history-status success">Hoàn thành</span>
                     </div>
                 }
