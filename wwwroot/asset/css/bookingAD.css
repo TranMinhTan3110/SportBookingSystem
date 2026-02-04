@@ -647,10 +647,10 @@ textarea.form-control {
 }
 
 tr .fw-bold{
-    color:white;
+    color:#000;
 }
 tr td {
-    color: white;
+    color: #000;
 }
 .form-control.flatpickr-input:focus {
     border-color: #10b981 !important;

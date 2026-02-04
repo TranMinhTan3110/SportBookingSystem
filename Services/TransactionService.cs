@@ -15,6 +15,7 @@ namespace SportBookingSystem.Services
         {
             var query = _context.Transactions
                 .Include(t => t.Sender)
+                .Where(t => t.TransactionType != "Chuyển tiền" && t.TransactionType != "Nhận tiền")
                 .OrderByDescending(t => t.TransactionDate);
 
             var totalRecords = await query.CountAsync();
