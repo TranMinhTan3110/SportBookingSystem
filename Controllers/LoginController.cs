@@ -83,12 +83,19 @@ namespace SportBookingSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(string email)
         {
+            var userExists = await _loginServices.IsEmailExistsAsync(email);
+            if (!userExists)
+            {
+                return Json(new { status = "error", message = "Email không tồn tại trong hệ thống." });
+            }
+
             var result = await _loginServices.SendOtpEmailAsync(email);
             if (result)
             {
                 return Json(new { status = "success", message = "Mã OTP đã được gửi đến email của bạn!" });
             }
-            return Json(new { status = "error", message = "Email không tồn tại trong hệ thống." });
+
+            return Json(new { status = "error", message = "Lỗi hệ thống gửi email. Vui lòng thử lại sau!" });
         }
         [HttpPost]
         public async Task<IActionResult> VerifyAndResetPassword(string email, string otp, string newPassword)
