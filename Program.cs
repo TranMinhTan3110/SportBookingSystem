@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using SportBookingSystem.Helper;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Services; 
 
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IVnPayService, VnPayService>();
 builder.Services.AddHostedService<OrderCancellationBackgroundService>();
 builder.Services.AddHostedService<BookingAutoCancellationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>

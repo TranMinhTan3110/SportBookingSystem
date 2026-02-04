@@ -430,7 +430,7 @@ namespace SportBookingSystem.Services
             if (fromDate.HasValue)
                 query = query.Where(ps => ps.PlayDate == fromDate.Value);
 
-            if (toDate.HasValue)
+            if (toDate.HasValue)     
                 query = query.Where(ps => ps.PlayDate <= toDate.Value);
 
             if (timeSlotId.HasValue)
