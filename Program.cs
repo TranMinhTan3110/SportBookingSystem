@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Helper;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Services; 
+using SportBookingSystem.Helper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // Đăng ký Dependency Injection cho LoginServices 
+builder.Services.AddScoped<IEmailService, SendGridEmailService>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IPitchService, PitchService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
@@ -48,6 +50,8 @@ builder.Services.AddControllersWithViews()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 builder.Services.AddMemoryCache();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 
 var app = builder.Build();
 
