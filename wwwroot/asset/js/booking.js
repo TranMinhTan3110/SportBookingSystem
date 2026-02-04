@@ -285,7 +285,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                     });
 
 
-                    console.log('🔔 Dispatching bookingCreated event...');
+                    console.log(' Dispatching bookingCreated event...');
                     window.dispatchEvent(new Event('bookingCreated'));
 
                     if (bookingModal) {
@@ -303,7 +303,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
                     });
                 }
             } catch (e) {
-                console.error('❌ Lỗi:', e);
+                console.error(' Lỗi:', e);
                 Swal.fire('Lỗi', 'Lỗi hệ thống.', 'error');
                 if (bookingModal) bookingModal.show();
             }
@@ -314,7 +314,7 @@ window.confirmBooking = function (pitchId, slotId, pitchName, timeRange, fullPri
 }
 
 function updateWalletBalance(newBalance) {
-    console.log('💵 updateWalletBalance được gọi với số dư:', newBalance);
+    console.log(' updateWalletBalance được gọi với số dư:', newBalance);
 
     const walletElements = document.querySelectorAll('.wallet-balance');
 

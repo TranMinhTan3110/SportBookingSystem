@@ -11,7 +11,7 @@ namespace SportBookingSystem.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMemoryCache _cache;
-        private readonly IEmailService _emailService; 
+        private readonly IEmailService _emailService;
 
         public LoginServices(ApplicationDbContext context, IMemoryCache cache, IEmailService emailService)
         {

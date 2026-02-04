@@ -151,79 +151,82 @@ namespace SportBookingSystem.Services
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-                // Tạo Lock Resource Name: duy nhất cho (Sân, Slot, Ngày)
+                // Tạo Lock (Giữ nguyên logic lock của bạn để tránh đặt trùng)
                 string lockResource = $"Booking_Lock_{pitchId}_{slotId}_{date:yyyyMMdd}";
-
-                // Yêu cầu SQL Server cấp Application Lock (Chỉ cho phép 1 transaction xử lý bộ này tại một thời điểm)
                 await _context.Database.ExecuteSqlRawAsync($@"
-                    DECLARE @res INT;
-                    EXEC @res = sp_getapplock 
-                        @Resource = '{lockResource}', 
-                        @LockMode = 'Exclusive', 
-                        @LockOwner = 'Transaction', 
-                        @LockTimeout = 5000;
-                    IF @res < 0 THROW 50000, 'Không thể lấy khóa đặt sân', 1;
-                ");
+        DECLARE @res INT;
+        EXEC @res = sp_getapplock @Resource = '{lockResource}', @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
+        IF @res < 0 THROW 50000, 'Không thể lấy khóa đặt sân', 1;
+    ");
 
-                // Kiểm tra trạng thái sân
+                // 2. Kiểm tra trạng thái sân trong DB
                 var slot = await _context.PitchSlots.FirstOrDefaultAsync(ps => ps.PitchId == pitchId && ps.SlotId == slotId && ps.PlayDate.Date == date.Date);
                 if (slot != null && slot.Status >= 1) return (false, "Sân này vừa được người khác đặt rồi!", null, null);
 
                 var pitch = await _context.Pitches.FindAsync(pitchId);
                 var timeSlot = await _context.TimeSlots.FindAsync(slotId);
-                var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
+
+                //  LOGIC THỜI GIAN VÀ GIÁ 
+                DateTime slotStartTime = date.Date.Add(timeSlot.StartTime);
+                DateTime slotEndTime = date.Date.Add(timeSlot.EndTime);
+                DateTime now = DateTime.Now; 
+
+                // Tính giá gốc
                 decimal currentPricePerHour = pitch.PricePerHour;
                 var specialPrice = await _context.PitchPriceSettings
-                    .FirstOrDefaultAsync(s => s.PitchId == pitchId
-                                           && timeSlot.StartTime >= s.StartTime
-                                           && timeSlot.StartTime < s.EndTime);
-                if (specialPrice != null)
-                {
-                    currentPricePerHour = specialPrice.Price;
-                }
+                    .FirstOrDefaultAsync(s => s.PitchId == pitchId && timeSlot.StartTime >= s.StartTime && timeSlot.StartTime < s.EndTime);
+                if (specialPrice != null) currentPricePerHour = specialPrice.Price;
 
+                var duration = (timeSlot.EndTime - timeSlot.StartTime).TotalHours;
                 decimal amount = currentPricePerHour * (decimal)duration;
 
+                // Chặn đặt sân nếu đã quá giờ
+                if (now >= slotEndTime) return (false, "Ca đá này đã kết thúc, không thể đặt!", null, null);
+
+                string discountNote = "";
+                if (now >= slotStartTime)
+                {
+                    double minutesPassed = (now - slotStartTime).TotalMinutes;
+                    if (minutesPassed > 30) return (false, "Đã quá 30 phút từ khi bắt đầu ca, hệ thống đã khóa đặt sân!", null, null);
+
+                    if (minutesPassed > 15)
+                    {
+                        amount = amount * 0.75m; // Giảm giá 25% vào Transaction
+                        discountNote = " (Giảm 25% vào muộn)";
+                    }
+                }
+
+                // Kiểm tra ví và trừ tiền (Dùng amount đã tính toán lại)
                 var user = await _context.Users.FindAsync(userId);
                 if (user.WalletBalance < amount) return (false, "Số dư không đủ. Vui lòng nạp thêm!", null, null);
 
                 user.WalletBalance -= amount;
                 _context.Users.Update(user);
 
-                // Tạo mã đặt sân duy nhất (Thêm UserId để phân biệt giữa các người đặt cùng giây)
-                string bookingCode = $"BKG-{DateTime.Now:yyMMddHHmmss}";
+                //  Lưu thông tin đặt sân và Giao dịch
+                string bookingCode = $"BKG-{DateTime.Now:yyMMddHHmmss}{userId}";
 
                 if (slot == null)
                 {
-                    slot = new PitchSlots
-                    {
-                        PitchId = pitchId,
-                        SlotId = slotId,
-                        PlayDate = date,
-                        Status = BookingStatus.PendingConfirm,
-                        BookingCode = bookingCode,
-                        UserId = userId
-                    };
+                    slot = new PitchSlots { PitchId = pitchId, SlotId = slotId, PlayDate = date, Status = BookingStatus.PendingConfirm, BookingCode = bookingCode, UserId = userId };
                     _context.PitchSlots.Add(slot);
                 }
                 else
                 {
-                    slot.Status = BookingStatus.PendingConfirm;
-                    slot.BookingCode = bookingCode;
-                    slot.UserId = userId;
+                    slot.Status = BookingStatus.PendingConfirm; slot.BookingCode = bookingCode; slot.UserId = userId;
                     _context.PitchSlots.Update(slot);
                 }
 
                 var trans = new Transactions
                 {
                     UserId = userId,
-                    Amount = amount,
+                    Amount = amount, // Lưu số tiền thực tế đã trừ
                     TransactionType = TransactionTypes.Booking,
                     Status = TransactionStatus.PendingConfirm,
                     Source = TransactionSources.Wallet,
                     TransactionDate = DateTime.Now,
                     TransactionCode = bookingCode,
-                    Message = $"Đặt sân {pitch.PitchName} - {date:dd/MM/yyyy}",
+                    Message = $"Đặt sân {pitch.PitchName} - {date:dd/MM/yyyy}{discountNote}",
                     BalanceAfter = user.WalletBalance
                 };
                 _context.Transactions.Add(trans);
@@ -269,9 +272,9 @@ namespace SportBookingSystem.Services
             }
 
             DateTime matchEndTime = slot.PlayDate.Date.Add(slot.TimeSlot.EndTime);
-            if (now > matchEndTime.AddMinutes(30))
+            if (now > matchEndTime)
             {
-                return (false, "Vé này đã quá hạn sử dụng!", null);
+                return (false, "Ca đá đã kết thúc hoàn toàn, mã QR không còn hiệu lực!", null);
             }
 
             return (true, "Mã hợp lệ", new
@@ -309,46 +312,49 @@ namespace SportBookingSystem.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
+                //  Lấy thông tin đặt sân kèm theo thông tin Ca (TimeSlot) và Sân (Pitch)
                 var slot = await _context.PitchSlots
                     .Include(ps => ps.TimeSlot)
                     .Include(ps => ps.Pitch)
                     .FirstOrDefaultAsync(ps => ps.BookingCode == bookingCode);
-
+                
                 if (slot == null) return (false, "Mã đặt sân không tồn tại!", 0);
 
+                // Chặn nếu đơn đã hủy hoặc đã hoàn tiền rồi
                 if (slot.Status == BookingStatus.Cancelled || slot.Status == BookingStatus.RefundBooking)
                 {
                     return (false, "Đơn đặt sân này đã được hủy trước đó.", 0);
                 }
 
+                // Chặn nếu khách đã vào sân hoặc đã hoàn thành ca đá
                 if (slot.Status >= BookingStatus.CheckedIn)
                 {
                     return (false, "Không thể hủy sân đã check-in hoặc hoàn thành.", 0);
                 }
 
                 DateTime matchStartTime = slot.PlayDate.Date.Add(slot.TimeSlot.StartTime);
+                DateTime now = DateTime.Now;
                 decimal refundAmount = 0;
                 bool isRefunded = false;
 
-                // Logic hoàn tiền: Nếu hủy trước > 24h
-                if (!isAutoCancel && DateTime.Now < matchStartTime.AddHours(-24))
+                // Logic hoàn tiền: Chỉ hoàn 100% nếu khách chủ động hủy TRƯỚC 24h so với giờ đá
+                if (!isAutoCancel && now < matchStartTime.AddHours(-24))
                 {
-                    var booking = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
-                    if (booking != null)
+                    var originalBookingTrans = await _context.Transactions
+                        .FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
+
+                    if (originalBookingTrans != null)
                     {
-                        refundAmount = booking.Amount * 1m; // Hoàn 100
-
-                        refundAmount = booking.Amount;
-
+                        refundAmount = originalBookingTrans.Amount;
                         isRefunded = true;
 
                         var user = await _context.Users.FindAsync(slot.UserId);
                         if (user != null)
                         {
-                            user.WalletBalance += refundAmount;
+                            user.WalletBalance += refundAmount; // Hoàn tiền vào ví
                             _context.Users.Update(user);
 
-                            // Tạo giao dịch hoàn tiền
+                            // Tạo bản ghi giao dịch hoàn tiền để lưu lịch sử
                             var refundTrans = new Transactions
                             {
                                 UserId = user.UserId,
@@ -356,9 +362,8 @@ namespace SportBookingSystem.Services
                                 TransactionType = TransactionTypes.RefundBooking,
                                 Status = TransactionStatus.Success,
                                 Source = TransactionSources.Wallet,
-                                TransactionDate = DateTime.Now,
-                                TransactionCode = $"REF-{DateTime.Now:yyMMddHHmmss}{user.UserId}",
-                              
+                                TransactionDate = now,
+                                TransactionCode = $"REF-{now:yyMMddHHmmss}{user.UserId}",
                                 Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
                                 BalanceAfter = user.WalletBalance
                             };
@@ -367,13 +372,27 @@ namespace SportBookingSystem.Services
                     }
                 }
 
-                // Cập nhật trạng thái sân
-                slot.Status = BookingStatus.RefundBooking;
-                slot.UpdatedAt = DateTime.Now;
-                _context.PitchSlots.Update(slot);
+                // Logic giải phóng sân (Mở lại sân trống) hoặc Khóa luôn sân
+                var durationInMinutes = (slot.TimeSlot.EndTime - slot.TimeSlot.StartTime).TotalMinutes;
+                var halfDuration = durationInMinutes / 2;
 
-                // Cập nhật trạng thái giao dịch gốc
-                var originalTrans = await _context.Transactions.FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
+                // Nếu thời điểm hủy vẫn chưa quá nửa thời gian ca đá
+                if (now < matchStartTime.AddMinutes(halfDuration))
+                {
+                    // XÓA bản ghi trong PitchSlots để sân hiện "Còn trống" cho người khác đặt
+                    _context.PitchSlots.Remove(slot);
+                }
+                else
+                {
+                    // Nếu đã quá nửa ca, giữ lại bản ghi và đổi trạng thái để sân hiện "Đã qua"
+                    slot.Status = BookingStatus.RefundBooking;
+                    slot.UpdatedAt = now;
+                    _context.PitchSlots.Update(slot);
+                }
+
+                // Cập nhật trạng thái giao dịch gốc thành "Đã hủy"
+                var originalTrans = await _context.Transactions
+                    .FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
                 if (originalTrans != null)
                 {
                     originalTrans.Status = TransactionStatus.CancelBooking;
@@ -383,15 +402,19 @@ namespace SportBookingSystem.Services
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                string msg = isRefunded ? $"Hủy sân thành công. Bạn được hoàn lại {refundAmount:N0}₫ (100%)." : "Hủy sân thành công. Giao dịch không đủ điều kiện hoàn tiền.";
-                if (isAutoCancel) msg = "Hệ thống tự động hủy sân do quá hạn check-in.";
+                // Trả về thông báo phù hợp
+                string msg = isRefunded
+                    ? $"Hủy sân thành công. Bạn được hoàn lại {refundAmount:N0}₫ (100%)."
+                    : "Hủy sân thành công. Giao dịch không đủ điều kiện hoàn tiền.";
+
+                if (isAutoCancel) msg = "Hệ thống tự động xử lý ca đá quá hạn.";
 
                 return (true, msg, refundAmount);
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                return (false, "Lỗi khi hủy sân: " + ex.Message, 0);
+                return (false, "Lỗi khi xử lý hủy sân: " + ex.Message, 0);
             }
         }
 
@@ -407,7 +430,7 @@ namespace SportBookingSystem.Services
             if (fromDate.HasValue)
                 query = query.Where(ps => ps.PlayDate == fromDate.Value);
 
-            if (toDate.HasValue)
+            if (toDate.HasValue)     
                 query = query.Where(ps => ps.PlayDate <= toDate.Value);
 
             if (timeSlotId.HasValue)

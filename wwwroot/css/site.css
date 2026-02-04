@@ -773,6 +773,29 @@ body.scroll-lock {
     pointer-events: none;
 }
 
-.header .dropdown.open .dropdown-menu {
+.header .dropdown.open .dropdown-menu { 
     pointer-events: auto !important;
+}
+
+@media (max-width: 864px) {
+    .footer-container {
+        grid-template-columns: 1fr 1fr; 
+        gap: 32px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-container {
+        grid-template-columns: 1fr !important; 
+        gap: 24px;
+        text-align: center; 
+    }
+
+    .footer-brand, .footer-links {
+        align-items: center; /
+    }
+
+    .footer-logo {
+        justify-content: center;
+    }
 }
