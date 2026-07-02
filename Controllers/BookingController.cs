@@ -48,7 +48,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+                throw;
             }
         }
 
@@ -95,7 +95,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi Controller: " + ex.Message });
+                throw;
             }
         }
 
@@ -110,7 +110,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi server: " + ex.Message });
+                throw;
             }
         }
 
@@ -124,7 +124,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi hệ thống: " + ex.Message });
+                throw;
             }
         }
 
@@ -138,7 +138,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi Controller: " + ex.Message });
+                throw;
             }
         }
     }

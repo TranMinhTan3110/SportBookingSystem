@@ -38,11 +38,45 @@ namespace SportBookingSystem.Services
                             .Where(code => !string.IsNullOrEmpty(code))
                             .ToList();
 
-                        foreach (var code in codesToCancel)
+                        if (!codesToCancel.Any()) continue;
+
+                        var slotsToCancel = expiredBookings.Where(ps => codesToCancel.Contains(ps.BookingCode)).ToList();
+                        
+                        var transactionsToCancel = await context.Transactions
+                            .Where(t => codesToCancel.Contains(t.TransactionCode) && t.TransactionType == TransactionTypes.Booking)
+                            .ToListAsync(stoppingToken);
+
+                        using var dbTransaction = await context.Database.BeginTransactionAsync(stoppingToken);
+                        
+                        foreach (var slot in slotsToCancel)
                         {
-                            Console.WriteLine($"[AutoCancel] Hủy đặt sân quá hạn: {code}");
-                            await bookingService.CancelBookingAsync(code!, isAutoCancel: true);
+                            Console.WriteLine($"[AutoCancel] Hủy đặt sân quá hạn: {slot.BookingCode}");
+                            
+                            var durationInMinutes = (slot.TimeSlot.EndTime - slot.TimeSlot.StartTime).TotalMinutes;
+                            var halfDuration = durationInMinutes / 2;
+                            var matchStartTime = slot.PlayDate.Date.Add(slot.TimeSlot.StartTime);
+
+                            if (now < matchStartTime.AddMinutes(halfDuration))
+                            {
+                                context.PitchSlots.Remove(slot);
+                            }
+                            else
+                            {
+                                slot.Status = BookingStatus.RefundBooking;
+                                slot.UpdatedAt = now;
+                                context.PitchSlots.Update(slot);
+                            }
+
+                            var originalTrans = transactionsToCancel.FirstOrDefault(t => t.TransactionCode == slot.BookingCode);
+                            if (originalTrans != null)
+                            {
+                                originalTrans.Status = TransactionStatus.CancelBooking;
+                                context.Transactions.Update(originalTrans);
+                            }
                         }
+
+                        await context.SaveChangesAsync(stoppingToken);
+                        await dbTransaction.CommitAsync(stoppingToken);
                     }
                 }
                 catch (Exception ex)

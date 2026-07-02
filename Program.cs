@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using SportBookingSystem.Middlewares;
 using SportBookingSystem.Helper;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Services; 
@@ -52,8 +53,10 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddMemoryCache();
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
-
 var app = builder.Build();
+
+// Đăng ký Middleware chống lộ lọt ex.Message ra ngoài
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (!app.Environment.IsDevelopment())
 {

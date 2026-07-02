@@ -88,7 +88,7 @@ namespace SportBookingSystem.Controllers
             catch (Exception ex)
             {
                 TempData["PaymentStatus"] = "error";
-                TempData["PaymentMessage"] = $"Lỗi hệ thống: {ex.Message}";
+                throw;
                 return RedirectToAction("Index", "Home");
             }
         }
