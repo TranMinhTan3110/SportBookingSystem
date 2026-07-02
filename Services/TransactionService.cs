@@ -519,7 +519,7 @@ namespace SportBookingSystem.Services
                     if (dbTrans != null) dbTrans.Status = TransactionStatus.Canceled;
                     
                     // Hoàn tiền
-                    if (order.UserId != null && users.TryGetValue(order.UserId, out var user))
+                    if (order.UserId != null && users.TryGetValue(order.UserId.Value, out var user))
                     {
                         user.WalletBalance += order.TotalAmount ?? 0;
                         

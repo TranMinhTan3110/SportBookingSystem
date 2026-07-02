@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SportBookingSystem.DTO;
 using SportBookingSystem.Services;
 using Microsoft.EntityFrameworkCore;
@@ -118,7 +118,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                throw;
             }
         }
 

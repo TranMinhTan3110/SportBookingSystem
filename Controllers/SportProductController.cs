@@ -67,7 +67,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+                throw;
             }
         }
 
@@ -86,7 +86,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Lỗi: " + ex.Message });
+                throw;
             }
         }
 
