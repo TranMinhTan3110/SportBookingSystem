@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.DTO;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
@@ -482,17 +482,85 @@ namespace SportBookingSystem.Services
             try
             {
                 var expirationTime = DateTime.Now.AddMinutes(-15);
-                var expiredOrderIds = await _context.Orders
+                
+                // 1. Lấy tất cả đơn hàng quá hạn (kèm chi tiết để hoàn kho)
+                var expiredOrders = await _context.Orders
+                    .Include(o => o.OrderDetails)
                     .Where(o => o.Status == 0 && o.OrderDate < expirationTime)
-                    .Select(o => o.OrderId)
                     .ToListAsync();
 
-                if (!expiredOrderIds.Any()) return;
+                if (!expiredOrders.Any()) return;
 
-                foreach (var orderId in expiredOrderIds)
+                var expiredOrderIds = expiredOrders.Select(o => o.OrderId).ToList();
+                
+                // 2. Lấy tất cả Transactions liên quan
+                var dbTransactions = await _context.Transactions
+                    .Where(t => expiredOrderIds.Contains(t.OrderId ?? 0))
+                    .ToListAsync();
+                    
+                // 3. Lấy Users để hoàn tiền
+                var userIds = expiredOrders.Where(o => o.UserId != null).Select(o => o.UserId).Distinct().ToList();
+                var users = await _context.Users.Where(u => userIds.Contains(u.UserId)).ToDictionaryAsync(u => u.UserId);
+                
+                // 4. Lấy Products để hoàn kho
+                var productIds = expiredOrders.SelectMany(o => o.OrderDetails.Select(od => od.ProductId)).Distinct().ToList();
+                var products = await _context.Products.Where(p => productIds.Contains(p.ProductId)).ToDictionaryAsync(p => p.ProductId);
+
+                var newRefunds = new List<Transactions>();
+
+                // Mở 1 Transaction duy nhất cho tất cả các đơn
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                
+                foreach (var order in expiredOrders)
                 {
-                    await UpdateOrderStatusAsync(orderId, TransactionStatus.Canceled);
+                    order.Status = -1; // Canceled
+                    
+                    var dbTrans = dbTransactions.FirstOrDefault(t => t.OrderId == order.OrderId);
+                    if (dbTrans != null) dbTrans.Status = TransactionStatus.Canceled;
+                    
+                    // Hoàn tiền
+                    if (order.UserId != null && users.TryGetValue(order.UserId, out var user))
+                    {
+                        user.WalletBalance += order.TotalAmount ?? 0;
+                        
+                        var refundTrans = new Transactions
+                        {
+                            UserId = user.UserId,
+                            Amount = order.TotalAmount ?? 0,
+                            TransactionType = TransactionTypes.Refund,
+                            Source = "System",
+                            Status = TransactionStatus.Success,
+                            TransactionDate = DateTime.Now,
+                            BalanceAfter = user.WalletBalance,
+                            Message = $"Hoàn tiền đơn hàng {order.OrderCode} do quá hạn",
+                            OrderId = order.OrderId
+                        };
+                        _context.Transactions.Add(refundTrans);
+                        newRefunds.Add(refundTrans);
+                    }
+                    
+                    // Hoàn kho
+                    foreach (var detail in order.OrderDetails)
+                    {
+                        if (products.TryGetValue(detail.ProductId, out var product))
+                        {
+                            product.StockQuantity += detail.Quantity;
+                        }
+                    }
                 }
+                
+                // Lưu lần 1 để sinh TransactionId
+                await _context.SaveChangesAsync();
+                
+                // Cập nhật mã TransactionCode cho các giao dịch hoàn tiền
+                foreach(var r in newRefunds) 
+                {
+                    r.TransactionCode = $"{TransactionPrefixes.Refund}-{r.TransactionId:D4}"; 
+                }
+                
+                // Lưu lần 2 và chốt sổ
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
             catch (Exception ex)
             {

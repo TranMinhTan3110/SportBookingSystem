@@ -450,11 +450,13 @@ namespace SportBookingSystem.Services
             var bookings = await query.OrderByDescending(ps => ps.PlayDate).ThenBy(ps => ps.TimeSlot.StartTime).ToListAsync();
             var result = new List<BookingManagementDTO>();
             
+            var bookingCodes = bookings.Select(b => b.BookingCode).ToList();
+            var allTrans = await _context.Transactions
+                    .Where(t => t.TransactionType == TransactionTypes.Booking && bookingCodes.Contains(t.TransactionCode))
+                    .ToListAsync();
             foreach (var b in bookings)
             {
-                var trans = await _context.Transactions
-                    .Where(t => t.TransactionCode == b.BookingCode && t.TransactionType == TransactionTypes.Booking)
-                    .FirstOrDefaultAsync();
+                    var trans = allTrans.FirstOrDefault(t => t.TransactionCode == b.BookingCode);
 
                 result.Add(new BookingManagementDTO
                 {
