@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using SportBookingSystem.Constants;
 using SportBookingSystem.Models.EF;
@@ -153,9 +153,9 @@ namespace SportBookingSystem.Services
             {
                 // Tạo Lock (Giữ nguyên logic lock của bạn để tránh đặt trùng)
                 string lockResource = $"Booking_Lock_{pitchId}_{slotId}_{date:yyyyMMdd}";
-                await _context.Database.ExecuteSqlRawAsync($@"
+                await _context.Database.ExecuteSqlAsync($@"
         DECLARE @res INT;
-        EXEC @res = sp_getapplock @Resource = '{lockResource}', @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
+        EXEC @res = sp_getapplock @Resource = {lockResource}, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
         IF @res < 0 THROW 50000, 'Không thể lấy khóa đặt sân', 1;
     ");
 
