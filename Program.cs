@@ -52,6 +52,12 @@ builder.Services.AddControllersWithViews()
     });
 builder.Services.AddMemoryCache();
 
+// Đăng ký Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379";
+    options.InstanceName = "SportBooking_";
+});
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 var app = builder.Build();
 

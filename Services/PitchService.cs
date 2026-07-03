@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
 using SportBookingSystem.Models.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace SportBookingSystem.Services
 {
@@ -10,15 +12,18 @@ namespace SportBookingSystem.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<PitchService> _logger;
+        private readonly IDistributedCache _cache;
 
         public PitchService(
             ApplicationDbContext context,
             IWebHostEnvironment environment,
-            ILogger<PitchService> logger)
+            ILogger<PitchService> logger,
+            IDistributedCache cache)
         {
             _context = context;
             _environment = environment;
             _logger = logger;
+            _cache = cache;
         }
 
         /// Lấy tất cả sân với điều kiện lọc
@@ -26,33 +31,57 @@ namespace SportBookingSystem.Services
         {
             try
             {
-                var query = _context.Pitches.Include(p => p.Category).AsQueryable();
-
-                // Lọc theo Category
-                if (categoryId.HasValue && categoryId.Value > 0)
+                // Nếu có bộ lọc thì không dùng cache
+                if (categoryId.HasValue || !string.IsNullOrEmpty(status) || !string.IsNullOrEmpty(searchTerm))
                 {
-                    query = query.Where(p => p.CategoryId == categoryId.Value);
+                    return await GetFilteredPitchesFromDbAsync(categoryId, status, searchTerm);
                 }
 
-                // Lọc theo Status
-                if (!string.IsNullOrEmpty(status))
+                string cacheKey = "ALL_PITCHES";
+                var cachedData = await _cache.GetStringAsync(cacheKey);
+
+                if (!string.IsNullOrEmpty(cachedData))
                 {
-                    query = query.Where(p => p.Status == status);
+                    return JsonSerializer.Deserialize<List<Pitches>>(cachedData) ?? new List<Pitches>();
                 }
 
-                // Tìm kiếm theo tên
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    query = query.Where(p => p.PitchName.Contains(searchTerm));
-                }
+                var pitchesFromDb = await GetFilteredPitchesFromDbAsync(null, null, null);
 
-                return await query.OrderBy(p => p.PitchName).ToListAsync();
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                };
+                
+                // Tránh lỗi vòng lặp Reference khi serialize
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+                };
+                await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(pitchesFromDb, jsonOptions), cacheOptions);
+
+                return pitchesFromDb;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi lấy danh sách sân");
+                _logger.LogError(ex, "Lỗi khi lấy danh sách sân (Redis/DB)");
                 return new List<Pitches>();
             }
+        }
+
+        private async Task<List<Pitches>> GetFilteredPitchesFromDbAsync(int? categoryId, string? status, string? searchTerm)
+        {
+            var query = _context.Pitches.Include(p => p.Category).AsNoTracking().AsQueryable();
+
+            if (categoryId.HasValue && categoryId.Value > 0)
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(p => p.Status == status);
+
+            if (!string.IsNullOrEmpty(searchTerm))
+                query = query.Where(p => p.PitchName.Contains(searchTerm));
+
+            return await query.OrderBy(p => p.PitchName).ToListAsync();
         }
 
         /// Lấy thông tin sân theo ID
@@ -115,6 +144,9 @@ namespace SportBookingSystem.Services
 
                 _context.Pitches.Add(pitch);
                 await _context.SaveChangesAsync();
+                
+                // Xóa Cache
+                await _cache.RemoveAsync("ALL_PITCHES");
 
                 return (true, "Thêm sân thành công", pitch);
             }
@@ -171,6 +203,9 @@ namespace SportBookingSystem.Services
 
                 _context.Pitches.Update(pitch);
                 await _context.SaveChangesAsync();
+                
+                // Xóa Cache
+                await _cache.RemoveAsync("ALL_PITCHES");
 
                 return (true, "Cập nhật sân thành công");
             }
@@ -209,6 +244,9 @@ namespace SportBookingSystem.Services
 
                 _context.Pitches.Remove(pitch);
                 await _context.SaveChangesAsync();
+
+                // Xóa Cache
+                await _cache.RemoveAsync("ALL_PITCHES");
 
                 return (true, "Xóa sân thành công");
             }
