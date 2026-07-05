@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.ViewModels;
@@ -64,13 +64,9 @@ namespace SportBookingSystem.Controllers
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
                 int userId;
 
-                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out userId))
+                if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out userId))
                 {
-                    
-                }
-                else
-                {
-                    userId = 1; 
+                    return Json(new { success = false, message = "Bạn cần đăng nhập để đặt sân!" });
                 }
 
                 var result = await _bookingService.BookPitchAsync(userId, pitchId, slotId, date);

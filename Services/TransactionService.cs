@@ -272,15 +272,13 @@ namespace SportBookingSystem.Services
                     Status = TransactionStatus.Success,
                     TransactionDate = DateTime.Now,
                     BalanceAfter = user.WalletBalance,
-                    Message = dto.Message
+                    Message = dto.Message,
+                    TransactionCode = GenerateTransactionCode(prefix)
                 };
 
                 _context.Transactions.Add(trans);
                 await _context.SaveChangesAsync();
 
-                trans.TransactionCode = $"{prefix}-{trans.TransactionId:D4}";
-
-                await _context.SaveChangesAsync();
                 await dbTransaction.CommitAsync();
                 return (true, "Nạp tiền thành công", trans.TransactionCode);
             }
@@ -444,12 +442,10 @@ namespace SportBookingSystem.Services
                             TransactionDate = DateTime.Now,
                             BalanceAfter = user.WalletBalance,
                             Message = $"Hoàn tiền đơn hàng {order.OrderCode}",
-                            OrderId = order.OrderId
+                            OrderId = order.OrderId,
+                            TransactionCode = GenerateTransactionCode(TransactionPrefixes.Refund)
                         };
                         _context.Transactions.Add(refundTrans);
-                        await _context.SaveChangesAsync();
-
-                        refundTrans.TransactionCode = $"{TransactionPrefixes.Refund}-{refundTrans.TransactionId:D4}";
                     }
 
                 
@@ -533,7 +529,8 @@ namespace SportBookingSystem.Services
                             TransactionDate = DateTime.Now,
                             BalanceAfter = user.WalletBalance,
                             Message = $"Hoàn tiền đơn hàng {order.OrderCode} do quá hạn",
-                            OrderId = order.OrderId
+                            OrderId = order.OrderId,
+                            TransactionCode = GenerateTransactionCode(TransactionPrefixes.Refund)
                         };
                         _context.Transactions.Add(refundTrans);
                         newRefunds.Add(refundTrans);
@@ -549,16 +546,7 @@ namespace SportBookingSystem.Services
                     }
                 }
                 
-                // Lưu lần 1 để sinh TransactionId
-                await _context.SaveChangesAsync();
-                
-                // Cập nhật mã TransactionCode cho các giao dịch hoàn tiền
-                foreach(var r in newRefunds) 
-                {
-                    r.TransactionCode = $"{TransactionPrefixes.Refund}-{r.TransactionId:D4}"; 
-                }
-                
-                // Lưu lần 2 và chốt sổ
+                // Lưu 1 lần duy nhất và chốt sổ
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -665,6 +653,13 @@ namespace SportBookingSystem.Services
             }
 
             return result;
+        }
+
+        private string GenerateTransactionCode(string prefix)
+        {
+            string datePart = DateTime.Now.ToString("yyMMdd");
+            string randomPart = Guid.NewGuid().ToString("N").Substring(0, 4).ToUpper();
+            return $"{prefix}-{datePart}-{randomPart}";
         }
     }
 }
