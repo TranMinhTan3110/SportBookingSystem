@@ -19,8 +19,7 @@ namespace SportBookingSystem.Services
             ApplicationDbContext context,
             IWebHostEnvironment environment,
             ILogger<PitchService> logger,
-            ICloudinaryService cloudinaryService)
-            ILogger<PitchService> logger,
+            ICloudinaryService cloudinaryService,
             IDistributedCache cache)
         {
             _context = context;
