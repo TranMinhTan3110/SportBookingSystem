@@ -337,37 +337,59 @@ namespace SportBookingSystem.Services
                 decimal refundAmount = 0;
                 bool isRefunded = false;
 
-                // Logic hoàn tiền: Chỉ hoàn 100% nếu khách chủ động hủy TRƯỚC 24h so với giờ đá
-                if (!isAutoCancel && now < matchStartTime.AddHours(-24))
+                // Logic hoàn tiền linh hoạt nhiều mức độ
+                if (!isAutoCancel)
                 {
                     var originalBookingTrans = await _context.Transactions
                         .FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
 
                     if (originalBookingTrans != null)
                     {
-                        refundAmount = originalBookingTrans.Amount;
-                        isRefunded = true;
+                        double hoursUntilMatch = (matchStartTime - now).TotalHours;
+                        double minutesSinceBooking = (now - originalBookingTrans.TransactionDate).TotalMinutes;
 
-                        var user = await _context.Users.FindAsync(slot.UserId);
-                        if (user != null)
+                        if (minutesSinceBooking <= 30) // Luật 1: Quay xe 30 phút -> Hoàn 100%
                         {
-                            user.WalletBalance += refundAmount; // Hoàn tiền vào ví
-                            _context.Users.Update(user);
+                            refundAmount = originalBookingTrans.Amount;
+                        }
+                        else if (hoursUntilMatch >= 24) // Luật 2: Trước 24h -> Hoàn 100%
+                        {
+                            refundAmount = originalBookingTrans.Amount;
+                        }
+                        else if (hoursUntilMatch >= 12) // Luật 3: Trước 12h -> Hoàn 50%
+                        {
+                            refundAmount = originalBookingTrans.Amount * 0.5m;
+                        }
+                        else // Luật 4: Sát giờ (dưới 12h) -> Phạt cọc, Hoàn 0đ
+                        {
+                            refundAmount = 0;
+                        }
 
-                            // Tạo bản ghi giao dịch hoàn tiền để lưu lịch sử
-                            var refundTrans = new Transactions
+                        if (refundAmount > 0)
+                        {
+                            isRefunded = true;
+
+                            var user = await _context.Users.FindAsync(slot.UserId);
+                            if (user != null)
                             {
-                                UserId = user.UserId,
-                                Amount = refundAmount,
-                                TransactionType = TransactionTypes.RefundBooking,
-                                Status = TransactionStatus.Success,
-                                Source = TransactionSources.Wallet,
-                                TransactionDate = now,
-                                TransactionCode = $"REF-{now:yyMMddHHmmss}{user.UserId}",
-                                Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
-                                BalanceAfter = user.WalletBalance
-                            };
-                            _context.Transactions.Add(refundTrans);
+                                user.WalletBalance += refundAmount; // Hoàn tiền vào ví
+                                _context.Users.Update(user);
+
+                                // Tạo bản ghi giao dịch hoàn tiền để lưu lịch sử
+                                var refundTrans = new Transactions
+                                {
+                                    UserId = user.UserId,
+                                    Amount = refundAmount,
+                                    TransactionType = TransactionTypes.RefundBooking,
+                                    Status = TransactionStatus.Success,
+                                    Source = TransactionSources.Wallet,
+                                    TransactionDate = now,
+                                    TransactionCode = $"REF-{now:yyMMddHHmmss}{user.UserId}",
+                                    Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
+                                    BalanceAfter = user.WalletBalance
+                                };
+                                _context.Transactions.Add(refundTrans);
+                            }
                         }
                     }
                 }
