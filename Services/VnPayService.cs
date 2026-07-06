@@ -1,4 +1,4 @@
-﻿using SportBookingSystem.Helper;
+using SportBookingSystem.Helper;
 using SportBookingSystem.Models.ViewModels;
 
 namespace SportBookingSystem.Services
@@ -16,10 +16,10 @@ namespace SportBookingSystem.Services
         {
             var vnpay = new VnPayLibrary();
 
-            var vnpUrl = _configuration["VnPay:BaseUrl"];
-            var vnpTmnCode = _configuration["VnPay:TmnCode"];
+            var vnpUrl = _configuration["VnPay:BaseUrl"]?.Trim();
+            var vnpTmnCode = _configuration["VnPay:TmnCode"]?.Trim();
             var vnpHashSecret = _configuration["VnPay:HashSecret"]?.Trim();
-            var vnpReturnUrl = _configuration["VnPay:ReturnUrl"];
+            var vnpReturnUrl = _configuration["VnPay:ReturnUrl"]?.Trim();
 
             var vnpAmount = ((long)(amount * 100)).ToString();
 
