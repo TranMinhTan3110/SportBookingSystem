@@ -8,11 +8,13 @@ namespace SportBookingSystem.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public SportProductService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment)
+        public SportProductService(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, ICloudinaryService cloudinaryService)
         {
             _context = context;
             _webHostEnvironment = webHostEnvironment;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<IEnumerable<Products>> GetAllProductsAsync(string? search, string? type, string? brand, string? stockStatus)
@@ -143,6 +145,10 @@ namespace SportBookingSystem.Services
 
                 if (imageFile != null && imageFile.Length > 0)
                 {
+                    if (!string.IsNullOrEmpty(existing.ImageUrl))
+                    {
+                        await _cloudinaryService.DeleteImageAsync(existing.ImageUrl);
+                    }
                     existing.ImageUrl = await SaveImageAsync(imageFile);
                 }
 
@@ -162,6 +168,11 @@ namespace SportBookingSystem.Services
             {
                 var product = await _context.Products.FindAsync(id);
                 if (product == null) return false;
+
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    await _cloudinaryService.DeleteImageAsync(product.ImageUrl);
+                }
 
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();
@@ -210,29 +221,9 @@ namespace SportBookingSystem.Services
             }
         }
 
-        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        private async Task<string?> SaveImageAsync(IFormFile imageFile)
         {
-            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "asset", "img");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
-
-            // Lấy tên file gốc 
-            string fileName = imageFile.FileName;
-            string filePath = Path.Combine(uploadsFolder, fileName);
-
-            if (System.IO.File.Exists(filePath))
-            {
-                return "/asset/img/" + fileName;
-            }
-
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
-
-            return "/asset/img/" + fileName;
+            return await _cloudinaryService.UploadImageAsync(imageFile, "products");
         }
 
         public async Task<IEnumerable<Categories>> GetCategoriesByTypeAsync(string type)
