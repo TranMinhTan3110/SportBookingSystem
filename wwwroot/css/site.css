@@ -251,13 +251,37 @@ body {
     cursor: pointer;
 }
 
-    .wallet-balance:hover {
+.wallet-balance:hover {
         background: var(--success);
         color: white;
         border-color: var(--success);
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
     }
+
+.cart-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--success);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+.cart-icon:hover {
+        background: var(--success);
+        color: white;
+        border-color: var(--success);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+
+    
 
 /* User Avatar & Dropdown */
 .user-dropdown {

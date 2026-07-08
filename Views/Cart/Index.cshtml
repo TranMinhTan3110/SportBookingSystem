@@ -1,0 +1,265 @@
+@using SportBookingSystem.Models.ViewModels
+@model CartViewModel
+
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/cart.css" />
+
+<div class="cart-page">
+    <h1 class="cart-page-title">
+        <i class="bi bi-cart-fill"></i> Giỏ hàng của bạn
+    </h1>
+
+    @if (Model.Items.Any())
+    {
+        <!-- Timer Bar -->
+        <div id="cartTimerBar" class="cart-timer-bar @(Model.IsCartExpired ? "expired" : "")"
+             data-remaining="@Model.RemainingSeconds"
+             style="@(Model.CartCreatedAt.HasValue ? "" : "display:none;")">
+            <div class="cart-timer-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="cart-timer-text">
+                <span id="cartTimerLabel">
+                    @if (Model.IsCartExpired)
+                    {
+                        <text>⏰ Giỏ hàng đã hết hạn!</text>
+                    }
+                    else
+                    {
+                        <text>⏱ Giỏ hàng hết hạn sau: <strong id="cartTimerDisplay">@TimeSpan.FromSeconds(Model.RemainingSeconds).ToString(@"mm\:ss")</strong></text>
+                    }
+                </span>
+            </div>
+            <button type="button" class="cart-timer-refresh" onclick="refreshCartTimer()" title="Làm mới thời gian">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        </div>
+
+        <div class="cart-layout">
+            <!-- Cart Items -->
+            <div class="cart-items" id="cartContainer">
+                <div class="cart-items-header">
+                    <span>Sản phẩm</span>
+                    <span>Đơn giá</span>
+                    <span>Số lượng</span>
+                    <span>Tạm tính</span>
+                    <span></span>
+                </div>
+
+                @foreach (var item in Model.Items)
+                {
+                    <div class="cart-item-row" data-product-id="@item.ProductId">
+                        <div class="cart-item-info">
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl" alt="@item.ProductName" class="cart-item-image"
+                                     onerror="this.src='/asset/img/no-image.png'" />
+                            }
+                            else
+                            {
+                                <div class="cart-item-image" style="background:var(--surface-light);display:flex;align-items:center;justify-content:center;">
+                                    <i class="bi bi-box" style="font-size:24px;color:#CBD5E1;"></i>
+                                </div>
+                            }
+                            <div class="cart-item-details">
+                                <div class="cart-item-name">@item.ProductName</div>
+                                <div class="cart-item-meta">
+                                    @if (!string.IsNullOrEmpty(item.CategoryName))
+                                    {
+                                        <span><i class="bi bi-tag"></i> @item.CategoryName</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.Brand))
+                                    {
+                                        <span><i class="bi bi-shield"></i> @item.Brand</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(item.Size))
+                                    {
+                                        <span><i class="bi bi-rulers"></i> @item.Size</span>
+                                    }
+                                </div>
+                                @if (!item.IsAvailable)
+                                {
+                                    <span class="badge bg-danger mt-1">Hết hàng</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="cart-item-price">@item.Price.ToString("N0")₫</div>
+
+                        <div class="cart-qty-controls">
+                            <button type="button" class="cart-qty-minus" data-product-id="@item.ProductId">−</button>
+                            <input type="number" class="cart-qty-input" data-product-id="@item.ProductId"
+                                   value="@item.Quantity" min="1" max="999" />
+                            <button type="button" class="cart-qty-plus" data-product-id="@item.ProductId">+</button>
+                        </div>
+
+                        <div class="cart-item-total">
+                            <span class="item-total" data-product-id="@item.ProductId">
+                                @item.Total.ToString("N0")₫
+                            </span>
+                        </div>
+
+                        <button type="button" class="cart-remove-btn" data-product-id="@item.ProductId" title="Xóa">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                }
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="cart-summary">
+                <h3 class="cart-summary-title">Tóm tắt đơn hàng</h3>
+
+                <div class="cart-summary-row">
+                    <span>Tạm tính</span>
+                    <span id="cartSubtotal">@Model.Items.Sum(i => i.Price * i.Quantity).ToString("N0")₫</span>
+                </div>
+
+                <div class="cart-summary-row total">
+                    <span>Tổng cộng</span>
+                    <span id="cartTotalAmount">@Model.TotalAmount.ToString("N0")₫</span>
+                </div>
+
+                @if (Model.IsLoggedIn)
+                {
+                    <div class="cart-summary-wallet @(Model.HasEnoughBalance ? "" : "shortage")">
+                        <i class="bi bi-wallet-fill"></i>
+                        <span>
+                            Số dư:
+                            <strong>@Model.WalletBalance.ToString("N0")₫</strong>
+                            @if (!Model.HasEnoughBalance)
+                            {
+                                <span style="color:var(--danger);display:block;margin-top:4px;font-size:13px;">
+                                    <i class="bi bi-exclamation-triangle-fill"></i> Thiếu @Model.ShortageAmount.ToString("N0")₫
+                                </span>
+                                <span style="font-size:12px;margin-top:2px;display:block;">
+                                    <a href="@Url.Action("Index", "Wallet")" style="color:var(--accent);">Nạp thêm tiền</a>
+                                </span>
+                            }
+                        </span>
+                    </div>
+
+                    <button type="button" class="cart-checkout-btn @(Model.HasEnoughBalance ? "enabled" : "disabled")"
+                            id="cartCheckoutBtn"
+                            onclick="showCartCheckoutModal()"
+                            @(Model.HasEnoughBalance && !Model.IsCartExpired ? "" : "disabled")>
+                        <i class="bi bi-check-circle-fill"></i>
+                        Thanh toán ngay
+                    </button>
+                }
+                else
+                {
+                    <div class="cart-summary-wallet shortage">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        <span>Vui lòng <a href="/Login/SignIn" style="color:var(--accent);font-weight:600;">đăng nhập</a> để thanh toán</span>
+                    </div>
+                    <a href="/Login/SignIn" class="cart-checkout-btn enabled" style="text-decoration:none;">
+                        <i class="bi bi-box-arrow-in-right"></i>
+                        Đăng nhập để thanh toán
+                    </a>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Empty Cart -->
+        <div class="cart-empty">
+            <i class="bi bi-cart-x"></i>
+            <h3>Giỏ hàng trống</h3>
+            <p>Hãy thêm sản phẩm từ cửa hàng của chúng tôi</p>
+        </div>
+    }
+</div>
+
+<!-- Checkout Confirmation Modal -->
+<div class="modal fade" id="cartCheckoutModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-primary text-white py-3">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-cart-check-fill me-2"></i>Xác nhận đơn hàng
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-3">
+                    <i class="bi bi-info-circle"></i> Vui lòng kiểm tra lại thông tin đơn hàng trước khi thanh toán.
+                </p>
+
+                <!-- Cart items list in modal -->
+                <div class="checkout-items-list" id="checkoutItemsList">
+                    <!-- Filled by JS -->
+                </div>
+
+                <div class="bg-light p-3 rounded-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-muted">Tạm tính:</span>
+                        <span class="fw-bold" id="checkoutSubtotal">0₫</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Số dư ví:</span>
+                        <span class="fw-bold text-primary" id="checkoutWalletBalance">0₫</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold fs-5">Tổng cộng:</span>
+                        <span class="fw-bold fs-5 text-danger" id="checkoutTotal">0₫</span>
+                    </div>
+                </div>
+
+                <div id="checkoutWarning" class="alert alert-danger border-0 d-none mb-0">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span id="checkoutWarningText"></span>
+                </div>
+
+                <div class="alert alert-info border-0 mb-0" style="background-color: #e3f2fd; color: #0d47a1;">
+                    <i class="bi bi-info-circle-fill me-2"></i> Số dư sẽ được trừ trực tiếp vào ví sau khi xác nhận.
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-4 pt-0">
+                <button type="button" class="btn btn-light px-4 py-2 fw-semibold" data-bs-dismiss="modal" style="border-radius: 10px;">
+                    <i class="bi bi-x-lg"></i> Hủy
+                </button>
+                <button type="button" class="btn btn-primary px-5 py-2 fw-semibold shadow-sm" id="confirmCheckoutBtn"
+                        onclick="processCartCheckout()" style="border-radius: 10px;">
+                    <i class="bi bi-check-circle-fill"></i> Xác nhận thanh toán
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Success Modal -->
+<div class="modal fade" id="cartQrModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-body text-center p-5">
+                <div class="mb-4">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="bi bi-check-lg" style="font-size: 32px;"></i>
+                    </div>
+                    <h3 class="fw-bold text-success">Thanh toán thành công!</h3>
+                    <p class="text-muted">Vui lòng giữ mã QR và đưa cho nhân viên để nhận hàng.</p>
+                </div>
+
+                <div class="qr-container p-3 bg-white border rounded-4 mb-4 shadow-sm">
+                    <img id="cartQrCodeImg" src="" alt="QR Code" class="img-fluid" style="max-width: 250px;">
+                    <div id="cartQrCountdown" class="mt-3 fw-bold text-danger" style="font-size: 1.1rem;">
+                        Hết hạn sau: <span id="cartQrTimer">15:00</span>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-primary w-100 py-3 fw-bold" onclick="location.href='/History'" style="border-radius: 15px;">
+                    <i class="bi bi-clock-history"></i> Xem lịch sử giao dịch
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/cart.js"></script>
