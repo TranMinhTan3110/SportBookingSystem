@@ -1,7 +1,8 @@
-﻿let selectedProduct = null;
+let selectedProduct = null;
 let purchaseModal = null;
 let qrModal = null;
 let foodInterval;
+let currentMode = 'buy'; // 'buy' or 'cart'
 
 $(document).ready(function () {
     purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
@@ -24,8 +25,8 @@ $(document).ready(function () {
             contentType: 'application/json',
             data: JSON.stringify({
                 categoryIds: selectedCats,
-                minPrice: minVal ? parseFloat(minVal) : null, 
-                maxPrice: maxVal ? parseFloat(maxVal) : null, 
+                minPrice: minVal ? parseFloat(minVal) : null,
+                maxPrice: maxVal ? parseFloat(maxVal) : null,
                 sortBy: sortVal
             }),
             success: function (response) {
@@ -37,7 +38,7 @@ $(document).ready(function () {
         });
     });
 
-    // xoa bo loc 
+    // xoa bo loc
     $(".btn-reset-filter").click(function () {
         $(".category-checkbox").prop("checked", false);
 
@@ -54,6 +55,7 @@ function renderProducts(products) {
     var html = '';
     products.forEach(p => {
         const safeName = p.productName.replace(/'/g, "\\'");
+        const safeCategory = (p.categoryName || '').replace(/'/g, "\\'");
         const imageUrl = p.imageUrl || '/asset/img/default-product.jpg';
 
         html += `
@@ -71,7 +73,7 @@ function renderProducts(products) {
                         <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(${p.productId}, '${safeName}', ${p.price}, '${imageUrl}')" style="border-radius: 10px;">
                             <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
                         </button>
-                        <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="addToCart(${p.productId}, '${safeName}', ${p.price})" style="border-radius: 10px;">
+                        <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="openAddToCartModal(${p.productId}, '${safeName}', ${p.price}, '${imageUrl}', '${safeCategory}')" style="border-radius: 10px;">
                             <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
                         </button>
                     </div>
@@ -81,15 +83,38 @@ function renderProducts(products) {
     $("#productsList").html(html);
 }
 
-
-
+// Mở modal Mua ngay
 window.openPurchaseModal = function (id, name, price, image) {
+    currentMode = 'buy';
     selectedProduct = { id, name, price };
     document.getElementById('modalProductImage').src = image;
     document.getElementById('modalProductName').innerText = name;
     document.getElementById('modalProductPrice').innerText = price.toLocaleString('vi-VN') + '₫';
     document.getElementById('purchaseQuantity').value = 1;
     calculateModalTotal();
+
+    // Update modal UI for Buy mode
+    document.getElementById('purchaseModalTitle').innerHTML = '<i class="fa-solid fa-utensils me-2"></i>Đặt món ăn';
+    document.getElementById('purchaseModalBtn').innerHTML = '<i class="fa-solid fa-bag-shopping me-2"></i>Xác nhận đặt món';
+    document.getElementById('purchaseModalInfo').innerHTML = '<i class="fa-solid fa-circle-info me-2"></i> Số dư sẽ được trừ trực tiếp vào ví sau khi xác nhận.';
+
+    purchaseModal.show();
+};
+
+// Mở modal Thêm vào giỏ
+window.openAddToCartModal = function (id, name, price, image, category) {
+    currentMode = 'cart';
+    selectedProduct = { id, name, price, imageUrl: image, categoryName: category || '' };
+    document.getElementById('modalProductImage').src = image;
+    document.getElementById('modalProductName').innerText = name;
+    document.getElementById('modalProductPrice').innerText = price.toLocaleString('vi-VN') + '₫';
+    document.getElementById('purchaseQuantity').value = 1;
+    calculateModalTotal();
+
+    // Update modal UI for Cart mode
+    document.getElementById('purchaseModalTitle').innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ hàng';
+    document.getElementById('purchaseModalBtn').innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ';
+    document.getElementById('purchaseModalInfo').innerHTML = '<i class="fa-solid fa-circle-info me-2"></i> Sản phẩm sẽ được thêm vào giỏ hàng. Bạn có thể thanh toán sau.';
 
     purchaseModal.show();
 };
@@ -111,11 +136,30 @@ function calculateModalTotal() {
 window.confirmPayment = function () {
     const quantity = parseInt(document.getElementById('purchaseQuantity').value);
 
-    const btn = document.querySelector('#purchaseModal .btn-primary');
+    const btn = document.getElementById('purchaseModalBtn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
     btn.disabled = true;
 
+    if (currentMode === 'cart') {
+        // Add to cart mode
+        var p = selectedProduct;
+        window.addToCart(p.id, p.name, p.imageUrl || '', p.price, quantity, p.categoryName || '', '', '')
+            .then(function (data) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if (data && data.success) {
+                    purchaseModal.hide();
+                }
+            })
+            .catch(function () {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        return;
+    }
+
+    // Buy mode (existing)
     $.ajax({
         url: '/Food/Purchase',
         type: 'POST',
@@ -177,16 +221,4 @@ function startCountdown(duration, display, container) {
     foodInterval = setInterval(updateDisplay, 1000);
 }
 
-window.addToCart = function (id, name, price) {
-    if (typeof Swal !== 'undefined') {
-        Swal.fire({
-            icon: 'success',
-            title: 'Đã thêm vào giỏ',
-            text: `${name} đã được thêm vào giỏ hàng của bạn (Demo)`,
-            timer: 2000,
-            showConfirmButton: false
-        });
-    } else {
-        alert(`Đã thêm ${name} vào giỏ hàng!`);
-    }
-};
+// addToCart được định nghĩa trong cart.js (tải toàn cục qua Layout)
