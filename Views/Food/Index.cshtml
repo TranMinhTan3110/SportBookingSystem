@@ -71,7 +71,7 @@
                                         <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl)')" style="border-radius: 10px;">
                                             <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
                                         </button>
-                                        <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="addToCart(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price)" style="border-radius: 10px;">
+                                        <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="openAddToCartModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl.Replace("'", "\\'"))', '@(p.CategoryName?.Replace("'", "\\'") ?? "")')" style="border-radius: 10px;">
                                             <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
                                         </button>
                                     </div>
@@ -84,12 +84,12 @@
         </div>
     </div>
 
-    <!-- Purchase Modal -->
+    <!-- Purchase / Add-to-Cart Modal -->
     <div class="modal fade" id="purchaseModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
                 <div class="modal-header bg-primary text-white py-3">
-                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-utensils me-2"></i>Đặt món ăn</h5>
+                    <h5 class="modal-title fw-bold" id="purchaseModalTitle"><i class="fa-solid fa-utensils me-2"></i>Đặt món ăn</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
@@ -100,7 +100,7 @@
                             <p id="modalProductPrice" class="text-primary fw-bold mb-0"></p>
                         </div>
                     </div>
-                    
+
                     <div class="bg-light p-3 rounded-3 mb-4">
                         <label class="form-label fw-bold mb-2">Số lượng</label>
                         <div class="input-group">
@@ -114,13 +114,13 @@
                         </div>
                     </div>
 
-                    <div class="alert alert-info border-0 mb-0" style="background-color: #e3f2fd; color: #0d47a1;">
+                    <div class="alert alert-info border-0 mb-0" id="purchaseModalInfo" style="background-color: #e3f2fd; color: #0d47a1;">
                         <i class="fa-solid fa-circle-info me-2"></i> Số dư sẽ được trừ trực tiếp vào ví sau khi xác nhận.
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-4 pt-0">
                     <button type="button" class="btn btn-light px-4 py-2 fw-semibold" data-bs-dismiss="modal" style="border-radius: 10px;">Hủy bỏ</button>
-                    <button type="button" class="btn btn-primary px-5 py-2 fw-semibold shadow-sm" onclick="confirmPayment()" style="border-radius: 10px;">Xác nhận đặt món</button>
+                    <button type="button" class="btn btn-primary px-5 py-2 fw-semibold shadow-sm" id="purchaseModalBtn" onclick="confirmPayment()" style="border-radius: 10px;">Xác nhận đặt món</button>
                 </div>
             </div>
         </div>

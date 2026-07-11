@@ -3,6 +3,12 @@ document.addEventListener('DOMContentLoaded', function () {
     applyFilters();
 });
 
+let selectedProduct = null;
+let purchaseModal = null;
+let qrModal = null;
+let suppliesInterval;
+let currentMode = 'buy'; // 'buy' or 'cart'
+
 function loadFilterData() {
     fetch('/Supplies/GetFilterData')
         .then(response => {
@@ -80,36 +86,39 @@ function renderProducts(products) {
         return;
     }
 
-    grid.innerHTML = products.map(p => `
-        <div class="product-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
-            <div class="product-image position-relative">
-                <img src="${p.imageUrl || '/img/placeholder.jpg'}" alt="${p.productName}" style="height: 200px; width: 100%; object-fit: cover;">
-                <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm fs-6 px-2 py-1">${p.category ? p.category.categoryName : 'Khác'}</span>
-            </div>
-            <div class="product-info p-3">
-                <div class="product-name fw-bold mb-1" style="font-size: 1.1rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.productName}</div>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="product-price text-primary fw-bold fs-5">${p.price.toLocaleString('vi-VN')}₫</div>
-                    <div class="text-muted small"><i class="fa-solid fa-box-open me-1"></i>Còn: ${p.stockQuantity}</div>
+    grid.innerHTML = products.map(p => {
+        const safeName = p.productName.replace(/'/g, "\\'");
+        const safeCategory = (p.category ? p.category.categoryName : '').replace(/'/g, "\\'");
+        const imageUrl = p.imageUrl || '/img/placeholder.jpg';
+        return `
+            <div class="product-card shadow-sm border-0" style="border-radius: 15px; overflow: hidden; transition: transform 0.3s;">
+                <div class="product-image position-relative">
+                    <img src="${imageUrl}" alt="${p.productName}" style="height: 200px; width: 100%; object-fit: cover;">
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-2 shadow-sm fs-6 px-2 py-1">${p.category ? p.category.categoryName : 'Khác'}</span>
                 </div>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                     <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(${p.productId}, '${p.productName.replace(/'/g, "\\'")}', ${p.price}, '${p.imageUrl || '/img/placeholder.jpg'}')" style="border-radius: 10px;">
-                        <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
-                    </button>
-                    <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="addToCart(${p.productId}, '${p.productName.replace(/'/g, "\\'")}', ${p.price})" style="border-radius: 10px;">
-                        <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
-                    </button>
+                <div class="product-info p-3">
+                    <div class="product-name fw-bold mb-1" style="font-size: 1.1rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${p.productName}</div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="product-price text-primary fw-bold fs-5">${p.price.toLocaleString('vi-VN')}₫</div>
+                        <div class="text-muted small"><i class="fa-solid fa-box-open me-1"></i>Còn: ${p.stockQuantity}</div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                         <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(${p.productId}, '${safeName}', ${p.price}, '${imageUrl}')" style="border-radius: 10px;">
+                            <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
+                        </button>
+                        <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="openAddToCartModal(${p.productId}, '${safeName}', ${p.price}, '${imageUrl}', '${safeCategory}')" style="border-radius: 10px;">
+                            <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
-let selectedProduct = null;
-let purchaseModal = null;
-let qrModal = null;
-
-function openPurchaseModal(id, name, price, image) {
+// Mở modal Mua ngay
+window.openPurchaseModal = function (id, name, price, image) {
+    currentMode = 'buy';
     selectedProduct = { id, name, price };
     document.getElementById('modalProductImage').src = image;
     document.getElementById('modalProductName').innerText = name;
@@ -117,11 +126,37 @@ function openPurchaseModal(id, name, price, image) {
     document.getElementById('purchaseQuantity').value = 1;
     calculateModalTotal();
 
+    // Update modal UI for Buy mode
+    document.getElementById('purchaseModalTitle').innerHTML = '<i class="fa-solid fa-cart-shopping me-2"></i>Thanh toán sản phẩm';
+    document.getElementById('purchaseModalBtn').innerHTML = '<i class="fa-solid fa-check-circle me-2"></i>Xác nhận thanh toán';
+    document.getElementById('purchaseModalInfo').innerHTML = '<i class="fa-solid fa-circle-info me-2"></i> Số dư sẽ được trừ trực tiếp vào ví sau khi nhấn thanh toán.';
+
     if (!purchaseModal) {
         purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
     }
     purchaseModal.show();
-}
+};
+
+// Mở modal Thêm vào giỏ
+window.openAddToCartModal = function (id, name, price, image, category) {
+    currentMode = 'cart';
+    selectedProduct = { id, name, price, imageUrl: image, categoryName: category || '' };
+    document.getElementById('modalProductImage').src = image;
+    document.getElementById('modalProductName').innerText = name;
+    document.getElementById('modalProductPrice').innerText = price.toLocaleString('vi-VN') + '₫';
+    document.getElementById('purchaseQuantity').value = 1;
+    calculateModalTotal();
+
+    // Update modal UI for Cart mode
+    document.getElementById('purchaseModalTitle').innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ hàng';
+    document.getElementById('purchaseModalBtn').innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ';
+    document.getElementById('purchaseModalInfo').innerHTML = '<i class="fa-solid fa-circle-info me-2"></i> Sản phẩm sẽ được thêm vào giỏ hàng. Bạn có thể thanh toán sau.';
+
+    if (!purchaseModal) {
+        purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+    }
+    purchaseModal.show();
+};
 
 function updateQuantity(amount) {
     const input = document.getElementById('purchaseQuantity');
@@ -137,9 +172,32 @@ function calculateModalTotal() {
     document.getElementById('modalTotalPrice').innerText = total.toLocaleString('vi-VN') + '₫';
 }
 
-function confirmPayment() {
+window.confirmPayment = function () {
     const quantity = parseInt(document.getElementById('purchaseQuantity').value);
+    const btn = document.getElementById('purchaseModalBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+    btn.disabled = true;
 
+    if (currentMode === 'cart') {
+        // Add to cart mode
+        var p = selectedProduct;
+        window.addToCart(p.id, p.name, p.imageUrl || '', p.price, quantity, p.categoryName || '', '', '')
+            .then(function (data) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if (data && data.success) {
+                    purchaseModal.hide();
+                }
+            })
+            .catch(function () {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            });
+        return;
+    }
+
+    // Buy mode (existing)
     Swal.fire({
         title: 'Đang xử lý...',
         allowOutsideClick: false,
@@ -154,6 +212,9 @@ function confirmPayment() {
         .then(response => response.json())
         .then(res => {
             Swal.close();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+
             if (res.success) {
                 purchaseModal.hide();
                 document.getElementById('purchaseQrCode').src = 'data:image/png;base64,' + res.qrCode;
@@ -174,12 +235,14 @@ function confirmPayment() {
             }
         })
         .catch(error => {
+            Swal.close();
+            btn.innerHTML = originalText;
+            btn.disabled = false;
             console.error(error);
             Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Có lỗi xảy ra khi kết nối máy chủ.' });
         });
-}
+};
 
-let suppliesInterval;
 function startSuppliesCountdown(duration, display, container) {
     if (suppliesInterval) clearInterval(suppliesInterval);
 
@@ -207,22 +270,13 @@ function startSuppliesCountdown(duration, display, container) {
     suppliesInterval = setInterval(updateDisplay, 1000);
 }
 
-function addToCart(id, name, price) {
-
-    Swal.fire({
-        icon: 'success',
-        title: 'Đã thêm vào giỏ',
-        text: `${name} đã được thêm vào giỏ hàng của bạn (Demo)`,
-        timer: 2000,
-        showConfirmButton: false
-    });
-}
+// addToCart được định nghĩa trong cart.js (tải toàn cục qua Layout)
 
 function resetFilters() {
     document.getElementById('userSearchInput').value = '';
+    document.getElementById('sortBy').value = 'newest';
     document.getElementById('minPrice').value = '';
     document.getElementById('maxPrice').value = '';
-    document.getElementById('sortBy').value = 'newest';
     document.querySelectorAll('.cat-check, .brand-check').forEach(cb => cb.checked = false);
     applyFilters();
 }
