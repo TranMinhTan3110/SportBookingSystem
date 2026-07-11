@@ -11,10 +11,11 @@ namespace SportBookingSystem.Services
     public class BookingService : IBookingService
     {
         private readonly ApplicationDbContext _context;
-
-        public BookingService(ApplicationDbContext context)
+        private readonly RabbitMQProducer _rabbitMQProducer;
+        public BookingService(ApplicationDbContext context, RabbitMQProducer rabbitMQProducer)
         {
             _context = context;
+            _rabbitMQProducer = rabbitMQProducer;
         }
 
         public async Task<FilterPitchesResponse> GetAvailablePitchesAsync(DateTime date, List<int>? slotIds, List<int>? categoryIds, List<int>? specificPitchIds, List<int>? capacities)
@@ -159,7 +160,7 @@ namespace SportBookingSystem.Services
         IF @res < 0 THROW 50000, 'Không thể lấy khóa đặt sân', 1;
     ");
 
-                // 2. Kiểm tra trạng thái sân trong DB
+                // Kiểm tra trạng thái sân trong DB
                 var slot = await _context.PitchSlots.FirstOrDefaultAsync(ps => ps.PitchId == pitchId && ps.SlotId == slotId && ps.PlayDate.Date == date.Date);
                 if (slot != null && slot.Status >= 1) return (false, "Sân này vừa được người khác đặt rồi!", null, null);
 
@@ -237,6 +238,25 @@ namespace SportBookingSystem.Services
                 string qrContent = $"BOOKING:{bookingCode}";
                 string qrBase64 = GenerateQrCode(qrContent);
 
+                // Tạo tờ giấy DTO để gửi
+                var emailMessage = new SportBookingSystem.DTO.EmailMessageDTO
+                {
+                    ToEmail = user.Email ?? "test@gmail.com", // Chỗ này lấy Email của khách
+                    BookingCode = bookingCode,
+                    CustomerName = user.FullName ?? "Khách Hàng",
+                    PitchName = pitch.PitchName,
+                    TotalAmount = amount.ToString(),
+                    QrCodeBase64 = qrBase64
+                };
+                try 
+                {
+                    await _rabbitMQProducer.SendMessageAsync(emailMessage);
+                } 
+                catch (Exception rqEx) 
+                {
+                    Console.WriteLine("Lỗi RabbitMQ: " + rqEx.Message);
+                }
+                
                 return (true, "Đặt sân thành công!", qrBase64, bookingCode);
             }
             catch (Exception ex)

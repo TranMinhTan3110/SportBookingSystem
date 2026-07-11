@@ -23,7 +23,15 @@
     
     <PackageReference Include="QRCoder" Version="1.7.0" />
     
+    <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
+    
     <PackageReference Include="SendGrid" Version="9.29.3" />
+
+     <!-- Cấm dự án Web đọc code và cấu hình của dự án Robot -->
+    <Compile Remove="SportBookingEmailWorker\**" />
+    <Content Remove="SportBookingEmailWorker\**" />
+    <EmbeddedResource Remove="SportBookingEmailWorker\**" />
+    <None Remove="SportBookingEmailWorker\**" />
   </ItemGroup>
 
 </Project>
