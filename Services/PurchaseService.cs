@@ -47,7 +47,7 @@ namespace SportBookingSystem.Services
                         UserId = userId,
                         OrderDate = DateTime.Now,
                         TotalAmount = totalAmount,
-                        Status = 0, // 0: Chờ xử lý (Pending)
+                        Status = OrderStatus.Pending, // 0: Chờ xử lý (Pending)
                         OrderCode = $"ORD-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}"
                     };
                     _context.Orders.Add(order);
@@ -141,7 +141,7 @@ namespace SportBookingSystem.Services
                         UserId = userId,
                         OrderDate = DateTime.Now,
                         TotalAmount = totalAmount,
-                        Status = 0,
+                        Status = OrderStatus.Pending,
                         OrderCode = $"ORD-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}"
                     };
                     _context.Orders.Add(order);

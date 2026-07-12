@@ -414,7 +414,7 @@ namespace SportBookingSystem.Services
 
                 if (newStatus == "Thành công")
                 {
-                    order.Status = 1;
+                    order.Status = OrderStatus.Completed;
                     dbTransaction.Status = TransactionStatus.Success;
 
                     await _context.SaveChangesAsync();
@@ -424,7 +424,7 @@ namespace SportBookingSystem.Services
                 }
                 else if (newStatus == "Đã hủy")
                 {
-                    order.Status = -1;
+                    order.Status = OrderStatus.Cancelled;
                     dbTransaction.Status = TransactionStatus.Canceled;
 
                     var user = await _context.Users.FindAsync(order.UserId);
@@ -482,7 +482,7 @@ namespace SportBookingSystem.Services
                 // 1. Lấy tất cả đơn hàng quá hạn (kèm chi tiết để hoàn kho)
                 var expiredOrders = await _context.Orders
                     .Include(o => o.OrderDetails)
-                    .Where(o => o.Status == 0 && o.OrderDate < expirationTime)
+                    .Where(o => o.Status == OrderStatus.Pending && o.OrderDate < expirationTime)
                     .ToListAsync();
 
                 if (!expiredOrders.Any()) return;
@@ -509,7 +509,7 @@ namespace SportBookingSystem.Services
                 
                 foreach (var order in expiredOrders)
                 {
-                    order.Status = -1; // Canceled
+                    order.Status = OrderStatus.Cancelled; // Canceled
                     
                     var dbTrans = dbTransactions.FirstOrDefault(t => t.OrderId == order.OrderId);
                     if (dbTrans != null) dbTrans.Status = TransactionStatus.Canceled;

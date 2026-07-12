@@ -1,4 +1,4 @@
-﻿namespace SportBookingSystem.Constants
+namespace SportBookingSystem.Constants
 {
     public static class TransactionStatus
     {
@@ -13,6 +13,7 @@
     {
         public const string Recharge = "Nạp tiền";
         public const string Transfer = "Chuyển tiền";
+        public const string Receive = "Nhận tiền";
         public const string Booking = "Thanh toán Booking";
         public const string Order = "Thanh toán Order";
         public const string Refund = "Hoàn tiền";
@@ -47,5 +48,12 @@
         public const int Completed = 3;
         public const int Cancelled = -1;
         public const int RefundBooking = -2;
+    }
+
+    public static class OrderStatus
+    {
+        public const int Pending = 0;
+        public const int Completed = 1;
+        public const int Cancelled = -1;
     }
 }
