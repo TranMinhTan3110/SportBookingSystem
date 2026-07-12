@@ -177,7 +177,7 @@
                                 <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl)', 'food')" style="border-radius: 10px;">
                                     <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
                                 </button>
-                                <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" id="btnAddToCart" onclick="addToCart(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price)" style="border-radius: 10px;">
+                                <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="openAddToCartModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl.Replace("'", "\\'"))', '@(p.Category?.CategoryName?.Replace("'", "\\'") ?? "")')" style="border-radius: 10px;">
                                     <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
                                 </button>
                             </div>
@@ -252,7 +252,7 @@
                                 <button class="btn btn-primary py-2 fw-semibold flex-fill" onclick="openPurchaseModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl)', 'supply')" style="border-radius: 10px;">
                                     <i class="fa-solid fa-bag-shopping me-2"></i>Mua ngay
                                 </button>
-                                <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" id="btnAddToCart" onclick="addToCart(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price)" style="border-radius: 10px;">
+                                <button class="btn btn-outline-primary py-2 fw-semibold flex-fill" onclick="openAddToCartModal(@p.ProductId, '@p.ProductName.Replace("'", "\\'")', @p.Price, '@(string.IsNullOrEmpty(p.ImageUrl) ? "/asset/img/default-product.jpg" : p.ImageUrl.Replace("'", "\\'"))', '@(p.Category?.CategoryName?.Replace("'", "\\'") ?? "")')" style="border-radius: 10px;">
                                     <i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ
                                 </button>
                             </div>
