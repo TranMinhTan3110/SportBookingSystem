@@ -142,6 +142,7 @@ let purchaseModal = null;
 let qrModal = null;
 let homeInterval;
 let purchaseType = 'food'; // 'food' hoac 'supply'
+let currentMode = 'buy'; // 'buy' hoac 'cart'
 
 window.openPurchaseModal = function (id, name, price, image, type) {
     selectedProduct = { id, name, price };
@@ -160,6 +161,31 @@ window.openPurchaseModal = function (id, name, price, image, type) {
     }
 
     calculateModalTotal();
+
+    if (!purchaseModal) {
+        purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
+    }
+    purchaseModal.show();
+};
+
+// Mở modal Thêm vào giỏ hàng
+window.openAddToCartModal = function (id, name, price, image, category) {
+    currentMode = 'cart';
+    selectedProduct = { id, name, price, imageUrl: image, categoryName: category || '' };
+
+    document.getElementById('modalProductImage').src = image;
+    document.getElementById('modalProductName').innerText = name;
+    document.getElementById('modalProductPrice').innerText = price.toLocaleString('vi-VN') + '₫';
+    document.getElementById('purchaseQuantity').value = 1;
+    calculateModalTotal();
+
+    // Update modal UI for Cart mode
+    var titleEl = document.getElementById('purchaseModalTitle');
+    var btnEl = document.getElementById('purchaseModalBtn');
+    var infoEl = document.getElementById('purchaseModalInfo');
+    if (titleEl) titleEl.innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ hàng';
+    if (btnEl) btnEl.innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ';
+    if (infoEl) infoEl.innerHTML = '<i class="fa-solid fa-circle-info me-2"></i> Sản phẩm sẽ được thêm vào giỏ hàng. Bạn có thể thanh toán sau.';
 
     if (!purchaseModal) {
         purchaseModal = new bootstrap.Modal(document.getElementById('purchaseModal'));
@@ -193,6 +219,26 @@ window.confirmPayment = function () {
     const quantityInput = document.getElementById('purchaseQuantity');
     if (!quantityInput) return;
     const quantity = parseInt(quantityInput.value);
+
+    if (currentMode === 'cart') {
+        // Add to cart mode
+        var p = selectedProduct;
+        var btn = document.getElementById('purchaseModalBtn');
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...'; }
+
+        window.addToCart(p.id, p.name, p.imageUrl || '', p.price, quantity, p.categoryName || '', '', '')
+            .then(function (data) {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ'; }
+                if (data && data.success) {
+                    if (purchaseModal) purchaseModal.hide();
+                }
+            })
+            .catch(function () {
+                if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cart-plus me-2"></i>Thêm vào giỏ'; }
+            });
+        return;
+    }
+
     const url = purchaseType === 'food' ? '/Food/Purchase' : '/Supplies/Purchase';
 
     Swal.fire({
@@ -275,12 +321,4 @@ function startCountdown(duration, display, container) {
     homeInterval = setInterval(updateDisplay, 1000);
 }
 
-window.addToCart = function (id, name, price) {
-    Swal.fire({
-        icon: 'success',
-        title: 'Đã thêm vào giỏ',
-        text: `${name} đã được thêm vào giỏ hàng của bạn (Demo)`,
-        timer: 2000,
-        showConfirmButton: false
-    });
-};
+// addToCart được định nghĩa trong cart.js (tải toàn cục qua Layout)
