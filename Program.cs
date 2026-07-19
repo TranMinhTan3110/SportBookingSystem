@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using SportBookingSystem.Middlewares;
 using SportBookingSystem.Helper;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Services; 
@@ -22,8 +23,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // Đăng ký Dependency Injection cho LoginServices 
-builder.Services.AddScoped<IEmailService, SendGridEmailService>();
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<ILoginServices, LoginServices>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 builder.Services.AddScoped<IPitchService, PitchService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -42,6 +44,8 @@ builder.Services.AddHostedService<OrderCancellationBackgroundService>();
 builder.Services.AddHostedService<BookingAutoCancellationService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddSingleton<RabbitMQProducer>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
@@ -51,9 +55,29 @@ builder.Services.AddControllersWithViews()
     });
 builder.Services.AddMemoryCache();
 
-builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+// Đăng ký Session cho giỏ hàng (CartService)
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".SportBooking.Session";
+});
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICartService, CartService>();
 
+// Đăng ký Redis Cache
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost:6379";
+    options.InstanceName = "SportBooking_";
+});
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 var app = builder.Build();
+
+// Đăng ký Middleware chống lộ lọt ex.Message ra ngoài
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -65,6 +89,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseSession();
 
 app.UseAuthentication();
 app.UseAuthorization();

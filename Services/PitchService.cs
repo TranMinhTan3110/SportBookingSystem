@@ -1,7 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
 using SportBookingSystem.Models.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace SportBookingSystem.Services
 {
@@ -10,15 +12,21 @@ namespace SportBookingSystem.Services
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<PitchService> _logger;
+        private readonly ICloudinaryService _cloudinaryService;
+        private readonly IDistributedCache _cache;
 
         public PitchService(
             ApplicationDbContext context,
             IWebHostEnvironment environment,
-            ILogger<PitchService> logger)
+            ILogger<PitchService> logger,
+            ICloudinaryService cloudinaryService,
+            IDistributedCache cache)
         {
             _context = context;
             _environment = environment;
             _logger = logger;
+            _cloudinaryService = cloudinaryService;
+            _cache = cache;
         }
 
         /// Lấy tất cả sân với điều kiện lọc
@@ -26,33 +34,57 @@ namespace SportBookingSystem.Services
         {
             try
             {
-                var query = _context.Pitches.Include(p => p.Category).AsQueryable();
-
-                // Lọc theo Category
-                if (categoryId.HasValue && categoryId.Value > 0)
+                // Nếu có bộ lọc thì không dùng cache
+                if (categoryId.HasValue || !string.IsNullOrEmpty(status) || !string.IsNullOrEmpty(searchTerm))
                 {
-                    query = query.Where(p => p.CategoryId == categoryId.Value);
+                    return await GetFilteredPitchesFromDbAsync(categoryId, status, searchTerm);
                 }
 
-                // Lọc theo Status
-                if (!string.IsNullOrEmpty(status))
+                string cacheKey = "ALL_PITCHES";
+                var cachedData = await _cache.GetStringAsync(cacheKey);
+
+                if (!string.IsNullOrEmpty(cachedData))
                 {
-                    query = query.Where(p => p.Status == status);
+                    return JsonSerializer.Deserialize<List<Pitches>>(cachedData) ?? new List<Pitches>();
                 }
 
-                // Tìm kiếm theo tên
-                if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    query = query.Where(p => p.PitchName.Contains(searchTerm));
-                }
+                var pitchesFromDb = await GetFilteredPitchesFromDbAsync(null, null, null);
 
-                return await query.OrderBy(p => p.PitchName).ToListAsync();
+                var cacheOptions = new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30)
+                };
+                
+                // Tránh lỗi vòng lặp Reference khi serialize
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+                };
+                await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(pitchesFromDb, jsonOptions), cacheOptions);
+
+                return pitchesFromDb;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi lấy danh sách sân");
+                _logger.LogError(ex, "Lỗi khi lấy danh sách sân (Redis/DB)");
                 return new List<Pitches>();
             }
+        }
+
+        private async Task<List<Pitches>> GetFilteredPitchesFromDbAsync(int? categoryId, string? status, string? searchTerm)
+        {
+            var query = _context.Pitches.Include(p => p.Category).AsNoTracking().AsQueryable();
+
+            if (categoryId.HasValue && categoryId.Value > 0)
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(p => p.Status == status);
+
+            if (!string.IsNullOrEmpty(searchTerm))
+                query = query.Where(p => p.PitchName.Contains(searchTerm));
+
+            return await query.OrderBy(p => p.PitchName).ToListAsync();
         }
 
         /// Lấy thông tin sân theo ID
@@ -115,6 +147,9 @@ namespace SportBookingSystem.Services
 
                 _context.Pitches.Add(pitch);
                 await _context.SaveChangesAsync();
+                
+                // Xóa Cache
+                await _cache.RemoveAsync("ALL_PITCHES");
 
                 return (true, "Thêm sân thành công", pitch);
             }
@@ -159,7 +194,7 @@ namespace SportBookingSystem.Services
                     // Xóa ảnh cũ nếu có
                     if (!string.IsNullOrEmpty(pitch.ImageUrl))
                     {
-                        DeleteImage(pitch.ImageUrl);
+                        await DeleteImageAsync(pitch.ImageUrl);
                     }
 
                     var imageUrl = await SaveImageAsync(model.ImageFile);
@@ -171,6 +206,9 @@ namespace SportBookingSystem.Services
 
                 _context.Pitches.Update(pitch);
                 await _context.SaveChangesAsync();
+                
+                // Xóa Cache
+                await _cache.RemoveAsync("ALL_PITCHES");
 
                 return (true, "Cập nhật sân thành công");
             }
@@ -204,11 +242,14 @@ namespace SportBookingSystem.Services
                 // Xóa ảnh nếu có
                 if (!string.IsNullOrEmpty(pitch.ImageUrl))
                 {
-                    DeleteImage(pitch.ImageUrl);
+                    await DeleteImageAsync(pitch.ImageUrl);
                 }
 
                 _context.Pitches.Remove(pitch);
                 await _context.SaveChangesAsync();
+
+                // Xóa Cache
+                await _cache.RemoveAsync("ALL_PITCHES");
 
                 return (true, "Xóa sân thành công");
             }
@@ -283,7 +324,7 @@ namespace SportBookingSystem.Services
 
         #region Private Methods - Xử lý ảnh
 
-        /// Lưu ảnh vào thư mục wwwroot/asset/img/
+        /// Lưu ảnh lên Cloudinary
         private async Task<string?> SaveImageAsync(IFormFile imageFile)
         {
             try
@@ -308,52 +349,37 @@ namespace SportBookingSystem.Services
                     return null;
                 }
 
-                // Tạo tên file unique
-                var fileName = $"pitch_{Guid.NewGuid()}{extension}";
-                var uploadPath = Path.Combine(_environment.WebRootPath, "asset", "img");
-
-                // Tạo thư mục nếu chưa tồn tại
-                if (!Directory.Exists(uploadPath))
-                {
-                    Directory.CreateDirectory(uploadPath);
-                }
-
-                var filePath = Path.Combine(uploadPath, fileName);
-
-                // Lưu file
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-
-                return $"/asset/img/{fileName}";
+                // Upload lên Cloudinary trong thư mục 'pitches'
+                return await _cloudinaryService.UploadImageAsync(imageFile, "pitches");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Lỗi khi lưu ảnh");
+                _logger.LogError(ex, "Lỗi khi lưu ảnh lên Cloudinary");
                 return null;
             }
         }
 
-        /// Xóa ảnh khỏi thư mục
-        private void DeleteImage(string imageUrl)
+        /// Xóa ảnh khỏi Cloudinary
+        private async Task DeleteImageAsync(string imageUrl)
         {
             try
             {
                 if (string.IsNullOrEmpty(imageUrl))
                     return;
 
-                var filePath = Path.Combine(_environment.WebRootPath, imageUrl.TrimStart('/'));
-
-                if (File.Exists(filePath))
+                var deleted = await _cloudinaryService.DeleteImageAsync(imageUrl);
+                if (deleted)
                 {
-                    File.Delete(filePath);
-                    _logger.LogInformation($"Đã xóa ảnh: {imageUrl}");
+                    _logger.LogInformation($"Đã xóa ảnh trên Cloudinary: {imageUrl}");
+                }
+                else
+                {
+                    _logger.LogWarning($"Không xóa được hoặc không cần xóa ảnh Cloudinary: {imageUrl}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Lỗi khi xóa ảnh: {imageUrl}");
+                _logger.LogError(ex, $"Lỗi khi xóa ảnh Cloudinary: {imageUrl}");
             }
         }
 

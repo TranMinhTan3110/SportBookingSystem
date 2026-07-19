@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using QRCoder;
 using SportBookingSystem.Constants;
 using SportBookingSystem.Models.EF;
@@ -11,10 +11,11 @@ namespace SportBookingSystem.Services
     public class BookingService : IBookingService
     {
         private readonly ApplicationDbContext _context;
-
-        public BookingService(ApplicationDbContext context)
+        private readonly RabbitMQProducer _rabbitMQProducer;
+        public BookingService(ApplicationDbContext context, RabbitMQProducer rabbitMQProducer)
         {
             _context = context;
+            _rabbitMQProducer = rabbitMQProducer;
         }
 
         public async Task<FilterPitchesResponse> GetAvailablePitchesAsync(DateTime date, List<int>? slotIds, List<int>? categoryIds, List<int>? specificPitchIds, List<int>? capacities)
@@ -153,13 +154,13 @@ namespace SportBookingSystem.Services
             {
                 // Tạo Lock (Giữ nguyên logic lock của bạn để tránh đặt trùng)
                 string lockResource = $"Booking_Lock_{pitchId}_{slotId}_{date:yyyyMMdd}";
-                await _context.Database.ExecuteSqlRawAsync($@"
+                await _context.Database.ExecuteSqlAsync($@"
         DECLARE @res INT;
-        EXEC @res = sp_getapplock @Resource = '{lockResource}', @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
+        EXEC @res = sp_getapplock @Resource = {lockResource}, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
         IF @res < 0 THROW 50000, 'Không thể lấy khóa đặt sân', 1;
     ");
 
-                // 2. Kiểm tra trạng thái sân trong DB
+                // Kiểm tra trạng thái sân trong DB
                 var slot = await _context.PitchSlots.FirstOrDefaultAsync(ps => ps.PitchId == pitchId && ps.SlotId == slotId && ps.PlayDate.Date == date.Date);
                 if (slot != null && slot.Status >= 1) return (false, "Sân này vừa được người khác đặt rồi!", null, null);
 
@@ -237,6 +238,25 @@ namespace SportBookingSystem.Services
                 string qrContent = $"BOOKING:{bookingCode}";
                 string qrBase64 = GenerateQrCode(qrContent);
 
+                // Tạo tờ giấy DTO để gửi
+                var emailMessage = new SportBookingSystem.DTO.EmailMessageDTO
+                {
+                    ToEmail = user.Email ?? "test@gmail.com", // Chỗ này lấy Email của khách
+                    BookingCode = bookingCode,
+                    CustomerName = user.FullName ?? "Khách Hàng",
+                    PitchName = pitch.PitchName,
+                    TotalAmount = amount.ToString(),
+                    QrCodeBase64 = qrBase64
+                };
+                try 
+                {
+                    await _rabbitMQProducer.SendMessageAsync(emailMessage);
+                } 
+                catch (Exception rqEx) 
+                {
+                    Console.WriteLine("Lỗi RabbitMQ: " + rqEx.Message);
+                }
+                
                 return (true, "Đặt sân thành công!", qrBase64, bookingCode);
             }
             catch (Exception ex)
@@ -337,37 +357,59 @@ namespace SportBookingSystem.Services
                 decimal refundAmount = 0;
                 bool isRefunded = false;
 
-                // Logic hoàn tiền: Chỉ hoàn 100% nếu khách chủ động hủy TRƯỚC 24h so với giờ đá
-                if (!isAutoCancel && now < matchStartTime.AddHours(-24))
+                // Logic hoàn tiền linh hoạt nhiều mức độ
+                if (!isAutoCancel)
                 {
                     var originalBookingTrans = await _context.Transactions
                         .FirstOrDefaultAsync(t => t.TransactionCode == bookingCode && t.TransactionType == TransactionTypes.Booking);
 
                     if (originalBookingTrans != null)
                     {
-                        refundAmount = originalBookingTrans.Amount;
-                        isRefunded = true;
+                        double hoursUntilMatch = (matchStartTime - now).TotalHours;
+                        double minutesSinceBooking = (now - originalBookingTrans.TransactionDate).TotalMinutes;
 
-                        var user = await _context.Users.FindAsync(slot.UserId);
-                        if (user != null)
+                        if (minutesSinceBooking <= 30) // Luật 1: Quay xe 30 phút -> Hoàn 100%
                         {
-                            user.WalletBalance += refundAmount; // Hoàn tiền vào ví
-                            _context.Users.Update(user);
+                            refundAmount = originalBookingTrans.Amount;
+                        }
+                        else if (hoursUntilMatch >= 24) // Luật 2: Trước 24h -> Hoàn 100%
+                        {
+                            refundAmount = originalBookingTrans.Amount;
+                        }
+                        else if (hoursUntilMatch >= 12) // Luật 3: Trước 12h -> Hoàn 50%
+                        {
+                            refundAmount = originalBookingTrans.Amount * 0.5m;
+                        }
+                        else // Luật 4: Sát giờ (dưới 12h) -> Phạt cọc, Hoàn 0đ
+                        {
+                            refundAmount = 0;
+                        }
 
-                            // Tạo bản ghi giao dịch hoàn tiền để lưu lịch sử
-                            var refundTrans = new Transactions
+                        if (refundAmount > 0)
+                        {
+                            isRefunded = true;
+
+                            var user = await _context.Users.FindAsync(slot.UserId);
+                            if (user != null)
                             {
-                                UserId = user.UserId,
-                                Amount = refundAmount,
-                                TransactionType = TransactionTypes.RefundBooking,
-                                Status = TransactionStatus.Success,
-                                Source = TransactionSources.Wallet,
-                                TransactionDate = now,
-                                TransactionCode = $"REF-{now:yyMMddHHmmss}{user.UserId}",
-                                Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
-                                BalanceAfter = user.WalletBalance
-                            };
-                            _context.Transactions.Add(refundTrans);
+                                user.WalletBalance += refundAmount; // Hoàn tiền vào ví
+                                _context.Users.Update(user);
+
+                                // Tạo bản ghi giao dịch hoàn tiền để lưu lịch sử
+                                var refundTrans = new Transactions
+                                {
+                                    UserId = user.UserId,
+                                    Amount = refundAmount,
+                                    TransactionType = TransactionTypes.RefundBooking,
+                                    Status = TransactionStatus.Success,
+                                    Source = TransactionSources.Wallet,
+                                    TransactionDate = now,
+                                    TransactionCode = $"REF-{now:yyMMddHHmmss}{user.UserId}",
+                                    Message = $"Hoàn tiền hủy sân {slot.Pitch?.PitchName} ({bookingCode})",
+                                    BalanceAfter = user.WalletBalance
+                                };
+                                _context.Transactions.Add(refundTrans);
+                            }
                         }
                     }
                 }
@@ -450,11 +492,13 @@ namespace SportBookingSystem.Services
             var bookings = await query.OrderByDescending(ps => ps.PlayDate).ThenBy(ps => ps.TimeSlot.StartTime).ToListAsync();
             var result = new List<BookingManagementDTO>();
             
+            var bookingCodes = bookings.Select(b => b.BookingCode).ToList();
+            var allTrans = await _context.Transactions
+                    .Where(t => t.TransactionType == TransactionTypes.Booking && bookingCodes.Contains(t.TransactionCode))
+                    .ToListAsync();
             foreach (var b in bookings)
             {
-                var trans = await _context.Transactions
-                    .Where(t => t.TransactionCode == b.BookingCode && t.TransactionType == TransactionTypes.Booking)
-                    .FirstOrDefaultAsync();
+                    var trans = allTrans.FirstOrDefault(t => t.TransactionCode == b.BookingCode);
 
                 result.Add(new BookingManagementDTO
                 {

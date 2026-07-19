@@ -1,22 +1,34 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.ViewModels;
 using System.Globalization;
+using Microsoft.Extensions.Caching.Distributed;
+using System.Text.Json;
 
 namespace SportBookingSystem.Services
 {
     public class FoodService : IFoodService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDistributedCache _cache;
 
-        public FoodService(ApplicationDbContext context)
+        public FoodService(ApplicationDbContext context, IDistributedCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         /// Lấy dữ liệu ban đầu cho trang Food 
         public async Task<FoodIndexViewModel> GetInitialDataAsync()
         {
+            string cacheKey = "FOOD_INITIAL_DATA";
+            var cachedData = await _cache.GetStringAsync(cacheKey);
+
+            if (!string.IsNullOrEmpty(cachedData))
+            {
+                return JsonSerializer.Deserialize<FoodIndexViewModel>(cachedData) ?? new FoodIndexViewModel();
+            }
+
             // Lấy danh sách Categories có Type = 'Product'
             var categories = await _context.Categories
                 .Where(c => c.Type == "Product")
@@ -39,12 +51,25 @@ namespace SportBookingSystem.Services
 
             var productViewModels = products.Select(p => MapToProductViewModel(p)).ToList();
 
-            return new FoodIndexViewModel
+            var result = new FoodIndexViewModel
             {
                 Categories = categories,
                 Products = productViewModels,
                 TotalProducts = products.Count
             };
+
+            var cacheOptions = new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60) // Menu để 1 tiếng
+            };
+            
+            var jsonOptions = new JsonSerializerOptions
+            {
+                ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+            };
+            await _cache.SetStringAsync(cacheKey, JsonSerializer.Serialize(result, jsonOptions), cacheOptions);
+
+            return result;
         }
 
         /// Lọc sản phẩm theo các tiêu chí

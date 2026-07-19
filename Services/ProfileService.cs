@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
+using SportBookingSystem.Constants;
 using BC = BCrypt.Net.BCrypt;
 
 namespace SportBookingSystem.Services
@@ -122,7 +123,7 @@ namespace SportBookingSystem.Services
             return await _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
-                .Where(o => o.UserId == userId && o.Status == 0) 
+                .Where(o => o.UserId == userId && o.Status == OrderStatus.Pending) 
                 .OrderByDescending(o => o.OrderDate)
                 .FirstOrDefaultAsync();
         }
@@ -132,7 +133,7 @@ namespace SportBookingSystem.Services
             return await _context.Orders
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.Product)
-                .Where(o => o.UserId == userId && o.Status == 0)
+                .Where(o => o.UserId == userId && o.Status == OrderStatus.Pending)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
@@ -150,7 +151,7 @@ namespace SportBookingSystem.Services
                 .Include(ps => ps.Pitch)
                 .Include(ps => ps.TimeSlot)
                 .Where(ps => ps.UserId == userId
-                          && (ps.Status == 0 || ps.Status == 1) // 0: Chờ nhận, 1: Đã nhận
+                          && (ps.Status == OrderStatus.Pending || ps.Status == OrderStatus.Completed) // 0: Chờ nhận, 1: Đã nhận
                           && ps.PlayDate >= DateTime.Today)
                 .OrderBy(ps => ps.PlayDate)
                 .ThenBy(ps => ps.TimeSlot.StartTime)

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SportBookingSystem.Constants;
 using SportBookingSystem.Services;
@@ -81,14 +81,14 @@ namespace SportBookingSystem.Controllers
                 else
                 {
                     TempData["PaymentStatus"] = "error";
-                    TempData["PaymentMessage"] = "Giao dịch thất bại hoặc chữ ký không hợp lệ";
+                    TempData["PaymentMessage"] = message;
                 }
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
                 TempData["PaymentStatus"] = "error";
-                TempData["PaymentMessage"] = $"Lỗi hệ thống: {ex.Message}";
+                throw;
                 return RedirectToAction("Index", "Home");
             }
         }

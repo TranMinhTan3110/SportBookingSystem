@@ -45,7 +45,7 @@ namespace SportBookingSystem.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                throw;
             }
         }
 

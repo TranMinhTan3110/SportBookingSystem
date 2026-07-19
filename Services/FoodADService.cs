@@ -1,17 +1,20 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.Entities;
 using SportBookingSystem.Models.ViewModels;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace SportBookingSystem.Services
 {
     public class FoodADService : IFoodADService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IDistributedCache _cache;
 
-        public FoodADService(ApplicationDbContext context)
+        public FoodADService(ApplicationDbContext context, IDistributedCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         public async Task<List<ProductViewModel>> GetAllProductsAsync(string searchTerm = null, int? categoryId = null, string stockFilter = null)
@@ -109,6 +112,10 @@ namespace SportBookingSystem.Services
 
                 _context.Products.Add(product);
                 await _context.SaveChangesAsync();
+
+                // Xóa Cache Menu người dùng
+                await _cache.RemoveAsync("FOOD_INITIAL_DATA");
+
                 return true;
             }
             catch (Exception)
@@ -139,6 +146,10 @@ namespace SportBookingSystem.Services
 
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
+
+                // Xóa Cache Menu người dùng
+                await _cache.RemoveAsync("FOOD_INITIAL_DATA");
+
                 return true;
             }
             catch (Exception)
@@ -159,6 +170,10 @@ namespace SportBookingSystem.Services
 
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
+
+                // Xóa Cache Menu người dùng
+                await _cache.RemoveAsync("FOOD_INITIAL_DATA");
+
                 return true;
             }
             catch (Exception)
@@ -178,6 +193,10 @@ namespace SportBookingSystem.Services
                 product.StockQuantity += amount;
                 _context.Products.Update(product);
                 await _context.SaveChangesAsync();
+
+                // Xóa Cache Menu người dùng
+                await _cache.RemoveAsync("FOOD_INITIAL_DATA");
+
                 return true;
             }
             catch (Exception)

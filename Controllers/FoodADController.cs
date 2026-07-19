@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SportBookingSystem.Models.ViewModels;
 using SportBookingSystem.Services;
 
@@ -7,10 +7,12 @@ namespace SportBookingSystem.Controllers
     public class FoodADController : Controller
     {
         private readonly IFoodADService _foodADService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public FoodADController(IFoodADService foodADService)
+        public FoodADController(IFoodADService foodADService, ICloudinaryService cloudinaryService)
         {
             _foodADService = foodADService;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<IActionResult> Index(string searchTerm = null, int? categoryId = null, string stockFilter = null)
@@ -133,7 +135,7 @@ namespace SportBookingSystem.Controllers
             return Json(new { status = "error", message = "Có lỗi xảy ra khi cập nhật số lượng!" });
         }
 
-        [HttpPost]
+         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile imageFile)
         {
             try
@@ -156,26 +158,17 @@ namespace SportBookingSystem.Controllers
                     return Json(new { success = false, message = "Kích thước file không được vượt quá 5MB!" });
                 }
 
-                var uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "products");
-                if (!Directory.Exists(uploadFolder))
+                var uploadUrl = await _cloudinaryService.UploadImageAsync(imageFile, "foods");
+                if (string.IsNullOrEmpty(uploadUrl))
                 {
-                    Directory.CreateDirectory(uploadFolder);
+                    return Json(new { success = false, message = "Lỗi khi lưu ảnh lên Cloudinary!" });
                 }
 
-                var fileName = $"{Guid.NewGuid()}{extension}";
-                var filePath = Path.Combine(uploadFolder, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await imageFile.CopyToAsync(stream);
-                }
-
-                var imageUrl = $"/uploads/products/{fileName}";
-                return Json(new { success = true, url = imageUrl });
+                return Json(new { success = true, url = uploadUrl });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Có lỗi xảy ra khi upload hình ảnh: " + ex.Message });
+                return Json(new { success = false, message = $"Lỗi hệ thống: {ex.Message}" });
             }
         }
     }
