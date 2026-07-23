@@ -1,4 +1,4 @@
-﻿.hero {
+.hero {
     padding: 80px 24px;
     text-align: center;
     position: relative;
@@ -1268,6 +1268,17 @@
 .history-status.pending {
     background: rgba(245, 158, 11, 0.2);
     color: var(--secondary);
+}
+
+.history-status.canceled {
+    background: rgba(239, 68, 68, 0.15); /* #fee2e2 equivalent with opacity */
+    color: var(--danger, #ef4444);
+}
+
+.history-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted, #94a3b8);
 }
 
 

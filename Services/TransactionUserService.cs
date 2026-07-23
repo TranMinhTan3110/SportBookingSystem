@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Constants;
 using SportBookingSystem.DTO;
 using SportBookingSystem.Models.EF;
@@ -35,8 +35,9 @@ namespace SportBookingSystem.Services
                     TransactionCode = t.TransactionCode,
                     Amount = t.Amount,
                     IsPositive = t.TransactionType == TransactionTypes.Recharge ||
-                                 t.TransactionType == TransactionTypes.Refund||
-                    t.TransactionType == TransactionTypes.RefundBooking,
+                                 t.TransactionType == TransactionTypes.Refund ||
+                                 t.TransactionType == TransactionTypes.RefundBooking ||
+                                 t.TransactionType == TransactionTypes.Receive,
                     TransactionType = t.TransactionType,
                     TransactionSource = t.Source,
                     Date = t.TransactionDate,
@@ -143,9 +144,9 @@ namespace SportBookingSystem.Services
                     UserId = senderId,
                     TransactionCode = senderCode,
                     Amount = dto.Amount,
-                    TransactionType = "Chuyển tiền",
-                    Source = "Ví nội bộ",
-                    Status = "Thành công",
+                    TransactionType = TransactionTypes.Transfer,
+                    Source = TransactionSources.Wallet,
+                    Status = TransactionStatus.Success,
                     Message = senderMsg,
                     TransactionDate = DateTime.Now,
                     ReceiverId = receiver.UserId,
@@ -157,9 +158,9 @@ namespace SportBookingSystem.Services
                     UserId = receiver.UserId,
                     TransactionCode = receiverCode,
                     Amount = dto.Amount,
-                    TransactionType = "Nhận tiền",
-                    Source = "Ví nội bộ",
-                    Status = "Thành công",
+                    TransactionType = TransactionTypes.Receive,
+                    Source = TransactionSources.Wallet,
+                    Status = TransactionStatus.Success,
                     Message = receiverMsg,
                     TransactionDate = DateTime.Now,
                     ReceiverId = senderId,

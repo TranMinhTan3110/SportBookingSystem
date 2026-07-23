@@ -1,11 +1,11 @@
-﻿@using SportBookingSystem.Models.ViewModels
+@using SportBookingSystem.Models.ViewModels
 @model HomeViewModel
 @{
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 @section Styles {
-    <link rel="stylesheet" href="~/css/Home.css" />
+    <link rel="stylesheet" href="~/css/Home.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/asset/css/booking.css" />
 }
@@ -307,13 +307,25 @@
                             <div class="history-item-date">@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</div>
                         </div>
                         <div class="history-amount @amountClass">@displayAmount₫</div>
-                        <span class="history-status success">Hoàn thành</span>
+                        
+                        @if (transaction.Status == SportBookingSystem.Constants.TransactionStatus.Success)
+                        {
+                            <span class="history-status success">Hoàn thành</span>
+                        }
+                        else if (transaction.Status == SportBookingSystem.Constants.TransactionStatus.Canceled || transaction.Status == SportBookingSystem.Constants.TransactionStatus.CancelBooking)
+                        {
+                            <span class="history-status canceled">Đã hủy</span>
+                        }
+                        else
+                        {
+                            <span class="history-status pending">@transaction.Status</span>
+                        }
                     </div>
                 }
             }
             else
             {
-                <div class="history-empty" style="text-align: center; padding: 40px; color: var(--text-muted);">
+                <div class="history-empty">
                     <i class="bi bi-inbox" style="font-size: 48px; display: block; margin-bottom: 10px;"></i>
                     <p>Chưa có giao dịch nào gần đây</p>
                 </div>

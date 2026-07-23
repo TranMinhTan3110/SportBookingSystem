@@ -272,15 +272,13 @@ namespace SportBookingSystem.Services
                     Status = TransactionStatus.Success,
                     TransactionDate = DateTime.Now,
                     BalanceAfter = user.WalletBalance,
-                    Message = dto.Message
+                    Message = dto.Message,
+                    TransactionCode = GenerateTransactionCode(prefix)
                 };
 
                 _context.Transactions.Add(trans);
                 await _context.SaveChangesAsync();
 
-                trans.TransactionCode = $"{prefix}-{trans.TransactionId:D4}";
-
-                await _context.SaveChangesAsync();
                 await dbTransaction.CommitAsync();
                 return (true, "Nạp tiền thành công", trans.TransactionCode);
             }
@@ -416,7 +414,7 @@ namespace SportBookingSystem.Services
 
                 if (newStatus == "Thành công")
                 {
-                    order.Status = 1;
+                    order.Status = OrderStatus.Completed;
                     dbTransaction.Status = TransactionStatus.Success;
 
                     await _context.SaveChangesAsync();
@@ -426,7 +424,7 @@ namespace SportBookingSystem.Services
                 }
                 else if (newStatus == "Đã hủy")
                 {
-                    order.Status = -1;
+                    order.Status = OrderStatus.Cancelled;
                     dbTransaction.Status = TransactionStatus.Canceled;
 
                     var user = await _context.Users.FindAsync(order.UserId);
@@ -444,12 +442,10 @@ namespace SportBookingSystem.Services
                             TransactionDate = DateTime.Now,
                             BalanceAfter = user.WalletBalance,
                             Message = $"Hoàn tiền đơn hàng {order.OrderCode}",
-                            OrderId = order.OrderId
+                            OrderId = order.OrderId,
+                            TransactionCode = GenerateTransactionCode(TransactionPrefixes.Refund)
                         };
                         _context.Transactions.Add(refundTrans);
-                        await _context.SaveChangesAsync();
-
-                        refundTrans.TransactionCode = $"{TransactionPrefixes.Refund}-{refundTrans.TransactionId:D4}";
                     }
 
                 
@@ -486,7 +482,7 @@ namespace SportBookingSystem.Services
                 // 1. Lấy tất cả đơn hàng quá hạn (kèm chi tiết để hoàn kho)
                 var expiredOrders = await _context.Orders
                     .Include(o => o.OrderDetails)
-                    .Where(o => o.Status == 0 && o.OrderDate < expirationTime)
+                    .Where(o => o.Status == OrderStatus.Pending && o.OrderDate < expirationTime)
                     .ToListAsync();
 
                 if (!expiredOrders.Any()) return;
@@ -513,7 +509,7 @@ namespace SportBookingSystem.Services
                 
                 foreach (var order in expiredOrders)
                 {
-                    order.Status = -1; // Canceled
+                    order.Status = OrderStatus.Cancelled; // Canceled
                     
                     var dbTrans = dbTransactions.FirstOrDefault(t => t.OrderId == order.OrderId);
                     if (dbTrans != null) dbTrans.Status = TransactionStatus.Canceled;
@@ -533,7 +529,8 @@ namespace SportBookingSystem.Services
                             TransactionDate = DateTime.Now,
                             BalanceAfter = user.WalletBalance,
                             Message = $"Hoàn tiền đơn hàng {order.OrderCode} do quá hạn",
-                            OrderId = order.OrderId
+                            OrderId = order.OrderId,
+                            TransactionCode = GenerateTransactionCode(TransactionPrefixes.Refund)
                         };
                         _context.Transactions.Add(refundTrans);
                         newRefunds.Add(refundTrans);
@@ -549,16 +546,7 @@ namespace SportBookingSystem.Services
                     }
                 }
                 
-                // Lưu lần 1 để sinh TransactionId
-                await _context.SaveChangesAsync();
-                
-                // Cập nhật mã TransactionCode cho các giao dịch hoàn tiền
-                foreach(var r in newRefunds) 
-                {
-                    r.TransactionCode = $"{TransactionPrefixes.Refund}-{r.TransactionId:D4}"; 
-                }
-                
-                // Lưu lần 2 và chốt sổ
+                // Lưu 1 lần duy nhất và chốt sổ
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -665,6 +653,13 @@ namespace SportBookingSystem.Services
             }
 
             return result;
+        }
+
+        private string GenerateTransactionCode(string prefix)
+        {
+            string datePart = DateTime.Now.ToString("yyMMdd");
+            string randomPart = Guid.NewGuid().ToString("N").Substring(0, 4).ToUpper();
+            return $"{prefix}-{datePart}-{randomPart}";
         }
     }
 }

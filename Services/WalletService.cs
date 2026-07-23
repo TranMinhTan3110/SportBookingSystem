@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using SportBookingSystem.Constants;
 using SportBookingSystem.Models.EF;
 using SportBookingSystem.Models.ViewModels;
@@ -43,16 +43,6 @@ namespace SportBookingSystem.Services
 
         public async Task<(bool success, string message)> ExecuteRechargeAsync(VnPayResponseModel vnPayResponse)
         {
-            if (!vnPayResponse.IsValidSignature)
-            {
-                return (false, "Chữ ký không hợp lệ");
-            }
-
-            if (vnPayResponse.ResponseCode != "00")
-            {
-                return (false, GetVnPayResponseMessage(vnPayResponse.ResponseCode));
-            }
-
             var transaction = await _context.Transactions
                 .Include(t => t.Sender)
                 .FirstOrDefaultAsync(t => t.TransactionCode == vnPayResponse.TransactionCode);
@@ -62,9 +52,28 @@ namespace SportBookingSystem.Services
                 return (false, "Không tìm thấy giao dịch");
             }
 
-            if (transaction.Status == TransactionStatus.Success)
+            if (transaction.Status != TransactionStatus.Pending)
             {
                 return (false, "Giao dịch đã được xử lý trước đó");
+            }
+
+            if (!vnPayResponse.IsValidSignature)
+            {
+                transaction.Status = TransactionStatus.Canceled;
+                transaction.Message = "Giao dịch thất bại (Chữ ký không hợp lệ)";
+                _context.Transactions.Update(transaction);
+                await _context.SaveChangesAsync();
+                return (false, "Chữ ký không hợp lệ");
+            }
+
+            if (vnPayResponse.ResponseCode != "00")
+            {
+                string errorMessage = GetVnPayResponseMessage(vnPayResponse.ResponseCode);
+                transaction.Status = TransactionStatus.Canceled;
+                transaction.Message = errorMessage;
+                _context.Transactions.Update(transaction);
+                await _context.SaveChangesAsync();
+                return (false, errorMessage);
             }
 
             using var dbTransaction = await _context.Database.BeginTransactionAsync();
