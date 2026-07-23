@@ -70,7 +70,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 // Đăng ký Redis Cache
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "localhost:6379";
+    options.Configuration = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6379";
     options.InstanceName = "SportBooking_";
 });
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
@@ -98,5 +98,12 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=TrangChu}/{action=Index}/{id?}");
+
+// Tự động Migrate Database khi khởi động 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
