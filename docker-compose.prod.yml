@@ -7,9 +7,11 @@ services:
       - "80:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
+      - RabbitMQ__HostName=rabbitmq
       # Các biến môi trường khác sẽ được truyền vào từ máy chủ EC2 (qua file .env)
     depends_on:
       - redis
+      - rabbitmq
     restart: always
 
   redis:
@@ -17,4 +19,22 @@ services:
     container_name: sportbooking_redis
     ports:
       - "6379:6379"
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: sportbooking_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    restart: always
+
+  worker:
+    image: minhtan3110/sportbooking-worker:latest
+    container_name: sportbooking_worker
+    environment:
+      - RabbitMQ__HostName=rabbitmq
+      # Các biến môi trường khác (SendGrid, v.v) sẽ lấy từ file .env của EC2
+    depends_on:
+      - rabbitmq
     restart: always

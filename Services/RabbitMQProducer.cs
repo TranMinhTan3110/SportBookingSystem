@@ -8,11 +8,18 @@ namespace SportBookingSystem.Services
     public class RabbitMQProducer
     {
         private const string QueueName = "invoice_email_queue";
+        private readonly IConfiguration _config;
+
+        public RabbitMQProducer(IConfiguration config)
+        {
+            _config = config;
+        }
 
         
         public async Task SendMessageAsync(EmailMessageDTO message)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var hostName = _config["RabbitMQ:HostName"] ?? "localhost";
+            var factory = new ConnectionFactory() { HostName = hostName };
             
             
             using var connection = await factory.CreateConnectionAsync();

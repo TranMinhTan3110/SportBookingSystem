@@ -23,7 +23,8 @@ namespace SportBookingEmailWorker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var hostName = _config["RabbitMQ:HostName"] ?? "localhost";
+            var factory = new ConnectionFactory() { HostName = hostName };
             using var connection = await factory.CreateConnectionAsync();
             using var channel = await connection.CreateChannelAsync();
 
