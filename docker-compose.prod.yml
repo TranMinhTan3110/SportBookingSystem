@@ -8,7 +8,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - RabbitMQ__HostName=rabbitmq
-      # Các biến môi trường khác sẽ được truyền vào từ máy chủ EC2 (qua file .env)
+    env_file:
+      - .env
     depends_on:
       - redis
       - rabbitmq
@@ -34,7 +35,8 @@ services:
     container_name: sportbooking_worker
     environment:
       - RabbitMQ__HostName=rabbitmq
-      # Các biến môi trường khác (SendGrid, v.v) sẽ lấy từ file .env của EC2
+    env_file:
+      - .env
     depends_on:
       - rabbitmq
     restart: always
