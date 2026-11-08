@@ -5,7 +5,7 @@ using System.Text.Json;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using SportBookingSystem.DTO; // Dùng chung namespace DTO của bạn
+using SportBookingSystem.DTO; 
 
 namespace SportBookingEmailWorker
 {
