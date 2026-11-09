@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -235,10 +235,10 @@
                     const bookingCode = decodedText.replace("BOOKING:", "").trim();
                     AdminQR.handleBookingScan(bookingCode);
                 }
-                else if (decodedText.startsWith("PURCHASE:")) {
+                else if (decodedText.startsWith("PURCHASE:") || decodedText.startsWith("CART:")) {
                     const parts = decodedText.split(":");
                     const orderId = parts[1];
-                    const orderCode = parts[2] || orderId;
+                    const orderCode = (parts.length > 2 && parts[2]) ? parts[2] : ('ORD-' + orderId);
 
                     Swal.close(); // Đóng loading nếu có
 

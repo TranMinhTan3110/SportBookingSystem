@@ -5,7 +5,7 @@ using System.Text.Json;
 using MimeKit;
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using SportBookingSystem.DTO; // Dùng chung namespace DTO của bạn
+using SportBookingSystem.DTO; 
 
 namespace SportBookingEmailWorker
 {
@@ -23,7 +23,8 @@ namespace SportBookingEmailWorker
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
+            var hostName = _config["RabbitMQ:HostName"] ?? "localhost";
+            var factory = new ConnectionFactory() { HostName = hostName };
             using var connection = await factory.CreateConnectionAsync();
             using var channel = await connection.CreateChannelAsync();
 
