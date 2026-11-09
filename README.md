@@ -123,28 +123,31 @@
    cd SportBookingSystem
    ```
 
-2. **Khởi động Database & Redis qua Docker**:
+2. **Khởi tạo file cấu hình môi trường**:
+   ```bash
+   # Windows PowerShell / CMD:
+   copy .env.example .env
+
+   # Linux / macOS:
+   cp .env.example .env
+   ```
+
+3. **Khởi động Database & Redis qua Docker**:
    ```bash
    docker compose up -d
    ```
    *(Container SQL Server sẽ chạy ở cổng `1435`, Redis chạy ở cổng `6379`)*
 
-3. **Cấu hình Secret Keys**:
-   Thiết lập connection string và cấu hình (hoặc tạo file `.env`):
-   ```bash
-   dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=localhost,1435;Database=SportBookingDb;User Id=sa;Password=SportBooking3110!;TrustServerCertificate=True"
-   ```
-
 4. **Chạy ứng dụng Web**:
    ```bash
    dotnet run --launch-profile "http"
    ```
-   👉 Truy cập web tại: **`http://localhost:5175`**
+   👉 Truy cập web tại: **`http://localhost:5175`**  
+   *(Hệ thống sẽ tự động khởi tạo cơ sở dữ liệu, các khung giờ đặt sân và tạo sẵn tài khoản Admin: `0900000000` / mật khẩu: `123456`)*
 
 5. **(Tùy chọn) Chạy Robot gửi Email**:
    ```bash
-   cd SportBookingEmailWorker
-   dotnet run
+   dotnet run --project SportBookingEmailWorker
    ```
 
 ---

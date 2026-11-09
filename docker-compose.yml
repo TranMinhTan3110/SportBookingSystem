@@ -6,10 +6,10 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - TZ=Asia/Bangkok
-      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD:-SportBooking3110!}
       - MSSQL_PID=Developer
     ports:
-      - "${SQL_PORT}:1433" 
+      - "${SQL_PORT:-1435}:1433" 
     volumes:
       - sql_data:/var/opt/mssql 
     restart: unless-stopped
