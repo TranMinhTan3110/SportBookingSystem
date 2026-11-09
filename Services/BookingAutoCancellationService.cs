@@ -38,9 +38,9 @@ namespace SportBookingSystem.Services
                             .Where(code => !string.IsNullOrEmpty(code))
                             .ToList();
 
-                        if (!codesToCancel.Any()) continue;
-
-                        var slotsToCancel = expiredBookings.Where(ps => codesToCancel.Contains(ps.BookingCode)).ToList();
+                        if (codesToCancel.Any())
+                        {
+                            var slotsToCancel = expiredBookings.Where(ps => codesToCancel.Contains(ps.BookingCode)).ToList();
                         
                         var transactionsToCancel = await context.Transactions
                             .Where(t => codesToCancel.Contains(t.TransactionCode) && t.TransactionType == TransactionTypes.Booking)
@@ -77,6 +77,7 @@ namespace SportBookingSystem.Services
 
                         await context.SaveChangesAsync(stoppingToken);
                         await dbTransaction.CommitAsync(stoppingToken);
+                        }
                     }
                 }
                 catch (Exception ex)
