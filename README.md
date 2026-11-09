@@ -14,8 +14,7 @@
 ## 📺 Video Demo & Hình Ảnh Dự Án
 
 ### 1. Video Demo Trải Nghiệm (Demo Walkthrough)
-[![Xem Video Demo](https://img.shields.io/badge/▶_Xem_Video_Demo-YouTube-red?style=for-the-badge&logo=youtube)](https://www.youtube.com/)
-*(Mẹo: Bạn có thể thay link YouTube / Google Drive / Loom video của bạn vào đây)*
+[![Xem Video Demo](https://img.shields.io/badge/▶_Xem_Video_Demo-YouTube-red?style=for-the-badge&logo=youtube)](#)
 
 ---
 
